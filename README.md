@@ -13,6 +13,6 @@ Binaries for Download:
 
 Windows 64bit: 
 
-ink: http://pan.baidu.com/s/1pLTRoBx 
+link: http://pan.baidu.com/s/1pLTRoBx 
 
 password：ulat
