@@ -13,6 +13,4 @@ Binaries for Download:
 
 Windows 64bit: 
 
-link: http://pan.baidu.com/s/1pLTRoBx 
-
-password：ulat
+http://pan.baidu.com/s/1hr6iFLa
