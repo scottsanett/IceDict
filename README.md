@@ -1,4 +1,4 @@
-#Old-Icelandic-Dictionary-Qt-
+#Old-Icelandic-Dictionary(Qt)
 
 The resources may be downloaded from the link below
 
