@@ -1,0 +1,1 @@
+# Old-Icelandic-Dictionary-Qt-
