@@ -43,6 +43,32 @@
     <item row="0" column="3">
      <layout class="QHBoxLayout" name="buttonLayout">
       <item>
+       <widget class="QPushButton" name="onlineIcl">
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Icelandic</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="onlineTxt">
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Advanced</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="searchIcl">
         <property name="font">
          <font>
@@ -51,7 +77,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Search</string>
+         <string>Norse</string>
         </property>
        </widget>
       </item>

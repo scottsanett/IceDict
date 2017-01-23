@@ -42,20 +42,22 @@ MainWindow::~MainWindow()
 void MainWindow::buttonChangeColor() {
     ui->searchIcl->setStyleSheet("");
     ui->searchTxt->setStyleSheet("");
-//    ui->searchReg->setStyleSheet("");
+    ui->onlineIcl->setStyleSheet("");
+    ui->onlineTxt->setStyleSheet("");
     ui->searchOrig->setStyleSheet("");
     ui->plot->setStyleSheet("");
     ui->printOne->setStyleSheet("");
     if (flags[0] == 1) { ui->searchIcl->setStyleSheet("background-color: grey"); }
     else if (flags[1] == 1) { ui->searchTxt->setStyleSheet("background-color: grey"); }
-//    else if (flags[2] == 1) { ui->searchReg->setStyleSheet("background-color: grey"); }
+    else if (flags[2] == 1) { ui->onlineIcl->setStyleSheet("background-color: grey"); }
     else if (flags[3] == 1) { ui->searchOrig->setStyleSheet("background-color: grey"); }
     else if (flags[4] == 1) { ui->plot->setStyleSheet("background-color: grey"); }
     else if (flags[5] == 1) { ui->printOne->setStyleSheet("background-color: grey"); }
+    else if (flags[6] == 1) { ui->onlineTxt->setStyleSheet("background-color: grey"); }
     else{}
 }
 
-void MainWindow::addStyleToResults(std::string & line) {
+std::string MainWindow::addStyleToResults(std::string line) {
     std::istringstream iss(line);
     std::string key;
     iss >> key;
@@ -84,11 +86,12 @@ void MainWindow::addStyleToResults(std::string & line) {
     arg4 = arg4.substr(0, arg4.length() - 1);
     arg4 = "<td>" + arg4 + "</td>";
     line = "<tr>" + key + arg2 + arg3 + arg4 + "</tr>";
+    return line;
 }
 
 void MainWindow::on_searchIcl_clicked()
 {
-    flags = {1, 0, 0, 0, 0, 0};
+    flags = {1, 0, 0, 0, 0, 0, 0};
     buttonChangeColor();
     ui->input->setPlaceholderText(tr("Insert word here..."));
     ui->input->clear();
@@ -98,6 +101,28 @@ void MainWindow::on_searchIcl_clicked()
 //    ui->options->addItems(dictentries);
 }
 
+void MainWindow::on_onlineIcl_clicked()
+{
+    flags = {0, 0, 1, 0, 0, 0, 0};
+    buttonChangeColor();
+    ui->input->setPlaceholderText(tr("Insert word here..."));
+    ui->input->clear();
+    ui->results->clear();
+    ui->options->clear();
+}
+
+
+void MainWindow::on_onlineTxt_clicked()
+{
+    flags = {0, 0, 0, 0, 0, 0, 1};
+    buttonChangeColor();
+    ui->input->setPlaceholderText(tr("Insert text here..."));
+    ui->input->clear();
+    ui->results->clear();
+    ui->options->clear();
+}
+
+
 void MainWindow::on_searchTxt_clicked()
 {
     if (!inflectionReady) {
@@ -106,25 +131,13 @@ void MainWindow::on_searchTxt_clicked()
         if (!dlg.exec()) { return; }
         importInflections();
     }
-    flags = {0, 1, 0, 0, 0, 0};
+    flags = {0, 1, 0, 0, 0, 0, 0};
     buttonChangeColor();
     ui->input->setPlaceholderText("Insert text here...");
     ui->input->clear();
     ui->results->clear();
     ui->options->clear();
 }
-
-/*
-void MainWindow::on_searchReg_clicked()
-{
-    flags = {0, 0, 1, 0, 0, 0};
-    buttonChangeColor();
-    ui->input->setPlaceholderText("Insert regex here...");
-    ui->input->clear();
-    ui->results->clear();
-    ui->options->clear();
-}
-*/
 
 void MainWindow::on_searchOrig_clicked()
 {
@@ -134,7 +147,7 @@ void MainWindow::on_searchOrig_clicked()
         if (!dlg.exec()) { return; }
         importInflections();
     }
-    flags = {0, 0, 0, 1, 0, 0};
+    flags = {0, 0, 0, 1, 0, 0, 0};
     buttonChangeColor();
     ui->results->clear();
     ui->options->clear();
@@ -151,7 +164,7 @@ void MainWindow::on_plot_clicked()
         importInflections();
         ui->results->setText("The dictionary is now ready.");
     }
-    flags = {0, 0, 0, 0, 1, 0};
+    flags = {0, 0, 0, 0, 1, 0, 0};
     buttonChangeColor();
     ui->results->clear();
     ui->options->clear();
@@ -170,7 +183,7 @@ void MainWindow::on_printOne_clicked()
         ui->results->setText("The dictionary is now ready.");
     }
     typeTimes = 0;
-    flags = {0, 0, 0, 0, 0, 1};
+    flags = {0, 0, 0, 0, 0, 1, 0};
     buttonChangeColor();
     stored.clear();
     ui->results->clear();
@@ -257,6 +270,29 @@ void MainWindow::toLower(std::string & str) {
         }
     } };
     f(str);
+}
+
+std::string MainWindow::wordToWrite(std::string str) {
+    for (auto && i : writeRules) {
+        while (str.find(i.first) != std::string::npos) {
+            auto pos = str.find(i.first);
+            str.replace(pos, i.first.length(), i.second);
+        }
+    }
+    return str;
+}
+
+std::string MainWindow::wordToRead(std::string str) {
+    for (auto && i : readRules) {
+        while (str.find(i.first) != std::string::npos) {
+            auto pos = str.find(i.first);
+            str.replace(pos, i.first.length(), i.second);
+        }
+    }
+    for (auto && i : str) {
+        i = std::tolower(i);
+    }
+    return str;
 }
 
 void MainWindow::importForms() {
@@ -481,7 +517,7 @@ void MainWindow::findInflection(std::string const & word) {
     std::string toprint;
     for (auto && i : *results) {
         for (auto && j : *i) {
-            addStyleToResults(j);
+            j = addStyleToResults(j);
             toprint += j + "\n\n";
         }
     }
@@ -586,7 +622,7 @@ void MainWindow::printAll(std::string const & str) {
     std::string toprint;
     for (auto && i : * results) {
         for (auto && j : *i) {
-            addStyleToResults(j);
+            j = addStyleToResults(j);
             toprint += j + '\n';
         }
     }
@@ -645,7 +681,6 @@ void MainWindow::printOneThread(ptrvecstrvecptr_t results, std::string word, std
             iss >> temp;
             if (temp == key) {
                 if (line.find(form) != std::string::npos) {
-//                    addStyleToResults(line);
                     thisResult->push_back(line);
                     break;
                 }
@@ -682,7 +717,7 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
     std::string toprint;
     for (auto && i : * results) {
         for (auto && j : *i) {
-            addStyleToResults(j);
+            j = addStyleToResults(j);
             toprint += j + '\n';
         }
     }
@@ -692,23 +727,35 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
     ui->input->clear();
 }
 
+void MainWindow::on_input_textChanged(const QString &arg1)
+{
+    if (flags[2] == 1) {
+        onlineEntries.clear();
+    }
+    else if (flags[6] == 1) {
+        onlineEntries.clear();
+    }
+}
 
 void MainWindow::on_input_editingFinished()
 {
     std::string word = ui->input->text().toStdString();
-    if (flags[0] == 1) {
+    if (flags[0] == 1 && word.length() > 0) {
         findDefinition(word);
     }
-    else if (flags[1] == 1) {
+    else if (flags[1] == 1 && word.length() > 0) {
         textualSearch(word);
     }
-    else if (flags[3] == 1 && inflectionReady) {
+    else if (flags[2] == 1 && word.length() > 0) {
+        onlineDefinition(word);
+    }
+    else if (flags[3] == 1 && inflectionReady && word.length() > 0) {
         findInflection(word);
     }
-    else if (flags[4] == 1 && inflectionReady) {
+    else if (flags[4] == 1 && inflectionReady && word.length() > 0) {
         printAll(word);
     }
-    else if (flags[5] == 1 && inflectionReady) {
+    else if (flags[5] == 1 && inflectionReady && word.length() > 0) {
         ++typeTimes;
         if (typeTimes > 0) {
             ui->input->clear();
@@ -719,6 +766,9 @@ void MainWindow::on_input_editingFinished()
             ui->input->setPlaceholderText("Insert word here...");
         }
     }
+    else if (flags[6] == 1 && word.length() > 0) {
+        onlineText(word);
+    }
 }
 
 void MainWindow::on_options_itemClicked(QListWidgetItem *item)
@@ -728,10 +778,144 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
         ui->input->setText(item->text());
         findDefinition(item->text().toStdString());
     }
+    else if (flags[2] == 1) {
+        std::string key = item->text().toStdString();
+        std::string url;
+        auto itr = onlineEntries.find(key);
+        if (itr != onlineEntries.end()) {
+            url = itr->second;
+        }
+        downloadPage(url);
+    }
     else if (flags[5] == 1) {
         ui->input->setText(item->text());
         printOneForm = item->text().toStdString();
         printOne(printOneWord, printOneForm);
     }
+    else if (flags[6] == 1) {
+        std::string key = item->text().toStdString();
+        std::string url;
+        auto itr = onlineEntries.find(key);
+        if (itr != onlineEntries.end()) {
+            url = itr->second;
+        }
+        downloadPage(url);
+    }
 }
 
+void MainWindow::downloadPage(std::string url) {
+    QUrl pageUrl(url.c_str());
+    pageControl = new PageDownloader(pageUrl, this);
+    connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
+}
+
+void MainWindow::loadPage() {
+    QByteArray qPage = (pageControl->downloadedData());
+    QString str = QString::fromLatin1(qPage);
+    webpage = str.toStdString();
+    parsePage();
+    ui->results->setHtml(webpage.c_str());
+    webpage = "";
+}
+
+void MainWindow::onlineText(const std::string & word) {
+    std::string newWord = wordToWrite(word);
+    std::string url = textUrl1 + newWord + textUrl2;
+    downloadPage(url.c_str());
+}
+
+void MainWindow::onlineDefinition(const std::string &word) {
+    std::string newWord = wordToWrite(word);
+    std::string url = writeUrl1 + newWord + writeUrl2;
+    downloadPage(url.c_str());
+}
+
+void MainWindow::parsePage() {
+    if (webpage.find("produced no results.") != std::string::npos) {
+        auto pos = webpage.find("<h3>While searching in Icelandic Online Dictionary and Readings</h3>");
+        if (pos != std::string::npos) webpage = webpage.substr(pos, webpage.length() - pos);
+        pos = webpage.find("<div class=\"mainBackground\">");
+        if (pos != std::string::npos) webpage = webpage.substr(0, pos);
+    }
+    else if (webpage.find("<div class=\"results\">") != std::string::npos) {
+        auto pos = webpage.find("<div class=\"results\">");
+        if (pos != std::string::npos) webpage = webpage.substr(pos, webpage.length() - pos);
+        pos = webpage.find("</div> <!-- results -->");
+        if (pos != std::string::npos) webpage = webpage.substr(0, pos);
+        std::vector<std::string> toBeDeleted = {
+            "<div class=\"results\">", "<div class=\"nestlevel\">", "<span class=\"lemma\">",
+            "<small><sup>", "</sup></small>", "</a></span>", "<span class=\"pos\">", "</span>",
+            "</div>", "<!-- results -->", "<a href=\""
+        };
+        auto results = webpage;
+        for (auto && i : toBeDeleted) {
+            while (results.find(i) != std::string::npos) {
+                auto pos = results.find(i);
+                if (pos != std::string::npos) { results.erase(pos, i.length()); }
+            }
+        }
+        std::istringstream iss(results);
+        std::vector<std::string> entries;
+        std::string line;
+        while (std::getline(iss, line)) {
+            if (line.length() > 0) {
+                pos = line.find("\">");
+                if (pos != std::string::npos) {
+                    line.replace(pos, 2, " ");
+                }
+                entries.push_back(line);
+            }
+        }
+        for (auto i : entries) {
+            std::istringstream iss(i);
+            std::string link, key;
+            iss >> link;
+            link = "http://digicoll.library.wisc.edu" + link;
+            std::string temp;
+            iss >> key;
+            if (key.back() == ',') {
+                std::string temp;
+                iss >> temp;
+                key += ' ' + temp;
+            }
+            onlineEntries.insert(std::make_pair(key, link));
+        }
+        QStringList alternatives;
+        for (auto && i : onlineEntries) {
+            alternatives.push_back(i.first.c_str());
+        }
+        ui->options->addItems(alternatives);
+    }
+    else {
+        auto pos = webpage.find("<div class=\"entry\">");
+        if (pos != std::string::npos) { webpage = webpage.substr(pos, webpage.length() - pos); }
+        pos = webpage.find("</div><!-- entry -->");
+        if (pos != std::string::npos) { webpage = webpage.substr(0, pos); }
+        pos = webpage.find("<span class=\"lemma\">");
+        if (pos != std::string::npos) {
+            std::string tag = "<span class=\"lemma\">";
+            webpage.replace(pos, tag.length(), "<span style=\" font-weight:600; font-size:24pt;\" class=\"lemma\">");
+        }
+        while (webpage.find("<span class=\"orth\">") != std::string::npos) {
+            std::string tag = "<span class=\"orth\">";
+            auto pos = webpage.find(tag);
+            if (pos != std::string::npos) {
+                webpage.replace(pos, tag.length(), "<span style=\" font-weight:600;\" class=\"orth\">");
+            }
+        }
+        while (webpage.find("<span class=\"trans\">") != std::string::npos) {
+            std::string tag = "<span class=\"trans\">";
+            auto pos = webpage.find(tag);
+            if (pos != std::string::npos) {
+                webpage.replace(pos, tag.length(), "<span style=\" font-style:italic;\" class=\"trans\">");
+            }
+        }
+        std::string word = ui->input->text().toStdString();
+        if (flags[6] == 1) {
+            auto pos = webpage.find(word);
+            if (pos != std::string::npos) {
+                webpage.replace(pos, word.length(), "<span style=\" font-weight:600; color:#ff0000;\">" + word + "</span>");
+            }
+        }
+    }
+}

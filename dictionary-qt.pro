@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui\
+           network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,15 +28,15 @@ win32:RC_ICONS += alphabet/icon.ico
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    dialog.cpp
+    dialog.cpp \
+    pagedownloader.cpp
 
 HEADERS  += mainwindow.h \
-    entry.hpp \
-    dialog.h
+    dialog.h \
+    pagedownloader.h
 
 FORMS += \
     mainwindow.ui \
     dialog.ui
 
-DISTFILES += \
-    dictionary-qt.pro.user
+DISTFILES +=
