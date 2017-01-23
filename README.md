@@ -9,7 +9,7 @@ password: w5l9
 
 
 
-Binaries for Download:
+Binaries for download:
 
 Windows 64bit: 
 
