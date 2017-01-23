@@ -13,4 +13,4 @@ Binaries for Download:
 
 Windows 64bit: 
 
-http://pan.baidu.com/s/1hr6iFLa
+https://sourceforge.net/projects/old-icelandic-dictionary-qt/
