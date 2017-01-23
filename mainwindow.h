@@ -73,15 +73,13 @@ private slots:
     void on_options_itemClicked(QListWidgetItem *item);
     void on_searchOrig_clicked();
     void on_searchTxt_clicked();
-//    void on_searchReg_clicked();
     void on_plot_clicked();
     void on_printOne_clicked();
-    void loadPage();
     void on_onlineIcl_clicked();
-
-    void on_input_textChanged(const QString &arg1);
-
     void on_onlineTxt_clicked();
+    void loadPage();
+//    void on_input_textChanged(const QString &arg1);
+//    void on_input_returnPressed();
 
 private:
     PageDownloader * pageControl;
@@ -120,7 +118,7 @@ private:
     std::string addStyleToResults(std::string str);
     std::string wordToWrite(std::string);
     std::string wordToRead(std::string);
-    std::multimap<std::string, std::string> onlineEntries;
+    std::map<std::string, std::string> onlineEntries;
     void downloadPage(std::string url);
     void parsePage();
     void buttonChangeColor();
@@ -133,7 +131,7 @@ private:
     void importOriginalThread(mapptrvecptr_t mapvec, size_t i);
     void importDictionary();
     void importDictionaryThread(std::string const name, size_t i);
-    void toLower(std::string & str);
+    std::string toLower(std::string str);
     void findDefinition(std::string const & word);
     void findInflection(std::string const & word);
     void onlineDefinition(std::string const & word);

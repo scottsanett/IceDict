@@ -104,22 +104,24 @@ void MainWindow::on_searchIcl_clicked()
 void MainWindow::on_onlineIcl_clicked()
 {
     flags = {0, 0, 1, 0, 0, 0, 0};
-    buttonChangeColor();
-    ui->input->setPlaceholderText(tr("Insert word here..."));
-    ui->input->clear();
     ui->results->clear();
     ui->options->clear();
+    onlineEntries.clear();
+    ui->input->clear();
+    buttonChangeColor();
+    ui->input->setPlaceholderText(tr("Insert word here..."));
 }
 
 
 void MainWindow::on_onlineTxt_clicked()
 {
     flags = {0, 0, 0, 0, 0, 0, 1};
-    buttonChangeColor();
-    ui->input->setPlaceholderText(tr("Insert text here..."));
-    ui->input->clear();
     ui->results->clear();
     ui->options->clear();
+    onlineEntries.clear();
+    ui->input->clear();
+    buttonChangeColor();
+    ui->input->setPlaceholderText(tr("Insert text here..."));
 }
 
 
@@ -180,7 +182,6 @@ void MainWindow::on_printOne_clicked()
         dlg.setModal(true);
         if (!dlg.exec()) { return; }
         importInflections();
-        ui->results->setText("The dictionary is now ready.");
     }
     typeTimes = 0;
     flags = {0, 0, 0, 0, 0, 1, 0};
@@ -208,6 +209,14 @@ void MainWindow::on_input_textEdited(const QString &arg1)
             }
             ui->options->addItems(display);
         }
+    }
+    else if (flags[1] == 1) {
+        ui->options->clear();
+        onlineEntries.clear();
+    }
+    else if (flags[6] == 1) {
+        ui->options->clear();
+        onlineEntries.clear();
     }
     else if (flags[3] == 1 && inflectionReady) //query on
     {
@@ -245,13 +254,13 @@ void MainWindow::allFormsAutocompleteThread(ptrvecstrvecptr_t results, std::stri
 }
 
 /*  Transfer a string to lower case   */
-void MainWindow::toLower(std::string & str) {
+std::string MainWindow::toLower(std::string str) {
     const std::vector<std::string> upper = { "Þ", "Ð", "Æ", "Ö", "Á", "É", "Í", "Ó", "Ú", "Ý", "Œ" };
     const std::vector<std::string> lower = { "þ", "ð", "æ", "ö", "á", "é", "í", "ó", "ú", "ý", "œ" };
     auto f = [&](std::string & name) { for (auto i = 0; i < name.length(); ++i) {
         if (isalpha(name[i])) {
             if (isupper(name[i])) {
-                name[i] = tolower(name[i]);
+                tolower(name[i]);
             }
         }
         else {
@@ -270,6 +279,7 @@ void MainWindow::toLower(std::string & str) {
         }
     } };
     f(str);
+    return str;
 }
 
 std::string MainWindow::wordToWrite(std::string str) {
@@ -526,11 +536,13 @@ void MainWindow::findInflection(std::string const & word) {
 }
 
 void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, std::string word, size_t index) {
+//    qDebug() << word.c_str();
     auto thisDic = inflectionals->at(index);
     auto thisResult = results->at(index);
     auto itr = thisDic->find(word);
     if (itr == thisDic->end()) { return; }
     std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
+//    qDebug() << word.c_str();
     QFile file(filename.c_str());
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
@@ -634,27 +646,33 @@ void MainWindow::printAll(std::string const & str) {
 void MainWindow::printAllThread(ptrvecstrvecptr_t results, std::string word, size_t index) {
     auto thisDic = originals->at(index);
     auto thisResult = results->at(index);
-    auto itr = thisDic->find(word);
-    if (itr == thisDic->end()) { return; }
+    auto range = thisDic->equal_range(word);
+    auto count = thisDic->count(word);
+//    qDebug() << thisDic->count(word);
+    if (count == 0) { return; }
     std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
     QFile file(filename.c_str());
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
     std::string line;
-    auto key = itr->first;
-    auto pos = itr->second;
     auto currentPos = 0;
-    while (std::getline(issfile, line)) {
-        if (currentPos < pos) { ++currentPos; continue; }
-        else {
-            std::istringstream iss(line);
-            std::string temp;
-            iss >> temp;
-            if (temp != key) { break; }
-            thisResult->push_back(line);
-            ++currentPos;
+    for (auto itr = range.first; itr != range.second; ++itr) {
+        auto key = itr->first;
+        auto pos = itr->second;
+//        qDebug() << pos;
+        while (std::getline(issfile, line)) {
+            if (currentPos < pos) { ++currentPos; continue; }
+            else {
+                std::istringstream iss(line);
+                std::string temp;
+                iss >> temp;
+                if (temp != key) { ++currentPos; break; }
+                thisResult->push_back(line);
+                ++currentPos;
+            }
         }
+        thisResult->push_back("; ; ; ");
     }
     file.close();
 }
@@ -662,31 +680,35 @@ void MainWindow::printAllThread(ptrvecstrvecptr_t results, std::string word, siz
 void MainWindow::printOneThread(ptrvecstrvecptr_t results, std::string word, std::string form, size_t index) {
     auto thisDic = originals->at(index);
     auto thisResult = results->at(index);
-    auto itr = thisDic->find(word);
-    if (itr == thisDic->end()) { return; }
+    auto range = thisDic->equal_range(word);
+    auto count = thisDic->count(word);
+    if (count == 0) { return; }
     std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
     QFile file(filename.c_str());
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
     std::string line;
-    auto key = itr->first;
-    auto pos = itr->second;
     auto currentPos = 0;
-    while (std::getline(issfile, line)) {
-        if (currentPos < pos) { ++currentPos; continue; }
-        else {
-            std::istringstream iss(line);
-            std::string temp;
-            iss >> temp;
-            if (temp == key) {
-                if (line.find(form) != std::string::npos) {
-                    thisResult->push_back(line);
-                    break;
+    for (auto itr = range.first; itr != range.second; ++itr) {
+        auto key = itr->first;
+        auto pos = itr->second;
+        while (std::getline(issfile, line)) {
+            if (currentPos < pos) { ++currentPos; continue; }
+            else {
+                std::istringstream iss(line);
+                std::string temp;
+                iss >> temp;
+                if (temp == key) {
+                    if (line.find(form) != std::string::npos) {
+                        thisResult->push_back(line);
+                        ++currentPos;
+                        break;
+                    }
+                    else { ++currentPos; }
                 }
-                else { ++currentPos; }
+                else { break; }
             }
-            else { break; }
         }
     }
     file.close();
@@ -727,15 +749,32 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
     ui->input->clear();
 }
 
+/*
 void MainWindow::on_input_textChanged(const QString &arg1)
 {
     if (flags[2] == 1) {
+        ui->options->clear();
         onlineEntries.clear();
     }
     else if (flags[6] == 1) {
+        ui->options->clear();
         onlineEntries.clear();
     }
 }
+*/
+/*
+void MainWindow::on_input_returnPressed()
+{
+    if (flags[2] == 1) {
+        onlineEntries.clear();
+        ui->options->clear();
+    }
+    else if (flags[6] == 1) {
+        onlineEntries.clear();
+        ui->options->clear();
+    }
+}
+*/
 
 void MainWindow::on_input_editingFinished()
 {
@@ -747,6 +786,8 @@ void MainWindow::on_input_editingFinished()
         textualSearch(word);
     }
     else if (flags[2] == 1 && word.length() > 0) {
+        ui->options->clear();
+        onlineEntries.clear();
         onlineDefinition(word);
     }
     else if (flags[3] == 1 && inflectionReady && word.length() > 0) {
@@ -767,6 +808,8 @@ void MainWindow::on_input_editingFinished()
         }
     }
     else if (flags[6] == 1 && word.length() > 0) {
+        ui->options->clear();
+        onlineEntries.clear();
         onlineText(word);
     }
 }
@@ -804,6 +847,8 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
 }
 
 void MainWindow::downloadPage(std::string url) {
+    ui->input->clear();
+    std::string input = ui->input->text().toStdString();
     QUrl pageUrl(url.c_str());
     pageControl = new PageDownloader(pageUrl, this);
     connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
@@ -815,7 +860,7 @@ void MainWindow::loadPage() {
     webpage = str.toStdString();
     parsePage();
     ui->results->setHtml(webpage.c_str());
-    webpage = "";
+    webpage.clear();
 }
 
 void MainWindow::onlineText(const std::string & word) {
