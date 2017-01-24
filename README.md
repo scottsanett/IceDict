@@ -26,6 +26,7 @@ Windows 64bit:
 
 https://sourceforge.net/projects/old-icelandic-dictionary-qt/
 
+One may also choose to compile from source for other platforms. QtCreator is recommended for that purpose.
 
 #Source of data
 
