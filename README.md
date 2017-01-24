@@ -19,6 +19,8 @@ This is a dictionary written in C++/Qt that focuses on the search and query of o
 
 "One infl.": offline, print out one particular inflectional form of the word inserted. A list of possible forms are listed below the input box as one types, and the answer may ony be displayed if one chooses one of the options.
 
+#Screenshots:
+https://github.com/scottsanett/Old-Icelandic-Dictionary-Qt-/issues/1
 
 #Download:
 
