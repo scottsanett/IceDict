@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     originals = mapptrvecptr_t(new mapptrvec_t);
     wordindex = strsetptr_t(new strset_t);
     dictionaries = strvecptrmapptrvecptr_t(new strvecptrmapptrvec_t);
+//    resultsToPrint = vecpairptrvecptr_t(new vecpairptrvec_t);
     forms = strsetptr_t(new strset_t);
     allInflectionalWords = strsetptr_t(new strset_t);
     for (size_t i = 0; i < 7; ++i) {
@@ -227,6 +228,10 @@ void MainWindow::on_input_textEdited(const QString &arg1)
             ui->options->addItems(display);
         }
     }
+    else if (flags[4] == 1 && inflectionReady) {
+        ui->options->clear();
+        resultsToPrint.clear();
+    }
     else if (flags[5] == 1 && inflectionReady) {
         if (typeTimes == 0) { printOneWord = word; }
         else {
@@ -288,19 +293,6 @@ std::string MainWindow::wordToWrite(std::string str) {
             auto pos = str.find(i.first);
             str.replace(pos, i.first.length(), i.second);
         }
-    }
-    return str;
-}
-
-std::string MainWindow::wordToRead(std::string str) {
-    for (auto && i : readRules) {
-        while (str.find(i.first) != std::string::npos) {
-            auto pos = str.find(i.first);
-            str.replace(pos, i.first.length(), i.second);
-        }
-    }
-    for (auto && i : str) {
-        i = std::tolower(i);
     }
     return str;
 }
@@ -612,43 +604,34 @@ void MainWindow::textualSearch(std::string const & word) {
 
 
 void MainWindow::printAll(std::string const & str) {
+    ui->input->clear();
     auto word = str + ';';
-    auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
-    for (auto i = 0; i < 7; ++i) {
-        results->push_back(strvecptr_t(new strvec_t));
-    }
-    std::thread t0(&MainWindow::printAllThread, this, results, word, 0);
-    std::thread t1(&MainWindow::printAllThread, this, results, word, 1);
-    std::thread t2(&MainWindow::printAllThread, this, results, word, 2);
-    std::thread t3(&MainWindow::printAllThread, this, results, word, 3);
-    std::thread t4(&MainWindow::printAllThread, this, results, word, 4);
-    std::thread t5(&MainWindow::printAllThread, this, results, word, 5);
-    std::thread t6(&MainWindow::printAllThread, this, results, word, 6);
+    auto & results = resultsToPrint;
+    std::thread t0(&MainWindow::printAllThread, this, word, 0);
+    std::thread t1(&MainWindow::printAllThread, this, word, 1);
+    std::thread t2(&MainWindow::printAllThread, this, word, 2);
+    std::thread t3(&MainWindow::printAllThread, this, word, 3);
+    std::thread t4(&MainWindow::printAllThread, this, word, 4);
+    std::thread t5(&MainWindow::printAllThread, this, word, 5);
+    std::thread t6(&MainWindow::printAllThread, this, word, 6);
     t0.join();
     t1.join(); t2.join(); t3.join(); t4.join(); t5.join(); t6.join();
-    auto resultSize = [&]() { size_t sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
+    auto resultSize = [&]() { size_t sz = 0; for (auto i : results) { sz += i.second.size(); } return sz; }();
     if (resultSize == 0) {
         ui->results->setText("Word not found.");
         return;
     }
-    std::string toprint;
-    for (auto && i : * results) {
-        for (auto && j : *i) {
-            j = addStyleToResults(j);
-            toprint += j + '\n';
-        }
+//    qDebug() << results.size();
+    for (auto && i : results) {
+            ui->options->addItem(i.first.c_str());
     }
-
-    toprint = "<p align=\"center\"><table border=\"1\" cellpadding=\"20\">" + toprint + "</table></p>";
-    ui->results->setHtml(toprint.c_str());
 }
 
-void MainWindow::printAllThread(ptrvecstrvecptr_t results, std::string word, size_t index) {
+void MainWindow::printAllThread(std::string word, size_t index) {
     auto thisDic = originals->at(index);
-    auto thisResult = results->at(index);
+    auto & thisResult = resultsToPrint; // pointer to a vector of
     auto range = thisDic->equal_range(word);
     auto count = thisDic->count(word);
-//    qDebug() << thisDic->count(word);
     if (count == 0) { return; }
     std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
     QFile file(filename.c_str());
@@ -659,22 +642,35 @@ void MainWindow::printAllThread(ptrvecstrvecptr_t results, std::string word, siz
     auto currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
+        strvec_t thisEntry;
         auto pos = itr->second;
-//        qDebug() << pos;
         while (std::getline(issfile, line)) {
             if (currentPos < pos) { ++currentPos; continue; }
             else {
                 std::istringstream iss(line);
                 std::string temp;
                 iss >> temp;
-                if (temp != key) { ++currentPos; break; }
-                thisResult->push_back(line);
+                if (temp != key) {
+                    ++currentPos;
+                    break; }
+                thisEntry.push_back(line);
                 ++currentPos;
             }
         }
-        thisResult->push_back("; ; ; ");
+        thisResult.push_back(std::make_pair(key, thisEntry));
     }
     file.close();
+}
+
+void MainWindow::printAllPrint(size_t index) {
+    auto thisResult = resultsToPrint[index];
+    std::string toprint;
+    for (auto i : thisResult.second) {
+       std::string temp = addStyleToResults(i);
+       toprint += temp;
+    }
+    toprint = "<p align=\"center\"><table border=\"1\" cellpadding=\"20\">" + toprint + "</table></p>";
+    ui->results->setHtml(toprint.c_str());
 }
 
 void MainWindow::printOneThread(ptrvecstrvecptr_t results, std::string word, std::string form, size_t index) {
@@ -749,32 +745,6 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
     ui->input->clear();
 }
 
-/*
-void MainWindow::on_input_textChanged(const QString &arg1)
-{
-    if (flags[2] == 1) {
-        ui->options->clear();
-        onlineEntries.clear();
-    }
-    else if (flags[6] == 1) {
-        ui->options->clear();
-        onlineEntries.clear();
-    }
-}
-*/
-/*
-void MainWindow::on_input_returnPressed()
-{
-    if (flags[2] == 1) {
-        onlineEntries.clear();
-        ui->options->clear();
-    }
-    else if (flags[6] == 1) {
-        onlineEntries.clear();
-        ui->options->clear();
-    }
-}
-*/
 
 void MainWindow::on_input_editingFinished()
 {
@@ -795,6 +765,8 @@ void MainWindow::on_input_editingFinished()
         findInflection(word);
     }
     else if (flags[4] == 1 && inflectionReady && word.length() > 0) {
+        ui->options->clear();
+        resultsToPrint.clear();
         printAll(word);
     }
     else if (flags[5] == 1 && inflectionReady && word.length() > 0) {
@@ -831,6 +803,13 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
             url = itr->second;
         }
         downloadPage(url);
+    }
+    else if (flags[4] == 1) {
+        ui->results->clear();
+        size_t index = ui->options->currentRow();
+        printAllPrint(index);
+
+// a function that prints according to the index.
     }
     else if (flags[5] == 1) {
         ui->input->setText(item->text());

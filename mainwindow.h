@@ -53,6 +53,13 @@ using strvecptrmap_t = std::multimap<std::string, strvecptr_t>;
 using strvecptrmapptr_t = std::shared_ptr<strvecptrmap_t>;
 using strvecptrmapptrvec_t = std::vector<strvecptrmapptr_t>;
 using strvecptrmapptrvecptr_t = std::shared_ptr<strvecptrmapptrvec_t>;
+/*
+using vecpair_t = std::vector<std::pair<std::string, strvecptr_t>>;
+using vecpairptr_t = std::shared_ptr<vecpair_t>;
+using vecpairptrvec_t = std::vector<vecpairptr_t>;
+using vecpairptrvecptr_t = std::shared_ptr<vecpairptrvec_t>;
+*/
+using vecpair_t = std::vector<std::pair<std::string, strvec_t>>;
 
 namespace Ui {
 class MainWindow;
@@ -78,8 +85,6 @@ private slots:
     void on_onlineIcl_clicked();
     void on_onlineTxt_clicked();
     void loadPage();
-//    void on_input_textChanged(const QString &arg1);
-//    void on_input_returnPressed();
 
 private:
     PageDownloader * pageControl;
@@ -91,10 +96,6 @@ private:
         std::make_pair("Í", "%CD"), std::make_pair("Ó", "%D3"), std::make_pair("Ú", "%DA"), std::make_pair("Ý", "%DD"),
         std::make_pair("æ", "%E6"), std::make_pair("ö", "%F6"), std::make_pair("Æ", "%C6"), std::make_pair("Ö", "%D6"),
         std::make_pair("þ", "%FE"), std::make_pair("ð", "%F0"), std::make_pair("Þ", "%DE"), std::make_pair("Ð", "%D0"),
-    };
-    std::vector<std::pair<std::string, std::string>> readRules = {
-        std::make_pair("AE1", "æ"), std::make_pair("TH1", "þ"), std::make_pair("A1", "á"), std::make_pair("E1", "é"), std::make_pair("I1", "í"), std::make_pair("O1", "ó"),
-        std::make_pair("U1", "ú"), std::make_pair("Y1", "ý"), std::make_pair("O3", "ö"), std::make_pair("D1", "ð")
     };
     std::string writeUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
     std::string writeUrl2 = "&submit=Search";
@@ -116,9 +117,9 @@ private:
     strsetptr_t forms;
     strsetptr_t wordindex;
     strsetptr_t allInflectionalWords;
+    vecpair_t resultsToPrint;
     std::string addStyleToResults(std::string str);
     std::string wordToWrite(std::string);
-    std::string wordToRead(std::string);
     std::map<std::string, std::string> onlineEntries;
     void downloadPage(std::string url);
     void parsePage();
@@ -141,7 +142,8 @@ private:
     void textualSearch(std::string const & word);
     void textualSearchThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
     void printAll(std::string const & word);
-    void printAllThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
+    void printAllThread(std::string word, size_t index);
+    void printAllPrint(size_t index);
     void printOne(std::string const & word, std::string const & form);
     void printOneThread(ptrvecstrvecptr_t dics, std::string word, std::string form, size_t index);
     void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
