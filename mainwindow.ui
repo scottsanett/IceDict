@@ -26,7 +26,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Icelandic</string>
+         <string>Headword</string>
         </property>
        </widget>
       </item>
@@ -39,7 +39,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Advanced</string>
+         <string>Entry</string>
         </property>
        </widget>
       </item>
@@ -91,7 +91,7 @@
          </font>
         </property>
         <property name="text">
-         <string>All Infl.</string>
+         <string>Inflections</string>
         </property>
        </widget>
       </item>
@@ -104,7 +104,7 @@
          </font>
         </property>
         <property name="text">
-         <string>One Infl.</string>
+         <string>Specfic</string>
         </property>
        </widget>
       </item>

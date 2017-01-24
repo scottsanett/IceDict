@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     std::thread t_zoega(&MainWindow::importWordIndexThread, this, definitions, zname, 0);
     std::thread t_vifgusson(&MainWindow::importWordIndexThread, this, definitions, vname, 1);
     t_zoega.join(); t_vifgusson.join();
+    importInflections();
     ui->setupUi(this);
     this->setWindowTitle("Old Icelandic Dictionary");
     QIcon icon(":/alphabet/icon.ico");
@@ -128,12 +129,14 @@ void MainWindow::on_onlineTxt_clicked()
 
 void MainWindow::on_searchTxt_clicked()
 {
+/*
     if (!inflectionReady) {
-        Dialog dlg;
-        dlg.setModal(true);
-        if (!dlg.exec()) { return; }
+          Dialog dlg;
+          dlg.setModal(true);
+          if (!dlg.exec()) { return; }
         importInflections();
     }
+*/
     flags = {0, 1, 0, 0, 0, 0, 0};
     buttonChangeColor();
     ui->input->setPlaceholderText("Insert text here...");
@@ -144,12 +147,14 @@ void MainWindow::on_searchTxt_clicked()
 
 void MainWindow::on_searchOrig_clicked()
 {
+    /*
     if (!inflectionReady) {
-        Dialog dlg;
-        dlg.setModal(true);
-        if (!dlg.exec()) { return; }
+//        Dialog dlg;
+//        dlg.setModal(true);
+//        if (!dlg.exec()) { return; }
         importInflections();
     }
+    */
     flags = {0, 0, 0, 1, 0, 0, 0};
     buttonChangeColor();
     ui->results->clear();
@@ -160,13 +165,14 @@ void MainWindow::on_searchOrig_clicked()
 
 void MainWindow::on_plot_clicked()
 {
+    /*
     if (!inflectionReady) {
-        Dialog dlg;
-        dlg.setModal(true);
-        if (!dlg.exec()) { return; }
+//        Dialog dlg;
+//        dlg.setModal(true);
+//        if (!dlg.exec()) { return; }
         importInflections();
-        ui->results->setText("The dictionary is now ready.");
     }
+    */
     flags = {0, 0, 0, 0, 1, 0, 0};
     buttonChangeColor();
     ui->results->clear();
@@ -178,12 +184,14 @@ void MainWindow::on_plot_clicked()
 
 void MainWindow::on_printOne_clicked()
 {
+    /*
     if (!inflectionReady) {
-        Dialog dlg;
-        dlg.setModal(true);
-        if (!dlg.exec()) { return; }
+//        Dialog dlg;
+//        dlg.setModal(true);
+//        if (!dlg.exec()) { return; }
         importInflections();
     }
+    */
     typeTimes = 0;
     flags = {0, 0, 0, 0, 0, 1, 0};
     buttonChangeColor();
@@ -638,7 +646,7 @@ void MainWindow::printAllThread(std::string word, size_t index) {
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
-    std::string line;
+    std::string line, partOfSpeech;
     auto currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
@@ -648,11 +656,24 @@ void MainWindow::printAllThread(std::string word, size_t index) {
             if (currentPos < pos) { ++currentPos; continue; }
             else {
                 std::istringstream iss(line);
-                std::string temp;
-                iss >> temp;
-                if (temp != key) {
+                std::string temp1;
+                iss >> temp1;
+                std::string temp2;
+                iss >> temp2;
+                if (currentPos == pos) { partOfSpeech = temp2; }
+                if (temp1 != key) {
                     ++currentPos;
-                    break; }
+                    break;
+                }
+                else if (temp2 != partOfSpeech) {
+                    qDebug() << temp2.c_str();
+                    ++currentPos;
+                    partOfSpeech = temp2;
+                    thisResult.push_back(std::make_pair(key, thisEntry));
+                    thisEntry.clear();
+                    thisEntry.push_back(line);
+                    continue;
+                }
                 thisEntry.push_back(line);
                 ++currentPos;
             }
