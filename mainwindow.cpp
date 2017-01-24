@@ -788,6 +788,7 @@ void MainWindow::on_input_editingFinished()
     else if (flags[2] == 1 && word.length() > 0) {
         ui->options->clear();
         onlineEntries.clear();
+        inputted = word;
         onlineDefinition(word);
     }
     else if (flags[3] == 1 && inflectionReady && word.length() > 0) {
@@ -810,6 +811,7 @@ void MainWindow::on_input_editingFinished()
     else if (flags[6] == 1 && word.length() > 0) {
         ui->options->clear();
         onlineEntries.clear();
+        inputted = word;
         onlineText(word);
     }
 }
@@ -852,6 +854,7 @@ void MainWindow::downloadPage(std::string url) {
     QUrl pageUrl(url.c_str());
     pageControl = new PageDownloader(pageUrl, this);
     connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
+//    }
 }
 
 void MainWindow::loadPage() {
@@ -955,11 +958,10 @@ void MainWindow::parsePage() {
                 webpage.replace(pos, tag.length(), "<span style=\" font-style:italic;\" class=\"trans\">");
             }
         }
-        std::string word = ui->input->text().toStdString();
         if (flags[6] == 1) {
-            auto pos = webpage.find(word);
+            auto pos = webpage.find(inputted);
             if (pos != std::string::npos) {
-                webpage.replace(pos, word.length(), "<span style=\" font-weight:600; color:#ff0000;\">" + word + "</span>");
+                webpage.replace(pos, inputted.length(), "<span style=\" font-weight:600; color:#ff0000;\">" + inputted + "</span>");
             }
         }
     }

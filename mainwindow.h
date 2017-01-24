@@ -84,6 +84,7 @@ private slots:
 private:
     PageDownloader * pageControl;
     std::string webpage;
+    std::string inputted;
     std::map<std::string, std::string> writeRules = {
         std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
         std::make_pair("ú", "%FA"), std::make_pair("ý", "%FD"), std::make_pair("Á", "%C1"), std::make_pair("É", "%C9"),
