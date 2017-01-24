@@ -1,6 +1,6 @@
 #Old Icelandic Dictionary(Qt)
 
-#Info:
+
 This is a dictionary written in C++/Qt that focuses on the search and query of old and modern Icelandic. The basic interface has seven pushbuttons. It supports offline search of old Icelandic words in the renowned old icelandic dictionaries of Zoega and Cleasby & Vifgusson(button labeled "Norse") and textual search in the dictionary ("Textual"), as well as the query of all inflectional forms of modern icelandic words("Query", "All infl." and "One infl."). It also supports online search of modern Icelandic words("Icelandic") and textual search("Advanced") in the dictionary. 
 
 #Interface:
