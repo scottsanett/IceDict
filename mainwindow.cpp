@@ -10,9 +10,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     originals = mapptrvecptr_t(new mapptrvec_t);
     wordindex = strsetptr_t(new strset_t);
     dictionaries = strvecptrmapptrvecptr_t(new strvecptrmapptrvec_t);
-//    resultsToPrint = vecpairptrvecptr_t(new vecpairptrvec_t);
     forms = strsetptr_t(new strset_t);
-    allInflectionalWords = strsetptr_t(new strset_t);
     for (size_t i = 0; i < 7; ++i) {
         inflectionals->push_back(mapptr_t(new map_t));
         originals->push_back(mapptr_t(new map_t));
@@ -126,8 +124,6 @@ void MainWindow::on_searchIcl_clicked()
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
     tabActive->clear();
     ui->options->clear();
-//    size_t num = 0;
-//    ui->options->addItems(dictentries);
 }
 
 void MainWindow::on_onlineIcl_clicked()
@@ -209,8 +205,9 @@ void MainWindow::on_input_textEdited(const QString &arg1)
     ui->options->clear();
     if (flags[0] == 1) // search icelandic on
     {
+        definitionResults.clear();
+        QStringList display;
         if (word.length() > 1) {
-            QStringList display;
             for (auto && entry : *wordindex) {
                 auto pos = entry.find(word);
                 if (pos == 0) {
@@ -218,27 +215,27 @@ void MainWindow::on_input_textEdited(const QString &arg1)
                 }
             }
             ui->options->addItems(display);
+//            qDebug() << ui->options->count();
         }
     }
     else if (flags[1] == 1) {
-        ui->options->clear();
+        textualResults.clear();
+    }
+    else if (flags[2] == 1) {
         onlineEntries.clear();
     }
     else if (flags[6] == 1) {
-        ui->options->clear();
         onlineEntries.clear();
     }
     else if (flags[3] == 1) //query on
     {
         if (word.length() > 2) {
-            auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
+//            auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
             QStringList display;
-
             ui->options->addItems(display);
         }
     }
     else if (flags[4] == 1) {
-        ui->options->clear();
         resultsToPrint.clear();
     }
     else if (flags[5] == 1) {
@@ -319,6 +316,7 @@ void MainWindow::importForms() {
 }
 
 /* import the index for all words in the two dictionaries */
+
 void MainWindow::importWordIndex() {
     QFile wd(":/alphabet/wordindex");
     wd.open(QIODevice::ReadOnly);
@@ -327,10 +325,10 @@ void MainWindow::importWordIndex() {
     std::string line;
     while (std::getline(wordindexfile, line)) {
         wordindex->insert(line);
-        dictentries.push_back(line.c_str());
     }
     wd.close();
 }
+
 
 /*import all the inflection forms and its position*/
 void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
@@ -459,52 +457,49 @@ void MainWindow::importDictionaryThread(std::string const name, size_t i) {
 }
 
 void MainWindow::findDefinition(std::string const & words) {
-    std::vector<std::string> results;
+    ui->input->clear();
     std::string word = "<b>" + words + "</b>";
-    QFile zfile(":/alphabet/zoega");
-    QFile vfile(":/alphabet/vifgusson");
-    zfile.open(QIODevice::ReadOnly);
-    vfile.open(QIODevice::ReadOnly);
-    QString ztext = zfile.readAll();
-    QString vtext = vfile.readAll();
-    std::istringstream ziss(ztext.toStdString());
-    std::istringstream viss(vtext.toStdString());
-    auto zitr = definitions->at(0)->find(word);
-    auto vitr = definitions->at(1)->find(word);
-    std::string line;
-    if (zitr != definitions->at(0)->end()) {
-        size_t zpos = zitr->second;
-//        qDebug() << zpos << '\n';
-        auto i = 0;
-        while (std::getline(ziss, line)) {
-            if (i == zpos) {
-                results.push_back(line);
-//                qDebug() << line.c_str() << '\n';
-                break;
-            }
-            ++i;
-        }
+    auto zisspair = dictionaries->at(0)->equal_range(word);
+    auto visspair = dictionaries->at(1)->equal_range(word);
+    if ((zisspair.first == zisspair.second) && (visspair.first == visspair.second)) {
+        auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
+        tabActive->setFontFamily("Perpetua");
+        tabActive->setFontPointSize(20);
+        tabActive->setText("Word not found.");
+        return;
     }
-    if (vitr != definitions->at(1)->end()) {
-        auto vpos = vitr->second;
-        auto i = 0;
-        while (std::getline(viss, line)) {
-            if (i == vpos) {
-                results.push_back(line + '\n');
-                break;
-            }
-            ++i;
-        }
+    for(auto itr = zisspair.first; itr != zisspair.second; ++itr) {
+        auto key = itr->first;
+        auto thisEntry = *itr->second;
+        definitionResults.push_back(std::make_pair(key, thisEntry));
     }
-    std::string display;
-    for (auto && i : results) {
-        display += i + "\n\n";
+    for (auto itr = visspair.first; itr != visspair.second; ++itr) {
+        auto key = itr->first;
+        auto thisEntry = *itr->second;
+        definitionResults.push_back(std::make_pair(key, thisEntry));
     }
+    ui->options->clear();
+    QStringList alternatives;
+    for (auto && i : definitionResults) {
+        std::string key = i.first.c_str();
+        key = key.substr(3, key.length() - 7);
+        alternatives.push_back(key.c_str());
+    }
+    ui->options->addItems(alternatives);
+    findDefinitionPrint(0);
+}
+
+void MainWindow::findDefinitionPrint(size_t index) {
+    auto thisEntry = definitionResults.at(index);
+    std::string key = thisEntry.first;
+    std::string value;
+    for (auto i : thisEntry.second) {
+        value += i + '\n';
+    }
+    std::string display = key + ' ' + value;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 16pt;\">" + display + "</span></p>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
     tabActive->setHtml(display.c_str());
-    zfile.close();
-    vfile.close();
 }
 
 void MainWindow::findInflection(std::string const & word) {
@@ -539,13 +534,11 @@ void MainWindow::findInflection(std::string const & word) {
 }
 
 void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, std::string word, size_t index) {
-//    qDebug() << word.c_str();
     auto thisDic = inflectionals->at(index);
     auto thisResult = results->at(index);
     auto itr = thisDic->find(word);
     if (itr == thisDic->end()) { return; }
     std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
-//    qDebug() << word.c_str();
     QFile file(filename.c_str());
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
@@ -569,22 +562,28 @@ void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, std::string wor
     file.close();
 }
 
-void MainWindow::textualSearchThread(ptrvecstrvecptr_t results, std::string word, size_t index) {
+void MainWindow::textualSearchPrint(size_t index) {
+    auto thisEntry = textualResults.at(index);
+    std::string key = thisEntry.first;
+    std::string display = thisEntry.second;
+    display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 16pt;\">" + display + "</span></p>";
+//    qDebug() << display.c_str();
+    auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
+    tabActive->setHtml(display.c_str());
+}
+
+void MainWindow::textualSearchThread(/*ptrvecstrvecptr_t results, */std::string word, size_t index) {
     auto thisDic = dictionaries->at(index);
-    auto thisResult = results->at(index);
     for (auto && i : *thisDic) {
         std::string key = i.first;
-        key = "<b>" + key + "</b>";
         for (auto && j : *i.second) {
             auto pos = j.find(word);
             if (pos != std::string::npos) {
                 auto subsitute = "<b><span style=\"color:#ff0000;\">" + word + "</span></b>";
                 j.replace(pos, word.length(), subsitute);
-                key += ' ' + j;
-                thisResult->push_back(key);
-                key = i.first;
-//                key = "<b>" + key + "</b>";
-//                qDebug() << key.c_str();
+                std::string value = key + ' ' + j;
+//                qDebug() << value.c_str();
+                textualResults.push_back(std::make_pair(key, value));
                 break;
             }
         }
@@ -592,28 +591,27 @@ void MainWindow::textualSearchThread(ptrvecstrvecptr_t results, std::string word
 }
 
 void MainWindow::textualSearch(std::string const & word) {
-    auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
-    for (auto i = 0; i < 2; ++i) {
-        results->push_back(strvecptr_t(new strvec_t));
-    }
-    std::thread t0(&MainWindow::textualSearchThread, this, results, word, 0);
-    std::thread t1(&MainWindow::textualSearchThread, this, results, word, 1);
+    ui->input->clear();
+    std::thread t0(&MainWindow::textualSearchThread, this, word, 0);
+    std::thread t1(&MainWindow::textualSearchThread, this, word, 1);
     t0.join(); t1.join();
-    auto resultSize = [&]() { size_t sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
-    if (resultSize == 0) {
+    if (textualResults.size() == 0) {
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
+        tabActive->setFontFamily("Perpetua");
+        tabActive->setFontPointSize(20);
         tabActive->setText("Word not found.");
         return;
     }
-    std::string toprint;
-    for (auto && i : * results) {
-        for (auto && j : *i) {
-            toprint += j + "<br><br>";
+    QStringList alternatives;
+    for (auto i : textualResults) {
+        std::string key = i.first;
+        if (key.length() > 7) {
+            key = key.substr(3, key.length() - 7);
+            alternatives.push_back(key.c_str());
         }
     }
-    toprint = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 16pt;\">" + toprint + "</span></p>";
-    auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(toprint.c_str());
+    ui->options->addItems(alternatives);
+    findDefinitionPrint(0);
 }
 
 
@@ -636,10 +634,10 @@ void MainWindow::printAll(std::string const & str) {
         tabActive->setText("Word not found.");
         return;
     }
-//    qDebug() << results.size();
     for (auto && i : results) {
             ui->options->addItem(i.first.c_str());
     }
+    printAllPrint(0);
 }
 
 void MainWindow::printAllThread(std::string word, size_t index) {
@@ -673,7 +671,7 @@ void MainWindow::printAllThread(std::string word, size_t index) {
                     break;
                 }
                 else if (temp2 != partOfSpeech) {
-                    qDebug() << temp2.c_str();
+//                    qDebug() << temp2.c_str();
                     ++currentPos;
                     partOfSpeech = temp2;
                     thisResult.push_back(std::make_pair(key, thisEntry));
@@ -781,26 +779,34 @@ void MainWindow::on_input_editingFinished()
 {
     std::string word = ui->input->text().toStdString();
     if (flags[0] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        std::string tag = "3. " + word;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+//        ui->options->clear();
         findDefinition(word);
     }
     else if (flags[1] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        std::string tag = "4. " + word;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+        ui->options->clear();
         textualSearch(word);
     }
     else if (flags[2] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        std::string tag = "1. " + word;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         ui->options->clear();
         onlineEntries.clear();
         inputted = word;
         onlineDefinition(word);
+
     }
     else if (flags[3] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        std::string tag = "5. " + word;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         findInflection(word);
     }
     else if (flags[4] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        std::string tag = "6. " + word;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         ui->options->clear();
         resultsToPrint.clear();
         printAll(word);
@@ -810,7 +816,8 @@ void MainWindow::on_input_editingFinished()
         if (typeTimes > 0) {
             ui->input->clear();
             ui->input->setPlaceholderText("Insert form here...");
-            ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+            std::string tag = "7. " + word;
+            ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         }
         else {
             ui->input->clear();
@@ -818,7 +825,8 @@ void MainWindow::on_input_editingFinished()
         }
     }
     else if (flags[6] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        std::string tag = "2. " + word;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         ui->options->clear();
         onlineEntries.clear();
         inputted = word;
@@ -828,15 +836,35 @@ void MainWindow::on_input_editingFinished()
 
 void MainWindow::on_options_itemClicked(QListWidgetItem *item)
 {
-
     if (flags[0] == 1) {
         ui->input->setText(item->text());
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), item->text());
-        findDefinition(item->text().toStdString());
+//        qDebug() << item->text();
+        std::string tag = "3. " + item->text().toStdString();
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+        if (definitionResults.size() == 0) {
+            findDefinition(item->text().toStdString());
+        }
+        else {
+            size_t index = ui->options->currentRow();
+            findDefinitionPrint(index);
+        }
+    }
+    else if (flags[1] == 1) {
+        ui->input->setText(item->text());
+        std::string tag = "4. " + item->text().toStdString();
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+        if (textualResults.size() == 0) {
+            textualSearch(item->text().toStdString());
+        }
+        else {
+            size_t index = ui->options->currentRow();
+            textualSearchPrint(index);
+        }
     }
     else if (flags[2] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), item->text());
         std::string key = item->text().toStdString();
+        std::string tag = "1. " + key;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         std::string url;
         auto itr = onlineEntries.find(key);
         if (itr != onlineEntries.end()) {
@@ -845,7 +873,8 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
         downloadPage(url);
     }
     else if (flags[4] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), item->text());
+        std::string tag = "6. " + item->text().toStdString();
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
         tabActive->clear();
         size_t index = ui->options->currentRow();
@@ -854,14 +883,16 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
 // a function that prints according to the index.
     }
     else if (flags[5] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), item->text());
+        std::string tag = "7. " + item->text().toStdString();
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         ui->input->setText(item->text());
         printOneForm = item->text().toStdString();
         printOne(printOneWord, printOneForm);
     }
     else if (flags[6] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), item->text());
         std::string key = item->text().toStdString();
+        std::string tag = "2. " + key;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         std::string url;
         auto itr = onlineEntries.find(key);
         if (itr != onlineEntries.end()) {

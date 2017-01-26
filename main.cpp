@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "dialog.h"
 
 int main(int argc, char *argv[])
 {

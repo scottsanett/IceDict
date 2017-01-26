@@ -107,7 +107,6 @@ private:
     std::string textUrl2 = "&submit=Search";
     std::string printOneWord;
     std::string printOneForm;
-    QStringList dictentries;
     bool textReady = false;
     size_t typeTimes = 0;
     Ui::MainWindow * ui;
@@ -119,11 +118,13 @@ private:
     strvecptrmapptrvecptr_t dictionaries;
     strsetptr_t forms;
     strsetptr_t wordindex;
-    strsetptr_t allInflectionalWords;
     vecpair_t resultsToPrint;
     std::string addStyleToResults(std::string str);
     std::string wordToWrite(std::string);
     std::map<std::string, std::string> onlineEntries;
+    std::vector<std::pair<std::string, std::vector<std::string>>> definitionResults;
+    std::vector<std::pair<std::string, std::string>> textualResults;
+//    QStringList alternatives;
     void newTab();
     void downloadPage(std::string url);
     void parsePage();
@@ -139,12 +140,14 @@ private:
     void importDictionaryThread(std::string const name, size_t i);
     std::string toLower(std::string str);
     void findDefinition(std::string const & word);
+    void findDefinitionPrint(size_t index);
     void findInflection(std::string const & word);
     void onlineDefinition(std::string const & word);
     void onlineText(std::string const & word);
     void findInflectionThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
     void textualSearch(std::string const & word);
-    void textualSearchThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
+    void textualSearchThread(/*ptrvecstrvecptr_t dics, */std::string word, size_t index);
+    void textualSearchPrint(size_t index);
     void printAll(std::string const & word);
     void printAllThread(std::string word, size_t index);
     void printAllPrint(size_t index);
