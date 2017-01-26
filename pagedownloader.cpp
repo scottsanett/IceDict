@@ -2,7 +2,8 @@
 
 PageDownloader::PageDownloader(QUrl fileUrl, QObject *parent) : QObject(parent)
 {
-    connect (&WebControl, SIGNAL(finished(QNetworkReply*)), this, SLOT(pageDownloaded(QNetworkReply*)));
+    connect (&WebControl, SIGNAL(finished(QNetworkReply*)),
+             this, SLOT(pageDownloaded(QNetworkReply*)));
     QNetworkRequest request(fileUrl);
     WebControl.get(request);
 }

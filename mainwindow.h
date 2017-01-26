@@ -22,6 +22,7 @@
 #include "QStringList"
 #include "QString"
 #include "QIcon"
+#include "QToolButton"
 
 #include <thread>
 #include <map>
@@ -35,7 +36,6 @@
 #include <algorithm>
 #include <cctype>
 
-#include "dialog.h"
 #include "pagedownloader.h"
 
 using map_t = std::multimap<std::string, size_t>;
@@ -85,11 +85,15 @@ private slots:
     void on_onlineIcl_clicked();
     void on_onlineTxt_clicked();
     void loadPage();
+    void addTab_clicked();
+    void closeTab(int);
 
 private:
+    QToolButton * addTab;
     PageDownloader * pageControl;
     std::string webpage;
     std::string inputted;
+    std::string startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24pt;\">Welcome to the Icelandic Dictionary</span></p><p align=\"center\"><span style=\" font-size:20pt;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
     std::map<std::string, std::string> writeRules = {
         std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
         std::make_pair("ú", "%FA"), std::make_pair("ý", "%FD"), std::make_pair("Á", "%C1"), std::make_pair("É", "%C9"),
@@ -104,7 +108,6 @@ private:
     std::string printOneWord;
     std::string printOneForm;
     QStringList dictentries;
-    bool inflectionReady = false;
     bool textReady = false;
     size_t typeTimes = 0;
     Ui::MainWindow * ui;
@@ -121,6 +124,7 @@ private:
     std::string addStyleToResults(std::string str);
     std::string wordToWrite(std::string);
     std::map<std::string, std::string> onlineEntries;
+    void newTab();
     void downloadPage(std::string url);
     void parsePage();
     void buttonChangeColor();

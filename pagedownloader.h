@@ -5,7 +5,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QString>
+#include <QByteArray>
 
 class PageDownloader : public QObject
 {

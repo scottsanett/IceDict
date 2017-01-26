@@ -28,15 +28,12 @@ win32:RC_ICONS += alphabet/icon.ico
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    dialog.cpp \
     pagedownloader.cpp
 
 HEADERS  += mainwindow.h \
-    dialog.h \
     pagedownloader.h
 
 FORMS += \
-    mainwindow.ui \
-    dialog.ui
+    mainwindow.ui
 
 DISTFILES +=
