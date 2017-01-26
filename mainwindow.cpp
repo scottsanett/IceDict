@@ -567,12 +567,11 @@ void MainWindow::textualSearchPrint(size_t index) {
     std::string key = thisEntry.first;
     std::string display = thisEntry.second;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 16pt;\">" + display + "</span></p>";
-//    qDebug() << display.c_str();
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
     tabActive->setHtml(display.c_str());
 }
 
-void MainWindow::textualSearchThread(/*ptrvecstrvecptr_t results, */std::string word, size_t index) {
+void MainWindow::textualSearchThread(std::string word, size_t index) {
     auto thisDic = dictionaries->at(index);
     for (auto && i : *thisDic) {
         std::string key = i.first;
@@ -582,7 +581,6 @@ void MainWindow::textualSearchThread(/*ptrvecstrvecptr_t results, */std::string 
                 auto subsitute = "<b><span style=\"color:#ff0000;\">" + word + "</span></b>";
                 j.replace(pos, word.length(), subsitute);
                 std::string value = key + ' ' + j;
-//                qDebug() << value.c_str();
                 textualResults.push_back(std::make_pair(key, value));
                 break;
             }
@@ -592,9 +590,8 @@ void MainWindow::textualSearchThread(/*ptrvecstrvecptr_t results, */std::string 
 
 void MainWindow::textualSearch(std::string const & word) {
     ui->input->clear();
-    std::thread t0(&MainWindow::textualSearchThread, this, word, 0);
-    std::thread t1(&MainWindow::textualSearchThread, this, word, 1);
-    t0.join(); t1.join();
+    textualSearchThread(word, 0);
+    textualSearchThread(word, 1);
     if (textualResults.size() == 0) {
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
         tabActive->setFontFamily("Perpetua");
@@ -611,7 +608,6 @@ void MainWindow::textualSearch(std::string const & word) {
         }
     }
     ui->options->addItems(alternatives);
-    findDefinitionPrint(0);
 }
 
 

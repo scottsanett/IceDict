@@ -53,12 +53,6 @@ using strvecptrmap_t = std::multimap<std::string, strvecptr_t>;
 using strvecptrmapptr_t = std::shared_ptr<strvecptrmap_t>;
 using strvecptrmapptrvec_t = std::vector<strvecptrmapptr_t>;
 using strvecptrmapptrvecptr_t = std::shared_ptr<strvecptrmapptrvec_t>;
-/*
-using vecpair_t = std::vector<std::pair<std::string, strvecptr_t>>;
-using vecpairptr_t = std::shared_ptr<vecpair_t>;
-using vecpairptrvec_t = std::vector<vecpairptr_t>;
-using vecpairptrvecptr_t = std::shared_ptr<vecpairptrvec_t>;
-*/
 using vecpair_t = std::vector<std::pair<std::string, strvec_t>>;
 
 namespace Ui {
@@ -124,7 +118,6 @@ private:
     std::map<std::string, std::string> onlineEntries;
     std::vector<std::pair<std::string, std::vector<std::string>>> definitionResults;
     std::vector<std::pair<std::string, std::string>> textualResults;
-//    QStringList alternatives;
     void newTab();
     void downloadPage(std::string url);
     void parsePage();
