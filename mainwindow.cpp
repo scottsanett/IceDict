@@ -19,10 +19,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         definitions->push_back(mapptr_t(new map_t));
         dictionaries->push_back(strvecptrmapptr_t(new strvecptrmap_t));
     }
-    importInflections();
     importWordIndex();
-    importWordIndexThread(definitions, "zoega", 0);
-    importWordIndexThread(definitions, "vifgusson", 1);
+    importForms();
+    importOriginal();
+    importDictionary();
+    importInflections();
     ui->setupUi(this);
     this->setWindowTitle("Icelandic Dictionary");
     QIcon icon(":/alphabet/icon.ico");
@@ -262,35 +263,6 @@ void MainWindow::allFormsAutocompleteThread(ptrvecstrvecptr_t results, std::stri
     auto thisResult = results->at(index);
 }
 
-/*  Transfer a string to lower case   */
-std::string MainWindow::toLower(std::string str) {
-    const std::vector<std::string> upper = { "Þ", "Ð", "Æ", "Ö", "Á", "É", "Í", "Ó", "Ú", "Ý", "Œ" };
-    const std::vector<std::string> lower = { "þ", "ð", "æ", "ö", "á", "é", "í", "ó", "ú", "ý", "œ" };
-    auto f = [&](std::string & name) { for (auto i = 0; i < name.length(); ++i) {
-        if (isalpha(name[i])) {
-            if (isupper(name[i])) {
-                tolower(name[i]);
-            }
-        }
-        else {
-            if ((name[i] == upper[0][0]) && (name[i + 1] == upper[0][1])) { name[i] = lower[0][0]; name[i + 1] = lower[0][1]; i += 1; }
-            else if ((name[i] == upper[1][0]) && (name[i + 1] == upper[1][1])) { name[i] = lower[1][0]; name[i + 1] = lower[1][1]; i += 1; }
-            else if ((name[i] == upper[2][0]) && (name[i + 1] == upper[2][1])) { name[i] = lower[2][0]; name[i + 1] = lower[2][1]; i += 1; }
-            else if ((name[i] == upper[3][0]) && (name[i + 1] == upper[3][1])) { name[i] = lower[3][0]; name[i + 1] = lower[3][1]; i += 1; }
-            else if ((name[i] == upper[4][0]) && (name[i + 1] == upper[4][1])) { name[i] = lower[4][0]; name[i + 1] = lower[4][1]; i += 1; }
-            else if ((name[i] == upper[5][0]) && (name[i + 1] == upper[5][1])) { name[i] = lower[5][0]; name[i + 1] = lower[5][1]; i += 1; }
-            else if ((name[i] == upper[6][0]) && (name[i + 1] == upper[6][1])) { name[i] = lower[6][0]; name[i + 1] = lower[6][1]; i += 1; }
-            else if ((name[i] == upper[7][0]) && (name[i + 1] == upper[7][1])) { name[i] = lower[7][0]; name[i + 1] = lower[7][1]; i += 1; }
-            else if ((name[i] == upper[8][0]) && (name[i + 1] == upper[8][1])) { name[i] = lower[8][0]; name[i + 1] = lower[8][1]; i += 1; }
-            else if ((name[i] == upper[9][0]) && (name[i + 1] == upper[9][1])) { name[i] = lower[9][0]; name[i + 1] = lower[9][1]; i += 1; }
-            else if ((name[i] == upper[10][0]) && (name[i + 1] == upper[10][1])) { name[i] = lower[10][0]; name[i + 1] = lower[10][1]; i += 1; }
-            else {}
-        }
-    } };
-    f(str);
-    return str;
-}
-
 std::string MainWindow::wordToWrite(std::string str) {
     for (auto && i : writeRules) {
         while (str.find(i.first) != std::string::npos) {
@@ -327,6 +299,11 @@ void MainWindow::importWordIndex() {
     wd.close();
 }
 
+void MainWindow::importInflections() {
+    for (auto i = 1; i <= 7; ++i) {
+        importInflectionsThread(inflectionals, i);
+    }
+}
 
 /*import all the inflection forms and its position*/
 void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
@@ -344,23 +321,6 @@ void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
     }
     f.close();
 }
-
-
-void MainWindow::importInflections() {
-    importForms();
-    importOriginal();
-    importDictionary();
-    std::thread t1(&MainWindow::importInflectionsThread, this, inflectionals, 1);
-    std::thread t2(&MainWindow::importInflectionsThread, this, inflectionals, 2);
-    std::thread t3(&MainWindow::importInflectionsThread, this, inflectionals, 3);
-    std::thread t4(&MainWindow::importInflectionsThread, this, inflectionals, 4);
-    std::thread t5(&MainWindow::importInflectionsThread, this, inflectionals, 5);
-    std::thread t6(&MainWindow::importInflectionsThread, this, inflectionals, 6);
-    std::thread t7(&MainWindow::importInflectionsThread, this, inflectionals, 7);
-    t1.join(); t2.join(); t3.join(); t4.join();
-    t5.join(); t6.join(); t7.join();
-}
-
 
 void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
     std::string filename = ":/alphabet/sources_index/part" + std::to_string(i);
@@ -387,43 +347,14 @@ void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
 }
 
 void MainWindow::importOriginal() {
-    std::thread t1(&MainWindow::importOriginalThread, this, originals, 1);
-    std::thread t2(&MainWindow::importOriginalThread, this, originals, 2);
-    std::thread t3(&MainWindow::importOriginalThread, this, originals, 3);
-    std::thread t4(&MainWindow::importOriginalThread, this, originals, 4);
-    std::thread t5(&MainWindow::importOriginalThread, this, originals, 5);
-    std::thread t6(&MainWindow::importOriginalThread, this, originals, 6);
-    std::thread t7(&MainWindow::importOriginalThread, this, originals, 7);
-    t1.join(); t2.join(); t3.join();
-    t4.join(); t5.join(); t6.join(); t7.join();
-}
-
-
-/* import all the inflection words  (without the size_t index)*/
-
-void MainWindow::importWordIndexThread(mapptrvecptr_t mapvec, std::string const name, size_t i) {
-    std::string filename = ":/alphabet/" + name;
-    QFile f(filename.c_str());
-    f.open(QIODevice::ReadOnly);
-    QString qfile = f.readAll();
-    std::istringstream file(qfile.toStdString());
-    std::string line;
-    auto thisMap = mapvec->at(i);
-    size_t index = 0;
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string key;
-        iss >> key;
-        thisMap->insert(std::make_pair(key, index));
-        ++index;
+    for (auto i = 1; i <= 7; ++i) {
+        importOriginalThread(originals, i);
     }
-    f.close();
 }
 
 void MainWindow::importDictionary() {
-    std::thread t0(&MainWindow::importDictionaryThread, this, "zoega", 0);
-    std::thread t1(&MainWindow::importDictionaryThread, this, "vifgusson", 1);
-    t0.join(); t1.join();
+    importDictionaryThread("zoega", 0);
+    importDictionaryThread("vifgusson", 1);
 }
 
 void MainWindow::importDictionaryThread(std::string const name, size_t i) {
@@ -505,14 +436,9 @@ void MainWindow::findInflection(std::string const & word) {
     for (auto i = 0; i < 7; ++i) {
         results->push_back(strvecptr_t(new strvec_t));
     }
-    std::thread t0(&MainWindow::findInflectionThread, this, results, word, 0);
-    std::thread t1(&MainWindow::findInflectionThread, this, results, word, 1);
-    std::thread t2(&MainWindow::findInflectionThread, this, results, word, 2);
-    std::thread t3(&MainWindow::findInflectionThread, this, results, word, 3);
-    std::thread t4(&MainWindow::findInflectionThread, this, results, word, 4);
-    std::thread t5(&MainWindow::findInflectionThread, this, results, word, 5);
-    std::thread t6(&MainWindow::findInflectionThread, this, results, word, 6);
-    t0.join(); t1.join(); t2.join(); t3.join(); t4.join(); t5.join(); t6.join();
+    for (auto i = 0; i < 7; ++i) {
+        findInflectionThread(results, word, i);
+    }
     auto resultSize = [&]() { size_t sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
     if (resultSize == 0) {
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
@@ -613,15 +539,9 @@ void MainWindow::printAll(std::string const & str) {
     ui->input->clear();
     auto word = str + ';';
     auto & results = resultsToPrint;
-    std::thread t0(&MainWindow::printAllThread, this, word, 0);
-    std::thread t1(&MainWindow::printAllThread, this, word, 1);
-    std::thread t2(&MainWindow::printAllThread, this, word, 2);
-    std::thread t3(&MainWindow::printAllThread, this, word, 3);
-    std::thread t4(&MainWindow::printAllThread, this, word, 4);
-    std::thread t5(&MainWindow::printAllThread, this, word, 5);
-    std::thread t6(&MainWindow::printAllThread, this, word, 6);
-    t0.join();
-    t1.join(); t2.join(); t3.join(); t4.join(); t5.join(); t6.join();
+    for (auto i = 0; i < 7; ++i) {
+        printAllThread(word, i);
+    }
     auto resultSize = [&]() { size_t sz = 0; for (auto i : results) { sz += i.second.size(); } return sz; }();
     if (resultSize == 0) {
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
@@ -739,14 +659,9 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
     for (auto i = 0; i < 7; ++i) {
         results->push_back(strvecptr_t(new strvec_t));
     }
-    std::thread t0(&MainWindow::printOneThread, this, results, word, form, 0);
-    std::thread t1(&MainWindow::printOneThread, this, results, word, form, 1);
-    std::thread t2(&MainWindow::printOneThread, this, results, word, form, 2);
-    std::thread t3(&MainWindow::printOneThread, this, results, word, form, 3);
-    std::thread t4(&MainWindow::printOneThread, this, results, word, form, 4);
-    std::thread t5(&MainWindow::printOneThread, this, results, word, form, 5);
-    std::thread t6(&MainWindow::printOneThread, this, results, word, form, 6);
-    t0.join(); t1.join(); t2.join(); t3.join(); t4.join(); t5.join(); t6.join();
+    for (auto i = 0; i < 7; ++i) {
+        printOneThread(results, word, form, i);
+    }
     auto resultSize = [&]() { size_t sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
     if (resultSize == 0) {
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());

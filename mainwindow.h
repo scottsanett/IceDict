@@ -24,7 +24,6 @@
 #include "QIcon"
 #include "QToolButton"
 
-#include <thread>
 #include <map>
 #include <set>
 #include <vector>
@@ -123,15 +122,14 @@ private:
     void parsePage();
     void buttonChangeColor();
     void importWordIndex();
-    void importInflections();
     void importForms();
+    void importInflections();
     void importInflectionsThread(mapptrvecptr_t mapvec, size_t i);
     void importWordIndexThread(mapptrvecptr_t mapvec, std::string const name, size_t i);
     void importOriginal();
     void importOriginalThread(mapptrvecptr_t mapvec, size_t i);
     void importDictionary();
     void importDictionaryThread(std::string const name, size_t i);
-    std::string toLower(std::string str);
     void findDefinition(std::string const & word);
     void findDefinitionPrint(size_t index);
     void findInflection(std::string const & word);
@@ -139,7 +137,7 @@ private:
     void onlineText(std::string const & word);
     void findInflectionThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
     void textualSearch(std::string const & word);
-    void textualSearchThread(/*ptrvecstrvecptr_t dics, */std::string word, size_t index);
+    void textualSearchThread(std::string word, size_t index);
     void textualSearchPrint(size_t index);
     void printAll(std::string const & word);
     void printAllThread(std::string word, size_t index);
