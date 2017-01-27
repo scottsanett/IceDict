@@ -19,14 +19,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         definitions->push_back(mapptr_t(new map_t));
         dictionaries->push_back(strvecptrmapptr_t(new strvecptrmap_t));
     }
-    std::thread t_wordindex(&MainWindow::importWordIndex, this);
-    t_wordindex.join();
     importInflections();
-    std::string zname = "zoega";
-    std::string vname = "vifgusson";
-    std::thread t_zoega(&MainWindow::importWordIndexThread, this, definitions, zname, 0);
-    std::thread t_vifgusson(&MainWindow::importWordIndexThread, this, definitions, vname, 1);
-    t_zoega.join(); t_vifgusson.join();
+    importWordIndex();
+    importWordIndexThread(definitions, "zoega", 0);
+    importWordIndexThread(definitions, "vifgusson", 1);
     ui->setupUi(this);
     this->setWindowTitle("Icelandic Dictionary");
     QIcon icon(":/alphabet/icon.ico");
@@ -45,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+    if (pageControl) { delete pageControl; }
+    if (addTab) { delete addTab; }
 }
 
 void MainWindow::addTab_clicked() {
@@ -356,10 +354,10 @@ void MainWindow::importInflections() {
     std::thread t2(&MainWindow::importInflectionsThread, this, inflectionals, 2);
     std::thread t3(&MainWindow::importInflectionsThread, this, inflectionals, 3);
     std::thread t4(&MainWindow::importInflectionsThread, this, inflectionals, 4);
-    t1.join(); t2.join(); t3.join(); t4.join();
     std::thread t5(&MainWindow::importInflectionsThread, this, inflectionals, 5);
     std::thread t6(&MainWindow::importInflectionsThread, this, inflectionals, 6);
     std::thread t7(&MainWindow::importInflectionsThread, this, inflectionals, 7);
+    t1.join(); t2.join(); t3.join(); t4.join();
     t5.join(); t6.join(); t7.join();
 }
 
@@ -777,7 +775,6 @@ void MainWindow::on_input_editingFinished()
     if (flags[0] == 1 && word.length() > 0) {
         std::string tag = "3. " + word;
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
-//        ui->options->clear();
         findDefinition(word);
     }
     else if (flags[1] == 1 && word.length() > 0) {
@@ -793,7 +790,6 @@ void MainWindow::on_input_editingFinished()
         onlineEntries.clear();
         inputted = word;
         onlineDefinition(word);
-
     }
     else if (flags[3] == 1 && word.length() > 0) {
         std::string tag = "5. " + word;
@@ -834,7 +830,6 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
 {
     if (flags[0] == 1) {
         ui->input->setText(item->text());
-//        qDebug() << item->text();
         std::string tag = "3. " + item->text().toStdString();
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
         if (definitionResults.size() == 0) {
