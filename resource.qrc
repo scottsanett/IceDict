@@ -1,33 +1,31 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
-<qresource>
-    <file>alphabet/cover.jpg</file>
-    <file>alphabet/icon.ico</file>
-    <file>alphabet/forms</file>
-    <file>alphabet/zoega</file>
-    <file>alphabet/vifgusson</file>
-    <file>alphabet/wordindex</file>
-    <file>alphabet/etymology.pdf</file>
-    <file>alphabet/sources/part1</file>
-    <file>alphabet/sources/part2</file>
-    <file>alphabet/sources/part3</file>
-    <file>alphabet/sources/part4</file>
-    <file>alphabet/sources/part5</file>
-    <file>alphabet/sources/part6</file>
-    <file>alphabet/sources/part7</file>
-    <file>alphabet/sources_index/part1</file>
-    <file>alphabet/sources_index/part2</file>
-    <file>alphabet/sources_index/part3</file>
-    <file>alphabet/sources_index/part4</file>
-    <file>alphabet/sources_index/part5</file>
-    <file>alphabet/sources_index/part6</file>
-    <file>alphabet/sources_index/part7</file>
-    <file>alphabet/source_reverse_index/part1</file>
-    <file>alphabet/source_reverse_index/part2</file>
-    <file>alphabet/source_reverse_index/part3</file>
-    <file>alphabet/source_reverse_index/part4</file>
-    <file>alphabet/source_reverse_index/part5</file>
-    <file>alphabet/source_reverse_index/part6</file>
-    <file>alphabet/source_reverse_index/part7</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>alphabet/cover.jpg</file>
+        <file>alphabet/icon.ico</file>
+        <file>alphabet/forms</file>
+        <file>alphabet/zoega</file>
+        <file>alphabet/vifgusson</file>
+        <file>alphabet/wordindex</file>
+        <file>alphabet/sources/part1</file>
+        <file>alphabet/sources/part2</file>
+        <file>alphabet/sources/part3</file>
+        <file>alphabet/sources/part4</file>
+        <file>alphabet/sources/part5</file>
+        <file>alphabet/sources/part6</file>
+        <file>alphabet/sources/part7</file>
+        <file>alphabet/sources_index/part1</file>
+        <file>alphabet/sources_index/part2</file>
+        <file>alphabet/sources_index/part3</file>
+        <file>alphabet/sources_index/part4</file>
+        <file>alphabet/sources_index/part5</file>
+        <file>alphabet/sources_index/part6</file>
+        <file>alphabet/sources_index/part7</file>
+        <file>alphabet/source_reverse_index/part1</file>
+        <file>alphabet/source_reverse_index/part2</file>
+        <file>alphabet/source_reverse_index/part3</file>
+        <file>alphabet/source_reverse_index/part4</file>
+        <file>alphabet/source_reverse_index/part5</file>
+        <file>alphabet/source_reverse_index/part6</file>
+        <file>alphabet/source_reverse_index/part7</file>
+    </qresource>
 </RCC>
