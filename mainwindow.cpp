@@ -42,8 +42,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+    /*
     if (pageControl) { delete pageControl; }
     if (addTab) { delete addTab; }
+    */
 }
 
 void MainWindow::addTab_clicked() {
@@ -198,6 +200,7 @@ void MainWindow::on_printOne_clicked()
     ui->input->clear();
 }
 
+
 void MainWindow::on_input_textEdited(const QString &arg1)
 {
     std::string word = arg1.toStdString();
@@ -214,7 +217,6 @@ void MainWindow::on_input_textEdited(const QString &arg1)
                 }
             }
             ui->options->addItems(display);
-//            qDebug() << ui->options->count();
         }
     }
     else if (flags[1] == 1) {
@@ -229,7 +231,6 @@ void MainWindow::on_input_textEdited(const QString &arg1)
     else if (flags[3] == 1) //query on
     {
         if (word.length() > 2) {
-//            auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
             QStringList display;
             ui->options->addItems(display);
         }

@@ -36,6 +36,7 @@
 #include <cctype>
 
 #include "pagedownloader.h"
+#include "poppler-qt5.h"
 
 using map_t = std::multimap<std::string, size_t>;
 using mapptr_t = std::shared_ptr<map_t>;

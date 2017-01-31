@@ -203,8 +203,6 @@
      </layout>
     </item>
    </layout>
-   <zorder></zorder>
-   <zorder>splitter</zorder>
   </widget>
   <action name="actionExit">
    <property name="text">
