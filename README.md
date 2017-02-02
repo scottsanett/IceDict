@@ -24,7 +24,7 @@ https://github.com/scottsanett/Old-Icelandic-Dictionary-Qt-/issues/1
 
 #Download:
 
-Windows 64bit: 
+Packages for Windows x64 and Android ARM may be downloaded from:
 
 https://sourceforge.net/projects/old-icelandic-dictionary-qt/
 
