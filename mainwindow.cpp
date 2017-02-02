@@ -260,10 +260,6 @@ void MainWindow::on_input_textEdited(const QString &arg1)
     }
 }
 
-void MainWindow::allFormsAutocompleteThread(ptrvecstrvecptr_t results, std::string word, size_t index) {
-    auto thisResult = results->at(index);
-}
-
 std::string MainWindow::wordToWrite(std::string str) {
     for (auto && i : writeRules) {
         while (str.find(i.first) != std::string::npos) {
@@ -308,7 +304,7 @@ void MainWindow::importInflections() {
 
 /*import all the inflection forms and its position*/
 void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
-    std::string filename = ":/alphabet/source_reverse_index/part" + std::to_string(i);
+    std::string filename = ":/alphabet/source_reverse_index/part" + to_string(i);
     QFile f(filename.c_str());
     f.open(QIODevice::ReadOnly);
     QString qfile = f.readAll();
@@ -324,7 +320,7 @@ void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
 }
 
 void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
-    std::string filename = ":/alphabet/sources_index/part" + std::to_string(i);
+    std::string filename = ":/alphabet/sources_index/part" + to_string(i);
     QFile f(filename.c_str());
     f.open(QIODevice::ReadOnly);
     QString qfile = f.readAll();
@@ -342,7 +338,9 @@ void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
         }
         std::string index;
         iss >> index;
-        thisMap->insert(std::make_pair(key, std::stoul(index)));
+        auto index_number = strtol(index.c_str(), 0, 10);
+        thisMap->insert(std::make_pair(key, index_number));
+//        thisMap->insert(std::make_pair(key, std::stoul(index)));
     }
     f.close();
 }
@@ -463,7 +461,7 @@ void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, std::string wor
     auto thisResult = results->at(index);
     auto itr = thisDic->find(word);
     if (itr == thisDic->end()) { return; }
-    std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
+    std::string filename = ":/alphabet/sources/part" + to_string(index + 1);
     QFile file(filename.c_str());
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
@@ -471,7 +469,7 @@ void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, std::string wor
     std::string line;
     auto key = itr->first;
     auto pos = itr->second;
-    auto currentPos = 0;
+    size_t currentPos = 0;
     while (std::getline(issfile, line)) {
         if (currentPos != pos) {
             ++currentPos;
@@ -561,13 +559,13 @@ void MainWindow::printAllThread(std::string word, size_t index) {
     auto range = thisDic->equal_range(word);
     auto count = thisDic->count(word);
     if (count == 0) { return; }
-    std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
+    std::string filename = ":/alphabet/sources/part" + to_string(index + 1);
     QFile file(filename.c_str());
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
     std::string line, partOfSpeech;
-    auto currentPos = 0;
+    size_t currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
         strvec_t thisEntry;
@@ -621,13 +619,13 @@ void MainWindow::printOneThread(ptrvecstrvecptr_t results, std::string word, std
     auto range = thisDic->equal_range(word);
     auto count = thisDic->count(word);
     if (count == 0) { return; }
-    std::string filename = ":/alphabet/sources/part" + std::to_string(index + 1);
+    std::string filename = ":/alphabet/sources/part" + to_string(index + 1);
     QFile file(filename.c_str());
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
     std::string line;
-    auto currentPos = 0;
+    size_t currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
         auto pos = itr->second;

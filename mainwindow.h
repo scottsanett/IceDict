@@ -8,8 +8,8 @@
 #include <QFile>
 #include "QWidget"
 #include "QMainWindow"
-#include "QMenuBar"
-#include "QStatusBar"
+//#include "QMenuBar"
+//#include "QStatusBar"
 #include "QPushButton"
 #include "QLineEdit"
 #include "QHBoxLayout"
@@ -23,6 +23,7 @@
 #include "QString"
 #include "QIcon"
 #include "QToolButton"
+#include <cstdlib>
 
 #include <map>
 #include <set>
@@ -36,7 +37,6 @@
 #include <cctype>
 
 #include "pagedownloader.h"
-#include "poppler-qt5.h"
 
 using map_t = std::multimap<std::string, size_t>;
 using mapptr_t = std::shared_ptr<map_t>;
@@ -147,6 +147,20 @@ private:
     void printOneThread(ptrvecstrvecptr_t dics, std::string word, std::string form, size_t index);
     void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
 };
+
+
+template <typename T>
+std::string to_string(T value)
+{
+  //create an output string stream
+  std::ostringstream os ;
+
+  //throw the value into the string stream
+  os << value ;
+
+  //convert the string stream into a string and return
+  return os.str() ;
+}
 
 
 #endif // MAINWINDOW_H
