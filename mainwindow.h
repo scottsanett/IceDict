@@ -23,6 +23,7 @@
 #include "QString"
 #include "QIcon"
 #include "QToolButton"
+#include "QShortcut"
 #include <cstdlib>
 
 #include <map>
@@ -79,6 +80,7 @@ private slots:
     void search_one_inflection();
     void search_icelandic_word();
     void search_icelandic_text();
+    void resultsFromDictionaries_itemClicked(QListWidgetItem * item);
 
     void loadPage();
     void addTab_clicked();
@@ -108,6 +110,7 @@ private slots:
 
 private:
     PageDownloader * pageControl;
+    QListWidget * resultsFromDictionaries;
     std::string webpage;
     std::string inputted;
     std::string startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24pt;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20pt;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
@@ -117,6 +120,11 @@ private:
         std::make_pair("Í", "%CD"), std::make_pair("Ó", "%D3"), std::make_pair("Ú", "%DA"), std::make_pair("Ý", "%DD"),
         std::make_pair("æ", "%E6"), std::make_pair("ö", "%F6"), std::make_pair("Æ", "%C6"), std::make_pair("Ö", "%D6"),
         std::make_pair("þ", "%FE"), std::make_pair("ð", "%F0"), std::make_pair("Þ", "%DE"), std::make_pair("Ð", "%D0"),
+    };
+    std::map<std::string, std::string> letterMapping = {
+      std::make_pair("á", "Á"), std::make_pair("é", "É"), std::make_pair("í", "Í"),
+        std::make_pair("ó", "Ó"), std::make_pair("ú", "Ú"), std::make_pair("ý", "Ý"),
+        std::make_pair("", ""), std::make_pair("", ""), std::make_pair("", "")
     };
     std::string writeUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
     std::string writeUrl2 = "&submit=Search";
@@ -141,6 +149,10 @@ private:
     std::map<std::string, std::string> onlineEntries;
     std::vector<std::pair<std::string, std::vector<std::string>>> definitionResults;
     std::vector<std::pair<std::string, std::string>> textualResults;
+
+private:
+    void activateInput();
+    void clearResultFromDictionaries();
     void newTab();
     void downloadPage(std::string url);
     bool parsePage();
