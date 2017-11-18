@@ -51,7 +51,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::addTab_clicked() {
     QTextBrowser * result = new QTextBrowser;
-    result->setHtml(startScreen.c_str());
+    result->setHtml(startScreen);
 //    ui->input->clear();
     auto index = ui->resultsTab->addTab(result, "(empty)");
     ui->resultsTab->setCurrentIndex(index);
