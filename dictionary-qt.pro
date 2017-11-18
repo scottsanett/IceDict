@@ -5,12 +5,13 @@
 #-------------------------------------------------
 
 QT       += core gui\
-           network
+           network\
+           widgets
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+# greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
 
-TARGET = dictionary-qt
+TARGET = IceDict
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++1y
 # The following define makes your compiler emit warnings if you use
@@ -19,6 +20,7 @@ QMAKE_CXXFLAGS += -std=c++1y
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 RESOURCES = resource.qrc
+ICON = alphabet/icon.icns
 CONFIG += resources_big
 win32:RC_ICONS += alphabet/icon.ico
 # You can also make your code fail to compile if you use deprecated APIs.
@@ -36,14 +38,3 @@ HEADERS  += mainwindow.h \
 
 FORMS += \
     mainwindow.ui
-
-DISTFILES += \
-    android/AndroidManifest.xml \
-    android/gradle/wrapper/gradle-wrapper.jar \
-    android/gradlew \
-    android/res/values/libs.xml \
-    android/build.gradle \
-    android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat
-
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

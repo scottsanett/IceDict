@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>alphabet/cover.jpg</file>
         <file>alphabet/icon.ico</file>
-        <file>alphabet/forms</file>
+        <file>alphabet/icon.icns</file>
         <file>alphabet/zoega</file>
         <file>alphabet/vifgusson</file>
         <file>alphabet/wordindex</file>
@@ -27,5 +27,6 @@
         <file>alphabet/source_reverse_index/part5</file>
         <file>alphabet/source_reverse_index/part6</file>
         <file>alphabet/source_reverse_index/part7</file>
+        <file>alphabet/forms</file>
     </qresource>
 </RCC>

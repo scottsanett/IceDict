@@ -38,7 +38,7 @@
 
 #include "pagedownloader.h"
 
-using map_t = std::multimap<std::string, size_t>;
+using map_t = std::multimap<std::string, int>;
 using mapptr_t = std::shared_ptr<map_t>;
 using mapptrvec_t = std::vector<mapptr_t>;
 using mapptrvecptr_t = std::shared_ptr<mapptrvec_t>;
@@ -68,26 +68,49 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_searchIcl_clicked();
     void on_input_textEdited(const QString &arg1);
     void on_input_editingFinished();
     void on_options_itemClicked(QListWidgetItem *item);
-    void on_searchOrig_clicked();
-    void on_searchTxt_clicked();
-    void on_plot_clicked();
-    void on_printOne_clicked();
-    void on_onlineIcl_clicked();
-    void on_onlineTxt_clicked();
+
+    void search_norse_word();
+    void search_norse_text();
+    void search_original();
+    void search_all_inflections();
+    void search_one_inflection();
+    void search_icelandic_word();
+    void search_icelandic_text();
+
     void loadPage();
     void addTab_clicked();
     void closeTab(int);
 
+    void on_actionMinimize_triggered();
+
+    void on_actionFullscreen_triggered();
+
+    void on_actionNew_Tab_triggered();
+
+    void on_actionClose_Tab_triggered();
+
+    void on_actionModern_Icelandic_triggered();
+
+    void on_actionEnglish_Modern_Icelandic_triggered();
+
+    void on_actionOld_Icelandic_English_triggered();
+
+    void on_actionOld_Icelandic_Text_Search_triggered();
+
+    void on_actionSearch_Inflections_triggered();
+
+    void on_actionList_All_Forms_triggered();
+
+    void on_actionList_One_Specific_Form_triggered();
+
 private:
-    QToolButton * addTab;
     PageDownloader * pageControl;
     std::string webpage;
     std::string inputted;
-    std::string startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24pt;\">Welcome to the Icelandic Dictionary</span></p><p align=\"center\"><span style=\" font-size:20pt;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
+    std::string startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24pt;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20pt;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
     std::map<std::string, std::string> writeRules = {
         std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
         std::make_pair("ú", "%FA"), std::make_pair("ý", "%FD"), std::make_pair("Á", "%C1"), std::make_pair("É", "%C9"),
@@ -102,7 +125,7 @@ private:
     std::string printOneWord;
     std::string printOneForm;
     bool textReady = false;
-    size_t typeTimes = 0;
+    int typeTimes = 0;
     Ui::MainWindow * ui;
     std::vector<std::string> stored;
     std::vector<bool> flags = {0, 0, 0, 0, 0, 0, 0};
@@ -120,32 +143,32 @@ private:
     std::vector<std::pair<std::string, std::string>> textualResults;
     void newTab();
     void downloadPage(std::string url);
-    void parsePage();
+    bool parsePage();
     void buttonChangeColor();
     void importWordIndex();
     void importForms();
     void importInflections();
-    void importInflectionsThread(mapptrvecptr_t mapvec, size_t i);
-    void importWordIndexThread(mapptrvecptr_t mapvec, std::string const name, size_t i);
+    void importInflectionsThread(mapptrvecptr_t mapvec, int i);
+    void importWordIndexThread(mapptrvecptr_t mapvec, std::string const name, int i);
     void importOriginal();
-    void importOriginalThread(mapptrvecptr_t mapvec, size_t i);
+    void importOriginalThread(mapptrvecptr_t mapvec, int i);
     void importDictionary();
-    void importDictionaryThread(std::string const name, size_t i);
+    void importDictionaryThread(std::string const name, int i);
     void findDefinition(std::string const & word);
-    void findDefinitionPrint(size_t index);
+    void findDefinitionPrint(int index);
     void findInflection(std::string const & word);
     void onlineDefinition(std::string const & word);
     void onlineText(std::string const & word);
-    void findInflectionThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
+    void findInflectionThread(ptrvecstrvecptr_t dics, std::string word, int index);
     void textualSearch(std::string const & word);
-    void textualSearchThread(std::string word, size_t index);
-    void textualSearchPrint(size_t index);
+    void textualSearchThread(std::string word, int index);
+    void textualSearchPrint(int index);
     void printAll(std::string const & word);
-    void printAllThread(std::string word, size_t index);
-    void printAllPrint(size_t index);
+    void printAllThread(std::string word, int index);
+    void printAllPrint(int index);
     void printOne(std::string const & word, std::string const & form);
-    void printOneThread(ptrvecstrvecptr_t dics, std::string word, std::string form, size_t index);
-    void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, std::string word, size_t index);
+    void printOneThread(ptrvecstrvecptr_t dics, std::string word, std::string form, int index);
+    void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, std::string word, int index);
 };
 
 
