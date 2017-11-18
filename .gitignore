@@ -1,8 +1,12 @@
-debug/
-release/
 
 alphabet/vifgusson-old
 
 alphabet/wordindex-old
 
 alphabet/zoega-old
+
+alphabet/unique*
+
+alphabet/extract*
+
+*.user*
