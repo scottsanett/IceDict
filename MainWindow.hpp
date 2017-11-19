@@ -12,6 +12,7 @@
 //#include "QStatusBar"
 #include "QPushButton"
 #include "QLineEdit"
+#include "QLabel"
 #include "QHBoxLayout"
 #include "QGridLayout"
 #include "QTextBrowser"
@@ -37,7 +38,9 @@
 #include <algorithm>
 #include <cctype>
 
-#include "pagedownloader.h"
+#include "PageDownloader.hpp"
+#include "TreeWidget.hpp"
+#include "TreeWidgetItem.hpp"
 
 using map_t = std::multimap<std::string, int>;
 using mapptr_t = std::shared_ptr<map_t>;
@@ -69,10 +72,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_input_textEdited(const QString &arg1);
-    void on_input_editingFinished();
-    void on_options_itemClicked(QListWidgetItem *item);
-
     void search_norse_word();
     void search_norse_text();
     void search_original();
@@ -85,6 +84,15 @@ private slots:
     void loadPage();
     void addTab_clicked();
     void closeTab(int);
+
+    /* slots concerning selection changes in the InflectionForms tree */
+    void checkStateChanged(Qt::CheckState, QString const &);
+
+    void on_input_textEdited(const QString &arg1);
+
+    void on_input_editingFinished();
+
+    void on_options_itemClicked(QListWidgetItem *item);
 
     void on_actionMinimize_triggered();
 
@@ -109,10 +117,18 @@ private slots:
     void on_actionList_One_Specific_Form_triggered();
 
 private:
+    /* pointers */
+    Ui::MainWindow * ui;
     PageDownloader * pageControl;
     QListWidget * resultsFromDictionaries;
-    Ui::MainWindow * ui;
+    TreeWidget * inflectionForms;
+    /*
+    QTreeView * inflectionForms;
+    QStandardItemModel * inflectionModel;
+    */
+    QLabel * alternativeLabel;
 
+    /* POD members */
     bool textReady = false;
     int typeTimes = 0;
     const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24pt;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20pt;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
@@ -121,6 +137,54 @@ private:
     const char * textUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=dentry&q1=";
     const char * textUrl2 = "&submit=Search";
 
+    struct PartOfSpeech {
+        const char * MasNoun = "<td>kk</td>";
+        const char * FemNoun = "<td>kvk</td>";
+        const char * NetNoun = "<td>hk</td>";
+        const char * Adjective = "<td>lo</td>";
+        const char * Verb = "<td>so</td>";
+        const char * Pronoun = "<td>fn</td>";
+    } PartOfSpeech;
+
+    struct InflectionalStructure {
+        const char * Participle = "part.";
+        const char * PresentParticiple = "pres. part.";
+        const char * PastParticiple = "past part.";
+        const char * Infinitive = "infin.";
+        const char * Supine = " supine";
+        const char * Impersonal = "impers.";
+        const char * Active = "act.";
+        const char * Middle = "mid.";
+        const char * Indicative = "indic.";
+        const char * Subjunctive = "subj.";
+        const char * Imperative = "imperat.";
+        const char * Present = " pres. ";
+        const char * Past = " past ";
+        const char * FstPrs = "1st";
+        const char * SndPrs = "2nd";
+        const char * ThdPrs = "3rd";
+        const char * Singular = "sg.";
+        const char * Plural = "pl.";
+        const char * Nominative = "nom.";
+        const char * Accusative = "acc.";
+        const char * Dative = "dat.";
+        const char * Genitive = "gen.";
+        const char * Masculine = " m.";
+        const char * Feminine = " f.";
+        const char * Neuter = " n.";
+        const char * Definite = " def.";
+        const char * Indefinite = " ind.";
+        const char * Positive = "pos.";
+        const char * Comparative = "comp.";
+        const char * Superlative = "superl.";
+    } InflectionalStructure;
+
+    std::string webpage;
+    std::string inputted;
+    std::string printOneWord;
+    std::string printOneForm;
+
+    /* Abstract data types */
     std::map<std::string, std::string> writeRules = {
         std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
         std::make_pair("ú", "%FA"), std::make_pair("ý", "%FD"), std::make_pair("Á", "%C1"), std::make_pair("É", "%C9"),
@@ -135,10 +199,6 @@ private:
         std::make_pair("", ""), std::make_pair("", ""), std::make_pair("", "")
     };
 
-    std::string webpage;
-    std::string inputted;
-    std::string printOneWord;
-    std::string printOneForm;
     std::vector<std::string> stored;
     std::vector<bool> flags = {0, 0, 0, 0, 0, 0, 0};
     mapptrvecptr_t inflectionals;
@@ -153,15 +213,49 @@ private:
     std::vector<std::pair<std::string, std::string>> textualResults;
 
 private:
+    TreeWidgetItem * constructItem(QString const &, TreeWidget * parent);
+    TreeWidgetItem * constructItem(QString const &, TreeWidgetItem * parent);
+
     std::string addStyleToResults(std::string str);
     std::string wordToWrite(std::string);
 
+    /* functions concerning user interface */
     void activateInput();
+    void initializeResultFromDictionaries();
     void clearResultFromDictionaries();
+    void initializeInflectionForms();
+    void clearInflectionForms();
     void newTab();
+
+    void fillInflectionForms(std::string const &);
+
+    /* functions concerning inflectional menu */
+    /* first level */
+    void fillVerbs(std::string const &);
+    void fillNouns(std::string const &);
+    void fillAdjectives(std::string const &);
+    void fillPronouns(std::string const &);
+    void fillAdverbs(std::string const &);
+
+    /* second level */
+    void fillImpersonality(TreeWidgetItem * item, std::string const &);
+    void fillVoices(TreeWidgetItem * item, std::string const &);
+    void fillMoods(TreeWidgetItem * item, std::string const &);
+    void fillTenses(TreeWidgetItem * item ,std::string const &);
+    void fillParticipleTenses(TreeWidgetItem * item, std::string const &);
+    void fillPersons(TreeWidgetItem * item, std::string const &);
+    void fillNumbers(TreeWidgetItem * item, std::string const &);
+    void fillCases(TreeWidgetItem * item, std::string const &);
+    void fillGenders(TreeWidgetItem * item, std::string const &);
+    void fillDefiniteness(TreeWidgetItem * item, std::string const &);
+    void fillAdverbForms(TreeWidgetItem * item, std::string const &);
+
+
+    /* functions concerning online query */
     void downloadPage(std::string url);
     bool parsePage();
-    void buttonChangeColor();
+
+    /* importing functions */
     void importWordIndex();
     void importForms();
     void importInflections();
@@ -171,6 +265,8 @@ private:
     void importOriginalThread(mapptrvecptr_t mapvec, int i);
     void importDictionary();
     void importDictionaryThread(std::string const name, int i);
+
+    /* query functions */
     void findDefinition(std::string const & word);
     void findDefinitionPrint(int index);
     void findInflection(std::string const & word);
@@ -190,15 +286,9 @@ private:
 
 
 template <typename T>
-std::string to_string(T value)
-{
-  //create an output string stream
+std::string to_string(T value) {
   std::ostringstream os ;
-
-  //throw the value into the string stream
   os << value ;
-
-  //convert the string stream into a string and return
   return os.str() ;
 }
 

@@ -30,11 +30,16 @@ win32:RC_ICONS += alphabet/icon.ico
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    pagedownloader.cpp
+    TreeWidget.cpp \
+    TreeWidgetItem.cpp \
+    MainWindow.cpp \
+    PageDownloader.cpp
 
-HEADERS  += mainwindow.h \
-    pagedownloader.h
+HEADERS  += \
+    TreeWidget.hpp \
+    TreeWidgetItem.hpp \
+    MainWindow.hpp \
+    PageDownloader.hpp
 
 FORMS += \
     mainwindow.ui

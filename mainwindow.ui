@@ -74,7 +74,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>150</width>
+            <width>200</width>
             <height>16777215</height>
            </size>
           </property>
@@ -111,7 +111,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>150</width>
+            <width>200</width>
             <height>16777215</height>
            </size>
           </property>
@@ -195,8 +195,14 @@
     <addaction name="actionList_All_Forms"/>
     <addaction name="actionList_One_Specific_Form"/>
    </widget>
+   <widget class="QMenu" name="menuInflections">
+    <property name="title">
+     <string>Inflections</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDictionaries"/>
+   <addaction name="menuInflections"/>
    <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -301,6 +307,72 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+7</string>
+   </property>
+  </action>
+  <action name="actionActive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Active</string>
+   </property>
+  </action>
+  <action name="actionMiddle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Middle</string>
+   </property>
+  </action>
+  <action name="actionAll">
+   <property name="text">
+    <string>All</string>
+   </property>
+  </action>
+  <action name="actionAll_2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>All</string>
+   </property>
+  </action>
+  <action name="actionImpersonal">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Impersonal</string>
+   </property>
+  </action>
+  <action name="actionIndicative">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Indicative</string>
+   </property>
+  </action>
+  <action name="actionSubjunctive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Subjunctive</string>
+   </property>
+  </action>
+  <action name="actionImperative">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Imperative</string>
+   </property>
+  </action>
+  <action name="actionAll_3">
+   <property name="text">
+    <string>All</string>
    </property>
   </action>
  </widget>

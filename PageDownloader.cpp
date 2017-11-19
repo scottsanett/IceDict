@@ -1,4 +1,4 @@
-#include "pagedownloader.h"
+#include "PageDownloader.hpp"
 
 PageDownloader::PageDownloader(QUrl fileUrl, QObject *parent) : QObject(parent)
 {
