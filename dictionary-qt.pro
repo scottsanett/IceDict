@@ -13,7 +13,7 @@ QT       += core gui\
 
 TARGET = IceDict
 TEMPLATE = app
-QMAKE_CXXFLAGS += -std=c++1y
+QMAKE_CXXFLAGS += -std=c++17
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -21,7 +21,7 @@ QMAKE_CXXFLAGS += -std=c++1y
 DEFINES += QT_DEPRECATED_WARNINGS
 RESOURCES = resource.qrc
 ICON = alphabet/icon.icns
-CONFIG += resources_big
+CONFIG += resources_big\
 win32:RC_ICONS += alphabet/icon.ico
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -33,13 +33,16 @@ SOURCES += main.cpp\
     TreeWidget.cpp \
     TreeWidgetItem.cpp \
     MainWindow.cpp \
-    PageDownloader.cpp
+    PageDownloader.cpp \
+    inflection.cpp
 
 HEADERS  += \
     TreeWidget.hpp \
     TreeWidgetItem.hpp \
     MainWindow.hpp \
-    PageDownloader.hpp
+    PageDownloader.hpp \
+    inflection.hpp \
+    macros.hpp
 
 FORMS += \
     mainwindow.ui

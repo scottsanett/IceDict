@@ -13,7 +13,7 @@ private:
     void adjustParentCheckStatus(QTreeWidgetItem * parent);
 
 signals:
-    void checkStateChanged(Qt::CheckState, QString const &);
+    void checkStateChanged(Qt::CheckState, QVector<QString> const);
 
 public:
     using QTreeWidgetItem::QTreeWidgetItem;

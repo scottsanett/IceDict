@@ -40,6 +40,7 @@ void TreeWidgetItem::setData(int column, int role, const QVariant& value) {
         && role == Qt::CheckStateRole
         && data(column, role).isValid()
         && checkState(0) != value;
+    auto backup = checkState(0);
     QTreeWidgetItem::setData(column, role, value);
 
     if (isCheckChange) {
@@ -66,6 +67,20 @@ void TreeWidgetItem::setData(int column, int role, const QVariant& value) {
             adjustParentCheckStatus(parent);
         }
 
-        emit checkStateChanged(checkState(0), this->text(0));
+        // no child
+        if (!count) {
+            QVector<QString> result;
+            QTreeWidgetItem * current = this;
+
+            while (current) {
+                result.push_front(current->text(0));
+                current = current->QTreeWidgetItem::parent();
+            }
+
+            if (checkState(0) != Qt::PartiallyChecked && backup != Qt::PartiallyChecked) {
+                emit checkStateChanged(checkState(0), result);
+            }
+
+        }
     }
 }

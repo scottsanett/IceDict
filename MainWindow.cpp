@@ -101,30 +101,15 @@ void MainWindow::clearResultFromDictionaries() {
 
 void MainWindow::initializeInflectionForms() {
     if (!inflectionForms) inflectionForms = new TreeWidget;
-
     inflectionForms->setHeaderLabel("Inflections");
     inflectionForms->setMaximumWidth(200);
     inflectionForms->setMinimumHeight(400);
     ui->inputLayout->addWidget(inflectionForms);
-    /*
-    QObject::connect(
-                inflectionQuery, &QLineEdit::textEdited,
-                this, &MainWindow::inflectionQuery_textEdited
-                );
-    QObject::connect(
-                inflectionQuery, &QLineEdit::editingFinished,
-                this, &MainWindow::inflectionQuery_editingFinished
-                );
-    QObject::connect(
-                inflectionForms, &QListWidget::itemClicked,
-                this, &MainWindow::inflectionForms_itemClicked
-                );
-                */
 }
 
 void MainWindow::clearInflectionForms() {
     if (inflectionForms) {
-//        inflectionForms->clear();
+        inflectionForms->clear();
         ui->inputLayout->removeWidget(inflectionForms);
         delete inflectionForms;
         inflectionForms = nullptr;
@@ -616,8 +601,14 @@ void MainWindow::printAllThread(std::string word, int index) {
 }
 
 void MainWindow::printAllPrint(int index) {
+    // thisResult is the vector that stores all the inflections of a given word
     auto thisResult = resultsToPrint[index];
+
+    inflSelectResult.clear();
+    inflSelectResult = thisResult.second;
+
     std::string toprint;
+
     for (auto i : thisResult.second) {
        std::string temp = addStyleToResults(i);
        toprint += temp;
@@ -631,7 +622,6 @@ void MainWindow::printAllPrint(int index) {
      * fill the widget per part of speech
      */
 
-//    qDebug() << toprint.c_str();
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
     tabActive->setHtml(toprint.c_str());
@@ -1118,14 +1108,53 @@ void MainWindow::on_actionList_One_Specific_Form_triggered()
     ui->statusBar->showMessage("Search one specific inflectional form of a word");
 }
 
-void MainWindow::checkStateChanged(Qt::CheckState state, QString const & str) {
-    qDebug() << str << "has changed to" << state;
+void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const vec) {
+    QString result;
+    for (auto && i : vec) {
+        result += i + " ";
+    }
+    result = result.trimmed();
+
+    if (state == Qt::CheckState::Checked) {
+        if (inflStruct.find(vec) == inflStruct.end()) {
+            inflStruct.insert(vec);
+        }
+    }
+    else if (state == Qt::CheckState::Unchecked) {
+        inflStruct.erase(inflStruct.find(vec));
+    }
+
+    for (auto && i : inflStruct) {
+        qDebug() << i;
+    }
+
+
+    // auto resultVec = ParseCheckStateChangeInfo();
+
+    //for (auto && i : resultVec) qDebug() << i.c_str();
+
+    /*
+    std::string toprint;
+    for (auto i : resultVec) {
+       std::string temp = addStyleToResults(i);
+       toprint += temp;
+    }
+
+    toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
+    auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
+    tabActive->setHtml(toprint.c_str());
+    */
+
+    /*
+    qDebug() << result << "has changed to" << state;
+    qDebug() << " ";
+    */
 }
 
-TreeWidgetItem * MainWindow::constructItem(QString const & label, TreeWidget * parent) {
+TreeWidgetItem * MainWindow::constructItem(QString label, TreeWidget * parent) {
     auto item = new TreeWidgetItem(parent);
     item->setText(0, label);
-    item->setCheckState(0, Qt::Checked);
+    item->setCheckState(0, Qt::Unchecked);
     QObject::connect(
                 item, &TreeWidgetItem::checkStateChanged,
                 this, &MainWindow::checkStateChanged
@@ -1133,10 +1162,10 @@ TreeWidgetItem * MainWindow::constructItem(QString const & label, TreeWidget * p
     return item;
 }
 
-TreeWidgetItem * MainWindow::constructItem(QString const & label, TreeWidgetItem * parent) {
+TreeWidgetItem * MainWindow::constructItem(QString label, TreeWidgetItem * parent) {
     auto item = new TreeWidgetItem(parent);
     item->setText(0, label);
-    item->setCheckState(0, Qt::Checked);
+    item->setCheckState(0, Qt::Unchecked);
     QObject::connect(
                 item, &TreeWidgetItem::checkStateChanged,
                 this, &MainWindow::checkStateChanged
@@ -1145,12 +1174,34 @@ TreeWidgetItem * MainWindow::constructItem(QString const & label, TreeWidgetItem
 }
 
 void MainWindow::fillInflectionForms(std::string const & str) {
-    if (str.find(PartOfSpeech.MasNoun) != std::string::npos) fillNouns(str);
-    else if (str.find(PartOfSpeech.FemNoun) != std::string::npos) fillNouns(str);
-    else if (str.find(PartOfSpeech.NetNoun) != std::string::npos) fillNouns(str);
-    else if (str.find(PartOfSpeech.Verb) != std::string::npos) fillVerbs(str);
-    else if (str.find(PartOfSpeech.Adjective) != std::string::npos) fillAdjectives(str);
-    else if (str.find(PartOfSpeech.Pronoun) != std::string::npos) fillPronouns(str);
+    if (str.find(PartOfSpeech.MasNoun) != std::string::npos) {
+        currentPOS = POS::Noun;
+        fillNouns(str);
+    }
+    else if (str.find(PartOfSpeech.FemNoun) != std::string::npos) {
+        currentPOS = POS::Noun;
+        fillNouns(str);
+    }
+    else if (str.find(PartOfSpeech.NetNoun) != std::string::npos) {
+        currentPOS = POS::Noun;
+        fillNouns(str);
+    }
+    else if (str.find(PartOfSpeech.Verb) != std::string::npos) {
+        currentPOS = POS::Verb;
+        fillVerbs(str);
+    }
+    else if (str.find(PartOfSpeech.Adjective) != std::string::npos) {
+        currentPOS = POS::Adjective;
+        fillAdjectives(str);
+    }
+    else if (str.find(PartOfSpeech.Pronoun) != std::string::npos) {
+        currentPOS = POS::Pronoun;
+        fillPronouns(str);
+    }
+    else if (str.find(PartOfSpeech.Adverb) != std::string::npos) {
+        currentPOS = POS::Adverb;
+        fillAdverbs(str);
+    }
     else ;
 }
 
@@ -1158,274 +1209,207 @@ void MainWindow::fillVerbs(const std::string & str) {
     if (!inflectionForms) return;
 
     auto none = constructItem("Verb", inflectionForms);
-    fillImpersonality(none, str);
-    fillVoices(none, str);
-    fillMoods(none, str);
-    fillTenses(none, str);
-    fillPersons(none, str);
-    fillNumbers(none, str);
+    fillStructures<false, TYPE_IMPERSONALITY>(none, str);
+    fillStructures<false, TYPE_VOICE>(none, str);
+    fillStructures<false, TYPE_MOOD>(none, str);
+    fillStructures<false, TYPE_TENSE>(none, str);
+    fillStructures<false, TYPE_PERSON>(none, str);
+    fillStructures<false, TYPE_NUMBER>(none, str);
 
-    bool findParticiple = str.find(InflectionalStructure.Participle) != std::string::npos;
-    if (findParticiple) {
-        auto participle = constructItem("Participle", inflectionForms);
-        fillParticipleTenses(participle, str);
-        fillDefiniteness(participle, str);
-        fillGenders(participle, str);
-        fillCases(participle, str);
-        fillNumbers(participle, str);
-    }
-
-    bool findInfinitive = str.find(InflectionalStructure.Infinitive) != std::string::npos;
+    bool findInfinitive = InflManager.find(str, Infl::Full, Infl::Infinitive);
     if (findInfinitive) {
         auto infinitive = constructItem("Infinitive", inflectionForms);
-        fillVoices(infinitive, str);
-        fillNumbers(infinitive, str);
+        fillStructures<false, TYPE_VOICE>(infinitive, str);
+        fillStructures<false, TYPE_NUMBER>(infinitive, str);
     }
 
-    bool findSupine = str.find(InflectionalStructure.Supine) != std::string::npos;
+    bool findSupine = InflManager.find(str, Infl::Full, Infl::Supine);
     if (findSupine) {
         auto supine = constructItem("Supine", inflectionForms);
-        fillVoices(supine, str);
+        fillStructures<false, TYPE_VOICE>(supine, str);
     }
 
+    bool findParticiple = InflManager.find(str, Infl::Full, Infl::Participle);
+    if (findParticiple) {
+        auto participle = constructItem("Participle", inflectionForms);
+        fillStructures<false, TYPE_PARTICIPLE_TENSE>(participle, str);
+        fillStructures<false, TYPE_DEFINITENESS>(participle, str);
+        fillStructures<false, TYPE_GENDER>(participle, str);
+        fillStructures<false, TYPE_CASE>(participle, str);
+        fillStructures<false, TYPE_NUMBER>(participle, str);
+    }
 }
 
 void MainWindow::fillNouns(std::string const & str) {
     if (!inflectionForms) return;
-
-    auto wordInflection = constructItem("Noun", inflectionForms);
-    fillCases(wordInflection, str);
-    fillNumbers(wordInflection, str);
-    fillDefiniteness(wordInflection, str);
+    fillStructures<true, TYPE_CASE>(inflectionForms, str);
+    fillStructures<true, TYPE_NUMBER>(inflectionForms, str);
+    fillStructures<true, TYPE_DEFINITENESS>(inflectionForms, str);
 }
 
 void MainWindow::fillAdjectives(std::string const & str) {
     if (!inflectionForms) return;
 
-    bool findPositive = str.find(InflectionalStructure.Positive) != std::string::npos;
-    bool findComparat = str.find(InflectionalStructure.Comparative) != std::string::npos;
-    bool findSuperlat = str.find(InflectionalStructure.Superlative) != std::string::npos;
+    bool findPositive = InflManager.find(str, Infl::Full, Infl::Positive);
+    bool findComparat = InflManager.find(str, Infl::Full, Infl::Comparative);
+    bool findSuperlat = InflManager.find(str, Infl::Full, Infl::Superlative);
 
-    if (!(findPositive && findComparat && findSuperlat)) return;
+    if (!(findPositive || findComparat || findSuperlat)) return;
 
     if (findPositive) {
         auto positive = constructItem("Positive", inflectionForms);
-        fillDefiniteness(positive, str);
-        fillGenders(positive, str);
-        fillCases(positive, str);
-        fillNumbers(positive, str);
+        fillStructures<false, TYPE_DEFINITENESS>(positive, str);
+        fillStructures<false, TYPE_GENDER>(positive, str);
+        fillStructures<false, TYPE_CASE>(positive, str);
+        fillStructures<false, TYPE_NUMBER>(positive, str);
     }
     if (findComparat) {
         auto comparat = constructItem("Comparative", inflectionForms);
-        fillGenders(comparat, str);
-        fillCases(comparat, str);
-        fillNumbers(comparat, str);
+        fillStructures<false, TYPE_GENDER>(comparat, str);
+        fillStructures<false, TYPE_CASE>(comparat, str);
+        fillStructures<false, TYPE_NUMBER>(comparat, str);
     }
     if (findSuperlat) {
         auto superlat = constructItem("Superlative", inflectionForms);
-        fillDefiniteness(superlat, str);
-        fillGenders(superlat, str);
-        fillCases(superlat, str);
-        fillNumbers(superlat, str);
+        fillStructures<false, TYPE_DEFINITENESS>(superlat, str);
+        fillStructures<false, TYPE_GENDER>(superlat, str);
+        fillStructures<false, TYPE_CASE>(superlat, str);
+        fillStructures<false, TYPE_NUMBER>(superlat, str);
     }
 }
 
 void MainWindow::fillPronouns(std::string const & str) {
     if (!inflectionForms) return;
-
-    auto wordInflection = constructItem("Inflections", inflectionForms);
-    fillGenders(wordInflection, str);
-    fillCases(wordInflection, str);
-    fillNumbers(wordInflection, str);
+    fillStructures<true, TYPE_GENDER>(inflectionForms, str);
+    fillStructures<true, TYPE_CASE>(inflectionForms, str);
+    fillStructures<true, TYPE_NUMBER>(inflectionForms, str);
 }
 
 void MainWindow::fillAdverbs(std::string const & str) {
     if (!inflectionForms) return;
-
-    auto wordInflection = constructItem("Adverb", inflectionForms);
-    fillAdverbForms(wordInflection, str);
+    fillStructures<true, TYPE_FORM>(inflectionForms, str);
 }
 
 
-void MainWindow::fillImpersonality(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    if (str.find(InflectionalStructure.Impersonal) == std::string::npos) return;
-    auto impersonality = constructItem("Impersonality", item);
-    auto impersonal = constructItem("Impersonal", impersonality);
-    auto other = constructItem("Other", impersonality);
-}
-
-void MainWindow::fillVoices(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findActive = str.find(InflectionalStructure.Active) != std::string::npos;
-    bool findMiddle = str.find(InflectionalStructure.Middle) != std::string::npos;
-    if (!(findActive && findMiddle)) return;
-
-    auto voices = constructItem("Voices", item);
-    if (findActive) {
-        auto active = constructItem("Active", voices);
+std::vector<std::string> MainWindow::ParseCheckStateChangeInfo() {
+    switch (currentPOS) {
+    case (POS::Verb): {
+        return ParseVerb();
     }
-    if (findMiddle) {
-        auto middle = constructItem("Middle", voices);
+    case (POS::Noun): {
+        return ParseNoun();
+    }
+    case (POS::Adjective): {
+        return ParseAdjective();
+    }
+    case (POS::Adverb): {
+        return ParseAdverb();
+    }
+    case (POS::Pronoun): {
+        return ParsePronoun();
+    }
     }
 }
 
-void MainWindow::fillMoods(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findIndicative = str.find(InflectionalStructure.Indicative) != std::string::npos;
-    bool findSubjunctive = str.find(InflectionalStructure.Subjunctive) != std::string::npos;
-    bool findImperative = str.find(InflectionalStructure.Imperative) != std::string::npos;
-    if (!(findIndicative && findSubjunctive && findImperative)) return;
+std::vector<std::string> MainWindow::ParseVerb() {
+    /*
+    std::vector<std::string> result;
+    for (auto && i : inflSelectResult) {
+        auto findInfin = InflManager.find(i, Infl::Short, Infl::Infinitive);
+        auto findSupin = InflManager.find(i, Infl::Short, Infl::Supine);
+        auto findParti = InflManager.find(i, Infl::Short, Infl::Participle);
 
-    auto moods = constructItem("Moods", item);
-    if (findIndicative) {
-        auto indicative = constructItem("Indicative", moods);
+        auto itr = inflStruct.cbegin();
+        while (itr != inflStruct.cend()) {
+            if (itr->at(0) == "Verb") {
+                if (!findInfin && !findSupin && !findParti) {
+                    if (itr->at(1) == "Impersonality") {
+
+                        itr = std::next(itr);
+                    }
+                    else if (itr->at(1) == "Voices") {
+
+                    }
+                    else if (itr->at(1) == "Moods") {
+                    }
+                    else if (itr->at(1) == "Tenses") {
+                    }
+                    else if (itr->at(1) == "Persons") {
+                    }
+                    else if (itr->at(1) == "Numbers") {
+                        if (itr->at(2) == InflManager.nameOf(Infl::Singular).c_str()) {
+                            if (InflManager.find(i, Infl::Short, Infl::Singular)) {
+
+                            }
+                        }
+                        else if (itr->at(2) == InflManager.nameOf(Infl::Plural).c_str()) {
+                            if (InflManager.find(i, Infl::Short, Infl::Plural)) {
+
+                            }
+                        }
+                    }
+                }
+ //               level1 = level1 || level3;
+            }
+            else if (itr->at(0) == InflManager.nameOf(Infl::Infinitive).c_str()) {
+                if (findInfin) {
+
+                }
+            }
+            else if (itr->at(0) == InflManager.nameOf(Infl::Supine).c_str()) {
+                if (findSupin) {
+
+                }
+            }
+            else if (itr->at(0) == InflManager.nameOf(Infl::Participle).c_str()) {
+                if (findParti) {
+
+                }
+            }
+        }
     }
-    if (findSubjunctive) {
-        auto subjunctive = constructItem("Subjunctive", moods);
-    }
-    if (findImperative) {
-        auto imperative = constructItem("Imperative", moods);
-    }
+    return result;
+    */
 }
 
-void MainWindow::fillTenses(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findPresent = str.find(InflectionalStructure.Present) != std::string::npos;
-    bool findPast = str.find(InflectionalStructure.Past) != std::string::npos;
-    if (!(findPresent && findPast)) return;
 
-    auto tenses = constructItem("Tenses", item);
-    if (findPresent) {
-        auto present = constructItem("Present", tenses);
+template <bool D,
+          Infl::Category cat,
+          Infl::Forms ... args,
+          class T>
+void MainWindow::fillStructures(T * item, std::string const & str) {
+    if (!item) return;
+    std::array<bool, sizeof... (args)> values;
+    for (unsigned i = 0; i < sizeof... (args); ++i) {
+        values = fillStructuresHelper<sizeof...(args), args...>(str);
     }
-    if (findPast) {
-        auto past = constructItem("Past", tenses);
+    bool boolSum = false;
+    for (auto && v : values) {
+        if (v == true) { boolSum = true; break; }
     }
+    if (boolSum == false) return;
+
+    auto parent = constructItem(InflManager.categoryOf(cat).c_str(), item);
+    fillStructureItemConstructor<sizeof...(args), args...>(parent, values);
 }
 
-void MainWindow::fillParticipleTenses(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findPresent = str.find(InflectionalStructure.PresentParticiple) != std::string::npos;
-    bool findPast = str.find(InflectionalStructure.PastParticiple) != std::string::npos;
-    if (!(findPresent && findPast)) return;
 
-    auto tenses = constructItem("Tenses", item);
-    if (findPresent) {
-        auto present = constructItem("Present", tenses);
-    }
-    if (findPast) {
-        auto past = constructItem("Past", tenses);
-    }
+template <int Size, Infl::Forms ... Forms>
+std::array<bool, Size> MainWindow::fillStructuresHelper(std::string const & str) {
+    std::array<bool, Size> result;
+    auto values = {Forms...}; // initializer list
+    unsigned index = 0;
+    std::for_each(values.begin(), values.end(), [&](Infl::Forms n){result[index] = InflManager.find(str, Infl::Full, n); ++index; });
+    return result;
 }
 
-void MainWindow::fillPersons(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findFirst = str.find(InflectionalStructure.FstPrs) != std::string::npos;
-    bool findSecond = str.find(InflectionalStructure.SndPrs) != std::string::npos;
-    bool findThird = str.find(InflectionalStructure.ThdPrs) != std::string::npos;
-    if (!(findFirst && findSecond && findThird)) return;
-
-    auto persons = constructItem("Persons", item);
-    if (findFirst) {
-        auto firstPrs = constructItem("First", persons);
-    }
-    if (findSecond) {
-        auto secondPrs = constructItem("Second", persons);
-    }
-    if (findThird) {
-        auto thirdPrs = constructItem("Third", persons);
-    }
+template <int Size, Infl::Forms ... Forms>
+void MainWindow::fillStructureItemConstructor(TreeWidgetItem * item, std::array<bool, Size> const & array) {
+    auto values = {Forms...};
+    unsigned index = 0;
+    std::for_each(values.begin(), values.end(), [&](Infl::Forms f){
+        if (array.at(index) == true) {
+            constructItem(InflManager.nameOf(f).c_str(), item);
+        }
+    });
 }
-
-void MainWindow::fillNumbers(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findSingular = str.find(InflectionalStructure.Singular) != std::string::npos;
-    bool findPlural = str.find(InflectionalStructure.Plural) != std::string::npos;
-    if (!(findSingular && findPlural)) return;
-
-    auto numbers = constructItem("Numbers", item);
-    if (findSingular) {
-        auto singular = constructItem("Singular", numbers);
-    }
-    if (findPlural) {
-        auto plural = constructItem("Plural", numbers);
-    }
-}
-
-void MainWindow::fillCases(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findNominative = str.find(InflectionalStructure.Nominative) != std::string::npos;
-    bool findAccusative = str.find(InflectionalStructure.Accusative) != std::string::npos;
-    bool findDative = str.find(InflectionalStructure.Dative) != std::string::npos;
-    bool findGenitive = str.find(InflectionalStructure.Genitive) != std::string::npos;
-    if (!(findNominative && findAccusative && findDative && findGenitive)) return;
-
-    auto cases = constructItem("Cases", item);
-    if (findNominative) {
-        auto nominative = constructItem("Nominative", cases);
-    }
-    if (findAccusative) {
-        auto accusative = constructItem("Accusative", cases);
-    }
-    if (findDative) {
-        auto dative = constructItem("Dative", cases);
-    }
-    if (findGenitive) {
-        auto genitive = constructItem("Genitive", cases);
-    }
-}
-
-void MainWindow::fillGenders(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findMasculine = str.find(InflectionalStructure.Masculine) != std::string::npos;
-    bool findFeminine = str.find(InflectionalStructure.Feminine) != std::string::npos;
-    bool findNeuter = str.find(InflectionalStructure.Neuter) != std::string::npos;
-    if (!(findMasculine && findFeminine && findNeuter)) return;
-
-    auto genders = constructItem("Genders", item);
-    if (findMasculine) {
-        auto masc = constructItem("Masculine", genders);
-    }
-    if (findFeminine) {
-        auto fem = constructItem("Feminine", genders);
-    }
-    if (findNeuter) {
-        auto neut = constructItem("Neuter", genders);
-    }
-}
-
-void MainWindow::fillDefiniteness(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findDefinite = str.find(InflectionalStructure.Definite) != std::string::npos;
-    bool findIndefinite = str.find(InflectionalStructure.Indefinite) != std::string::npos;
-    if (!(findDefinite && findIndefinite)) return;
-
-    auto definiteness = constructItem("Definiteness", item);
-    if (findDefinite) {
-        auto definite = constructItem("Definite", definiteness);
-    }
-    if (findIndefinite) {
-        auto indefinite = constructItem("Indefinite", definiteness);
-    }
-}
-
-void MainWindow::fillAdverbForms(TreeWidgetItem * item, std::string const & str) {
-    if (!inflectionForms) return;
-    bool findPositive = str.find(InflectionalStructure.Positive) != std::string::npos;
-    bool findComparat = str.find(InflectionalStructure.Comparative) != std::string::npos;
-    bool findSuperlat = str.find(InflectionalStructure.Superlative) != std::string::npos;
-    if (!(findPositive && findComparat && findSuperlat)) return;
-
-    auto adforms = constructItem("Forms", item);
-    if (findPositive) {
-        auto positive = constructItem("Positive", adforms);
-    }
-    if (findComparat) {
-        auto comparat = constructItem("Comparative", adforms);
-    }
-    if (findSuperlat) {
-        auto superlat = constructItem("Superlative", adforms);
-    }
-}
-
