@@ -13,6 +13,7 @@
         <file>alphabet/source_reverse_index/part5</file>
         <file>alphabet/source_reverse_index/part6</file>
         <file>alphabet/source_reverse_index/part7</file>
+        <file>alphabet/source_reverse_index/part8</file>
         <file>alphabet/source/part1</file>
         <file>alphabet/source/part2</file>
         <file>alphabet/source/part3</file>
@@ -29,6 +30,5 @@
         <file>alphabet/source_index/part6</file>
         <file>alphabet/source_index/part7</file>
         <file>alphabet/source_index/part8</file>
-        <file>alphabet/source_reverse_index/part8</file>
     </qresource>
 </RCC>
