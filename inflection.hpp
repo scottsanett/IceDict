@@ -54,23 +54,23 @@ private:
     };
 
     std::array<const char *, 32> InflStruct {
-        {"part.", "pres. part.", "past part.",
-        "infin.", " supine", "impers.", "other",
-        "act.", "mid.",
-        "indic.", "subj.", "imperat.",
-        " pres. ", " past ",
+        {"participle", "present participle", "past participle",
+        "infinitive", "supine", "impersonal", "other",
+        "active voice", "middle voice",
+        "indicative", "subjunctive", "imperative",
+        "present tense", "past tense",
         "1st", "2nd", "3rd",
-        "sg.", "pl.", "clipped",
-        "nom.", "acc.", "dat.", "gen.",
-        " m.", " f.", " n.",
-        " def.", " ind.",
-        "pos.", "comp.", "superl."}
+        "singular", "plural", "clipped",
+        "nominative", "accusative", "dative", "genitive",
+        "masculine", "feminine", "neuter",
+        " definite", "indefinite",
+        "positive", "comparative", "superlative"}
     };
 
     std::array<const char *, 11> InflCategory {
         {"Impersonality", "Voice", "Mood",
         "Tense", "Tense", "Person", "Number",
-        "Case", "Gender", "Definiteness", "Form"}
+        "Case", "Gender", "Definiteness", "Degree"}
     };
 
     QVector<std::pair<QString, QString>> InflVec;

@@ -182,7 +182,6 @@
     <addaction name="actionOld_Icelandic_Text_Search"/>
     <addaction name="actionSearch_Inflections"/>
     <addaction name="actionList_All_Forms"/>
-    <addaction name="actionList_One_Specific_Form"/>
    </widget>
    <widget class="QMenu" name="menuInflections">
     <property name="title">

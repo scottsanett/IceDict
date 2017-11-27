@@ -11,19 +11,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     wordindex = strsetptr_t(new strset_t);
     dictionaries = strvecptrmapptrvecptr_t(new strvecptrmapptrvec_t);
     forms = strsetptr_t(new strset_t);
-    for (int i = 0; i < 7; ++i) {
+
+    for (int i = 0; i < 8; ++i) {
         inflectionals->push_back(mapptr_t(new map_t));
         originals->push_back(mapptr_t(new map_t));
     }
+
     for (int i = 0; i < 2; ++i) {
         definitions->push_back(mapptr_t(new map_t));
         dictionaries->push_back(strvecptrmapptr_t(new strvecptrmap_t));
     }
 
     importWordIndex();
-    importForms();
-    importOriginal();
     importDictionary();
+    importOriginal();
     importInflections();
     ui->setupUi(this);
     this->setWindowTitle("Icelandic Dictionary");
@@ -244,21 +245,6 @@ QString MainWindow::wordToWrite(QString arg) {
     return str;
 }
 
-void MainWindow::importForms() {
-    QFile f(":/alphabet/forms");
-
-    f.open(QIODevice::ReadOnly);
-    QString qfile = f.readAll();
-
-    std::istringstream file(qfile.toStdString());
-    std::string line;
-    while (std::getline(file, line)) {
-        forms->insert(line.c_str());
-    }
-
-    f.close();
-}
-
 /* import the index for all words in the two dictionaries */
 
 void MainWindow::importWordIndex() {
@@ -276,10 +262,11 @@ void MainWindow::importWordIndex() {
 }
 
 void MainWindow::importInflections() {
-    for (size_t i = 1; i <= 7; ++i) {
+    for (size_t i = 1; i <= 8; ++i) {
         importInflectionsThread(inflectionals, i);
     }
 }
+
 
 /*import all the inflection forms and its position*/
 void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
@@ -297,12 +284,17 @@ void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
         ++index;
     }
 
-
     f.close();
 }
 
+void MainWindow::importOriginal() {
+    for (size_t i = 1; i <= 8; ++i) {
+        importOriginalThread(originals, i);
+    }
+}
+
 void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
-    QString filename = QString(":/alphabet/sources_index/part") + to_string(i).c_str();
+    QString filename = QString(":/alphabet/source_index/part") + to_string(i).c_str();
     QFile f(filename);
 
     f.open(QIODevice::ReadOnly);
@@ -323,17 +315,9 @@ void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
         iss >> index;
         auto index_number = strtol(index.c_str(), 0, 10);
         thisMap->insert(std::make_pair(key.c_str(), index_number));
-//        thisMap->insert(std::make_pair(key, std::stoul(index)));
     }
-
 
     f.close();
-}
-
-void MainWindow::importOriginal() {
-    for (size_t i = 1; i <= 7; ++i) {
-        importOriginalThread(originals, i);
-    }
 }
 
 void MainWindow::importDictionary() {
@@ -443,12 +427,14 @@ void MainWindow::findDefinitionPrint(size_t index) {
 
 void MainWindow::findInflection(QString const & word) {
     auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
-    for (auto i = 0; i < 7; ++i) {
+    for (auto i = 0; i < 8; ++i) {
         results->push_back(strvecptr_t(new strvec_t));
     }
-    for (size_t i = 0; i < 7; ++i) {
+
+    for (size_t i = 0; i < 8; ++i) {
         findInflectionThread(results, word, i);
     }
+
     auto resultSize = [&]() { int sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
     if (resultSize == 0) {
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
@@ -473,10 +459,9 @@ void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, QString word, s
     auto thisResult = results->at(index);
     auto itr = thisDic->find(word);
     if (itr == thisDic->end()) { return; }
-    QString filename = QString(":/alphabet/sources/part") + to_string(index + 1).c_str();
+    QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
-
 
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
@@ -562,7 +547,7 @@ void MainWindow::printAll(QString const & str) {
     ui->options->clear();
     auto word = str + ';';
     auto & results = resultsToPrint;
-    for (size_t i = 0; i < 7; ++i) {
+    for (size_t i = 0; i < 8; ++i) {
         printAllThread(word, i);
     }
     auto resultSize = [&]() { int sz = 0; for (auto i : results) { sz += i.second.size(); } return sz; }();
@@ -579,12 +564,12 @@ void MainWindow::printAll(QString const & str) {
 }
 
 void MainWindow::printAllThread(QString word, size_t index) {
-    auto thisDic = originals->at(index);
-    auto & thisResult = resultsToPrint; // pointer to a vector of
+    auto & thisDic = originals->at(index);
+    auto & thisResult = resultsToPrint;
     auto range = thisDic->equal_range(word);
     auto count = thisDic->count(word);
     if (count == 0) { return; }
-    QString filename = QString(":/alphabet/sources/part") + to_string(index + 1).c_str();
+    QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
@@ -604,6 +589,7 @@ void MainWindow::printAllThread(QString word, size_t index) {
                 iss >> temp1;
                 std::string temp2;
                 iss >> temp2;
+//                qDebug() << temp1.c_str() << temp2.c_str();
                 if (currentPos == pos) { partOfSpeech = temp2; }
                 if (temp1.c_str() != key) {
                     ++currentPos;
@@ -623,7 +609,6 @@ void MainWindow::printAllThread(QString word, size_t index) {
             }
         }
 
-
         thisResult.push_back(std::make_pair(key, thisEntry));
     }
     file.close();
@@ -633,6 +618,7 @@ void MainWindow::printAllPrint(size_t index) {
     // thisResult is the vector that stores all the inflections of a given word
     auto thisResult = resultsToPrint[index];
 
+    inflStruct.clear();
     inflSelectResult.clear();
     inflSelectResult = thisResult.second;
 
@@ -646,87 +632,11 @@ void MainWindow::printAllPrint(size_t index) {
     clearInflectionForms();
     initializeInflectionForms();
     fillInflectionForms(toprint);
-    /* To do:
-     * send `toprint` to functions that fills the TreeWidget
-     * fill the widget per part of speech
-     */
 
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
     tabActive->setHtml(toprint);
 }
-
-void MainWindow::printOneThread(ptrvecstrvecptr_t results, QString word, QString form, size_t index) {
-    auto thisDic = originals->at(index);
-    auto thisResult = results->at(index);
-    auto range = thisDic->equal_range(word);
-    auto count = thisDic->count(word);
-    if (count == 0) { return; }
-    QString filename = QString(":/alphabet/sources/part") + to_string(index + 1).c_str();
-    QFile file(filename);
-    file.open(QIODevice::ReadOnly);
-    auto qfile = file.readAll();
-    std::istringstream issfile(qfile.toStdString());
-    std::string line;
-    int currentPos = 0;
-    for (auto itr = range.first; itr != range.second; ++itr) {
-        auto key = itr->first;
-        auto pos = itr->second;
-
-        while (std::getline(issfile, line)) {
-            if (currentPos < pos) { ++currentPos; continue; }
-            else {
-                std::istringstream iss(line);
-                std::string temp;
-                iss >> temp;
-                if (temp.c_str() == key) {
-                    if (line.find(form.toStdString()) != std::string::npos) {
-                        thisResult->push_back(line.c_str());
-                        ++currentPos;
-                        break;
-                    }
-                    else { ++currentPos; }
-                }
-                else { break; }
-            }
-        }
-    }
-    file.close();
-}
-
-void MainWindow::printOne(const QString &arg1, const QString &arg2) {
-    ui->input->setPlaceholderText("Insert word here...");
-    auto word = arg1 + ';';
-    auto form = arg2 + ';';
-    auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
-    for (auto i = 0; i < 7; ++i) {
-        results->push_back(strvecptr_t(new strvec_t));
-    }
-    for (size_t i = 0; i < 7; ++i) {
-        printOneThread(results, word, form, i);
-    }
-    auto resultSize = [&]() { int sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
-    if (resultSize == 0) {
-        auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-        tabActive->setFontPointSize(20);
-        tabActive->setText("Word not found.");
-//        ui->input->clear();
-        return;
-    }
-    QString toprint;
-    for (auto && i : * results) {
-        for (auto && j : *i) {
-            j = addStyleToResults(j);
-            toprint += j + '\n';
-        }
-    }
-    toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-    auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(toprint);
-    typeTimes = 0;
-//    ui->input->clear();
-}
-
 
 void MainWindow::on_input_textEdited(const QString &arg1)
 {
@@ -766,33 +676,6 @@ void MainWindow::on_input_textEdited(const QString &arg1)
     else if (flags[4] == 1) {
         resultsToPrint.clear();
     }
-    else if (flags[5] == 1) {
-        if (typeTimes == 0) { printOneWord = word; }
-        else {
-            stored.clear();
-            printOneForm = word;
-            QStringList display;
-            std::istringstream iss(word.toStdString());
-            std::string snippet;
-
-            while (iss >> snippet) {
-                stored.push_back(snippet.c_str());
-            }
-
-            for (auto && entry : *forms) {
-                auto flag = [&]() { for (auto && snippet : stored) {
-                        if (!entry.contains(snippet))
-                            return false;
-                    } return true;
-                }();
-                if (flag == true) {
-                    display.push_back(entry);
-                }
-            }
-//            inflectionForms->addItems(display);
-//            ui->options->addItems(display);
-        }
-    }
 }
 
 void MainWindow::on_input_editingFinished()
@@ -823,19 +706,6 @@ void MainWindow::on_input_editingFinished()
         ui->options->clear();
         resultsToPrint.clear();
         printAll(word);
-    }
-    else if (flags[5] == 1 && word.length() > 0) {
-        ++typeTimes;
-        if (typeTimes > 0) {
-            ui->input->clear();
-            ui->input->setPlaceholderText("Insert form here...");
-            QString tag = word;
-            ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
-        }
-        else {
-            ui->input->clear();
-            ui->input->setPlaceholderText("Insert word here...");
-        }
     }
     else if (flags[6] == 1 && word.length() > 0) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
@@ -886,12 +756,6 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
         size_t index = ui->options->currentRow();
         printAllPrint(index);
 // a function that prints according to the index.
-    }
-    else if (flags[5] == 1) {
-        ui->options->clear();
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
-        ui->input->setText(itemText);
-        printOne(printOneWord, tag);
     }
     else if (flags[6] == 1) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
@@ -1140,25 +1004,8 @@ void MainWindow::on_actionList_All_Forms_triggered()
     ui->statusBar->showMessage("List all inflections of a word");
 }
 
-void MainWindow::on_actionList_One_Specific_Form_triggered()
-{
-    clearResultFromDictionaries();
-    clearInflectionForms();
-    ui->input->setEnabled(true);
-    ui->options->setEnabled(true);
-    search_one_inflection();
-    ui->statusBar->showMessage("Search one specific inflectional form of a word");
-}
 
 void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const vec) {
-    /*
-    QString result;
-    for (auto && i : vec) {
-        result += i + " ";
-    }
-    result = result.trimmed();
-    */
-
     if (state == Qt::CheckState::Checked) {
         if (inflStruct.find(vec) == inflStruct.end()) {
             inflStruct.insert(vec);
@@ -1168,11 +1015,9 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
         inflStruct.erase(inflStruct.find(vec));
     }
 
-/*
     for (auto && i : inflStruct) {
         qDebug() << i;
     }
-*/
 
     auto resultVec = ParseCheckStateChangeInfo();
 
@@ -1216,9 +1061,8 @@ template <bool D,
 void MainWindow::fillStructures(T * item, QString const & str) {
     if (!item) return;
     std::array<bool, sizeof... (args)> values;
-    for (unsigned i = 0; i < sizeof... (args); ++i) {
-        values = fillStructuresHelper<sizeof...(args), args...>(str);
-    }
+    values = fillStructuresHelper<sizeof...(args), args...>(str);
+
     bool boolSum = false;
     for (auto && v : values) {
         if (v == true) { boolSum = true; break; }
@@ -1235,7 +1079,9 @@ std::array<bool, Size> MainWindow::fillStructuresHelper(QString const & str) {
     std::array<bool, Size> result;
     auto values = {Forms...}; // initializer list
     unsigned index = 0;
-    std::for_each(values.begin(), values.end(), [&](Infl::Forms n){result[index] = InflManager.find(str, Infl::Short, n); ++index; });
+    std::for_each(values.begin(), values.end(), [&](Infl::Forms n){
+        result[index++] = InflManager.find(str, Infl::Short, n);
+    });
     return result;
 }
 
@@ -1244,7 +1090,7 @@ void MainWindow::fillStructureItemConstructor(TreeWidgetItem * item, std::array<
     auto values = {Forms...};
     unsigned index = 0;
     std::for_each(values.begin(), values.end(), [&](Infl::Forms f){
-        if (array.at(index) == true) {
+        if (array.at(index++) == true) {
             constructItem(InflManager.nameOf(f), item);
         }
     });
@@ -1271,13 +1117,17 @@ void MainWindow::fillInflectionForms(QString const & str) {
         currentPOS = POS::Adjective;
         fillAdjectives(str);
     }
+    else if (str.contains(PartOfSpeech.Adverb)) {
+        currentPOS = POS::Adverb;
+        fillAdverbs(str);
+    }
     else if (str.contains(PartOfSpeech.Pronoun)) {
         currentPOS = POS::Pronoun;
         fillPronouns(str);
     }
-    else if (str.contains(PartOfSpeech.Adverb)) {
-        currentPOS = POS::Adverb;
-        fillAdverbs(str);
+    else if (str.contains(PartOfSpeech.Numerical)) {
+        currentPOS = POS::Numerical;
+        fillPronouns(str);
     }
     else ;
 }
@@ -1324,25 +1174,13 @@ void MainWindow::fillVerbs(QString const & str) {
         fillStructures<false, TYPE_CASE>(participle, str);
         fillStructures<false, TYPE_NUMBER>(participle, str);
     }
-
-    /*
-    bool findParticiple = InflManager.find(str, Infl::Short, Infl::Participle);
-    if (findParticiple) {
-        auto participle = constructItem(InflManager.nameOf(Infl::Participle), inflectionForms);
-        fillStructures<false, TYPE_PARTICIPLE_TENSE>(participle, str);
-        fillStructures<false, TYPE_DEFINITENESS>(participle, str);
-        fillStructures<false, TYPE_GENDER>(participle, str);
-        fillStructures<false, TYPE_CASE>(participle, str);
-        fillStructures<false, TYPE_NUMBER>(participle, str);
-    }
-    */
 }
 
 void MainWindow::fillNouns(QString const & str) {
     if (!inflectionForms) return;
+    fillStructures<true, TYPE_DEFINITENESS>(inflectionForms, str);
     fillStructures<true, TYPE_CASE>(inflectionForms, str);
     fillStructures<true, TYPE_NUMBER>(inflectionForms, str);
-    fillStructures<true, TYPE_DEFINITENESS>(inflectionForms, str);
 }
 
 void MainWindow::fillAdjectives(QString const & str) {
@@ -1385,7 +1223,14 @@ void MainWindow::fillPronouns(QString const & str) {
 
 void MainWindow::fillAdverbs(QString const & str) {
     if (!inflectionForms) return;
-    fillStructures<true, TYPE_FORM>(inflectionForms, str);
+
+    bool findPositive = InflManager.find(str, Infl::Short, Infl::Positive);
+    bool findComparat = InflManager.find(str, Infl::Short, Infl::Comparative);
+    bool findSuperlat = InflManager.find(str, Infl::Short, Infl::Superlative);
+
+    if (findPositive) constructItem(InflManager.nameOf(Infl::Positive), inflectionForms);
+    if (findComparat) constructItem(InflManager.nameOf(Infl::Comparative), inflectionForms);
+    if (findSuperlat) constructItem(InflManager.nameOf(Infl::Superlative), inflectionForms);
 }
 
 
@@ -1404,6 +1249,9 @@ QVector<QString> MainWindow::ParseCheckStateChangeInfo() {
         return ParseAdverb();
     }
     case (POS::Pronoun): {
+        return ParsePronoun();
+    }
+    case (POS::Numerical): {
         return ParsePronoun();
     }
     }
@@ -1469,9 +1317,7 @@ QVector<QString> MainWindow::ParseVerb() {
                                                  InflManager.find(entry, Infl::Short, d) &&
                                                  InflManager.find(entry, Infl::Short, e) &&
                                                  InflManager.find(entry, Infl::Short, f);
-                                if (satisfied) {
-                                    result.push_back(entry);
-                                }
+                                if (satisfied) result.push_back(entry);
                             }
                         }
                     }
@@ -1495,9 +1341,7 @@ QVector<QString> MainWindow::ParseVerb() {
         for (auto && a : infinitiveContainer) {
             auto satisfied = InflManager.find(entry, Infl::Short, Infl::Infinitive) &&
                              InflManager.find(entry, Infl::Short, a);
-            if (satisfied) {
-                result.push_back(entry);
-            }
+            if (satisfied) result.push_back(entry);
         }
     }
 
@@ -1515,9 +1359,7 @@ QVector<QString> MainWindow::ParseVerb() {
         for (auto && a : imperativeContainer) {
             auto satisfied = InflManager.find(entry, Infl::Short, Infl::Imperative) &&
                              InflManager.find(entry, Infl::Short, a);
-            if (satisfied) {
-                result.push_back(entry);
-            }
+            if (satisfied) result.push_back(entry);
         }
     }
 
@@ -1535,9 +1377,7 @@ QVector<QString> MainWindow::ParseVerb() {
         for (auto && a : supineContainer) {
             auto satisfied = InflManager.find(entry, Infl::Short, Infl::Supine) &&
                              InflManager.find(entry, Infl::Short, a);
-            if (satisfied) {
-                result.push_back(entry);
-            }
+            if (satisfied) result.push_back(entry);
         }
     }
 
@@ -1554,9 +1394,7 @@ QVector<QString> MainWindow::ParseVerb() {
         for (auto && a : presPartContainer) {
             auto satisfied = InflManager.find(entry, Infl::Short, Infl::PresentParticiple) &&
                              InflManager.find(entry, Infl::Short, a);
-            if (satisfied) {
-                result.push_back(entry);
-            }
+            if (satisfied) result.push_back(entry);
         }
     }
 
@@ -1589,9 +1427,7 @@ QVector<QString> MainWindow::ParseVerb() {
                                     InflManager.find(entry, Infl::Short, b) &&
                                     InflManager.find(entry, Infl::Short, c) &&
                                     InflManager.find(entry, Infl::Short, d);
-                        if (satisfied) {
-                            result.push_back(entry);
-                        }
+                        if (satisfied) result.push_back(entry);
                     }
                 }
             }
@@ -1601,4 +1437,237 @@ QVector<QString> MainWindow::ParseVerb() {
     return result;
 }
 
+QVector<QString> MainWindow::ParseNoun() {
+    QVector<QString> result;
+
+    if (inflStruct.empty()) return QVector<QString>{};
+
+    auto itr = inflStruct.cbegin();
+    auto end = inflStruct.cend();
+
+    std::array<QVector<Infl::Forms>, 3> nounContainer;
+    nounContainer.fill(QVector<Infl::Forms>{});
+
+    while (itr != end && itr->at(0) != InflManager.categoryOf(Infl::Definiteness)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.categoryOf(Infl::Definiteness)) {
+        nounContainer.at(0).push_back(InflManager.enumOfForms(itr->at(1)));
+        itr = std::next(itr);
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.categoryOf(Infl::Case)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.categoryOf(Infl::Case)) {
+        nounContainer.at(1).push_back(InflManager.enumOfForms(itr->at(1)));
+        itr = std::next(itr);
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.categoryOf(Infl::Number)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.categoryOf(Infl::Number)) {
+        nounContainer.at(2).push_back(InflManager.enumOfForms(itr->at(1)));
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : nounContainer.at(0)) {
+            for (auto && b : nounContainer.at(1)) {
+                for (auto && c : nounContainer.at(2)) {
+                    auto satisfied = InflManager.find(entry, Infl::Short, a) &&
+                                     InflManager.find(entry, Infl::Short, b) &&
+                                     InflManager.find(entry, Infl::Short, c);
+                    if (satisfied) result.push_back(entry);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+QVector<QString> MainWindow::ParseAdjective() {
+    QVector<QString> result;
+
+    if (inflStruct.empty()) return QVector<QString>{};
+
+    auto itr = inflStruct.cbegin();
+    auto end = inflStruct.cend();
+
+    std::array<QVector<Infl::Forms>, 4> positiveContainer;
+    positiveContainer.fill(QVector<Infl::Forms>{});
+
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Positive)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Positive)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Definiteness)) {
+            positiveContainer.at(0).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Gender)) {
+            positiveContainer.at(1).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Case)) {
+            positiveContainer.at(2).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+            positiveContainer.at(3).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : positiveContainer.at(0)) {
+            for (auto && b : positiveContainer.at(1)) {
+                for (auto && c : positiveContainer.at(2)) {
+                    for (auto && d : positiveContainer.at(3)) {
+                        auto satisfied = InflManager.find(entry, Infl::Short, Infl::Positive) &&
+                                         InflManager.find(entry, Infl::Short, a) &&
+                                         InflManager.find(entry, Infl::Short, b) &&
+                                         InflManager.find(entry, Infl::Short, c) &&
+                                         InflManager.find(entry, Infl::Short, d);
+                        if (satisfied) result.push_back(entry);
+                    }
+                }
+            }
+        }
+    }
+
+    std::array<QVector<Infl::Forms>, 3> comparativeContainer;
+    comparativeContainer.fill(QVector<Infl::Forms>{});
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Comparative)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Comparative)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Gender)) {
+            comparativeContainer.at(0).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Case)) {
+            comparativeContainer.at(1).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+            comparativeContainer.at(2).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : comparativeContainer.at(0)) {
+            for (auto && b : comparativeContainer.at(1)) {
+                for (auto && c : comparativeContainer.at(2)) {
+                    auto satisfied = InflManager.find(entry, Infl::Short, Infl::Comparative) &&
+                                     InflManager.find(entry, Infl::Short, a) &&
+                                     InflManager.find(entry, Infl::Short, b) &&
+                                     InflManager.find(entry, Infl::Short, c);
+                    if (satisfied) result.push_back(entry);
+                }
+            }
+        }
+    }
+
+    std::array<QVector<Infl::Forms>, 4> superlativeContainer;
+    superlativeContainer.fill(QVector<Infl::Forms>{});
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Superlative)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Superlative)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Definiteness)) {
+            superlativeContainer.at(0).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Gender)) {
+            superlativeContainer.at(1).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Case)) {
+            superlativeContainer.at(2).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+            superlativeContainer.at(3).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : superlativeContainer.at(0)) {
+            for (auto && b : superlativeContainer.at(1)) {
+                for (auto && c : superlativeContainer.at(2)) {
+                    for (auto && d : superlativeContainer.at(3)) {
+                        auto satisfied = InflManager.find(entry, Infl::Short, Infl::Superlative) &&
+                                         InflManager.find(entry, Infl::Short, a) &&
+                                         InflManager.find(entry, Infl::Short, b) &&
+                                         InflManager.find(entry, Infl::Short, c) &&
+                                         InflManager.find(entry, Infl::Short, d);
+                        if (satisfied) result.push_back(entry);
+                    }
+                }
+            }
+        }
+    }
+    return result;
+}
+
+QVector<QString> MainWindow::ParsePronoun() {
+    QVector<QString> result;
+
+    if (inflStruct.empty()) return QVector<QString>{};
+
+    std::array<QVector<Infl::Forms>, 3> pronounContainer;
+    pronounContainer.fill(QVector<Infl::Forms>{});
+
+    auto itr = inflStruct.cbegin();
+    auto end = inflStruct.cend();
+
+    while (itr != end && itr->at(0) != InflManager.categoryOf(Infl::Gender)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.categoryOf(Infl::Gender)) {
+        pronounContainer.at(0).push_back(InflManager.enumOfForms(itr->at(1)));
+        itr = std::next(itr);
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.categoryOf(Infl::Case)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.categoryOf(Infl::Case)) {
+        pronounContainer.at(1).push_back(InflManager.enumOfForms(itr->at(1)));
+        itr = std::next(itr);
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.categoryOf(Infl::Number)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.categoryOf(Infl::Number)) {
+        pronounContainer.at(2).push_back(InflManager.enumOfForms(itr->at(1)));
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : pronounContainer.at(0)) {
+            for (auto && b : pronounContainer.at(1)) {
+                for (auto && c : pronounContainer.at(2)) {
+                    auto satisfied = InflManager.find(entry, Infl::Short, a) &&
+                                     InflManager.find(entry, Infl::Short, b) &&
+                                     InflManager.find(entry, Infl::Short, c);
+                    if (satisfied) result.push_back(entry);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
+QVector<QString> MainWindow::ParseAdverb() {
+    QVector<QString> result;
+
+    if (inflStruct.empty()) return QVector<QString>{};
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : inflStruct) {
+            if (a.at(0) == InflManager.nameOf(Infl::Positive)) {
+                if (InflManager.find(entry, Infl::Short, Infl::Positive)) result.push_back(entry);
+            }
+            else if (a.at(0) == InflManager.nameOf(Infl::Comparative)) {
+                if (InflManager.find(entry, Infl::Short, Infl::Comparative)) result.push_back(entry);
+
+            }
+            else if (a.at(0) == InflManager.nameOf(Infl::Superlative)) {
+                if (InflManager.find(entry, Infl::Short, Infl::Superlative)) result.push_back(entry);
+            }
+        }
+    }
+
+    return result;
+}
 

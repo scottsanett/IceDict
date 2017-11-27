@@ -92,7 +92,7 @@ private:
                             "&q1=";
     const char * textUrl2 = "&submit=Search";
 
-    enum class POS { Noun, Verb, Adjective, Adverb, Pronoun};
+    enum class POS { Noun, Verb, Adjective, Adverb, Pronoun, Numerical};
     enum POS currentPOS;
 
     struct PartOfSpeech {
@@ -103,6 +103,7 @@ private:
         const char * Verb = "<td>so</td>";
         const char * Pronoun = "<td>fn</td>";
         const char * Adverb = "<td>ao</td>";
+        const char * Numerical = "<td>to</td>";
     } PartOfSpeech;
 
     QString webpage;
@@ -179,8 +180,6 @@ private slots:
 
     void on_actionList_All_Forms_triggered();
 
-    void on_actionList_One_Specific_Form_triggered();
-
 
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
@@ -222,11 +221,11 @@ private:
 
     /* CheckInfo Parser Functions */
     QVector<QString> ParseCheckStateChangeInfo(); // returns new result to print
-    QVector<QString> ParseNoun() {}
+    QVector<QString> ParseNoun();
     QVector<QString> ParseVerb();
-    QVector<QString> ParseAdjective() {}
-    QVector<QString> ParseAdverb() {}
-    QVector<QString> ParsePronoun() {}
+    QVector<QString> ParseAdjective();
+    QVector<QString> ParseAdverb();
+    QVector<QString> ParsePronoun();
 
     bool findImpersonal(QString const &);
     bool findActive(QString const &);
@@ -247,7 +246,6 @@ private:
 
     /* importing functions */
     void importWordIndex();
-    void importForms();
     void importInflections();
     void importInflectionsThread(mapptrvecptr_t mapvec, size_t i);
     void importWordIndexThread(mapptrvecptr_t mapvec, QString const name, size_t i);
@@ -269,8 +267,6 @@ private:
     void printAll(QString const & word);
     void printAllThread(QString word, size_t index);
     void printAllPrint(size_t index);
-    void printOne(QString const & word, QString const & form);
-    void printOneThread(ptrvecstrvecptr_t dics, QString word, QString form, size_t index);
     void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, QString word, size_t index);
 };
 
