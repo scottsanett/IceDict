@@ -11,4 +11,6 @@ alphabet/extract*
 
 dictionary-qt.pro.user*
 
-*.user*
+dictionary-qt_resource.rc
+
+Makefile
