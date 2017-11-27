@@ -27,15 +27,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     importOriginal();
     importInflections();
     ui->setupUi(this);
-    this->setWindowTitle("Icelandic Dictionary");
+    this->setWindowTitle("IceDict");
     QIcon icon(":/alphabet/icon.ico");
     this->setWindowIcon(icon);
     ui->input->setPlaceholderText("Select a dictionary first...");
+    ui->input->setFrame(false);
     ui->resultsTab->setDocumentMode(true);
     ui->resultsTab->setTabsClosable(true);
     ui->resultsTab->tabBar()->setMovable(true);
     ui->resultsTab->tabBar()->setAutoHide(true);
     ui->resultsTab->tabBar()->setExpanding(true);
+    ui->statusBar->hide();
     connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
     QShortcut* searchShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this);
@@ -53,6 +55,7 @@ MainWindow::~MainWindow()
 void MainWindow::addTab_clicked() {
     QTextBrowser * result = new QTextBrowser;
     result->setHtml(startScreen);
+    result->setFrameStyle(QFrame::NoFrame);
 //    ui->input->clear();
     auto index = ui->resultsTab->addTab(result, "(empty)");
     ui->resultsTab->setCurrentIndex(index);
@@ -74,11 +77,11 @@ void MainWindow::activateInput() {
 }
 
 void MainWindow::initializeResultFromDictionaries() {
-    if (!alternativeLabel) alternativeLabel = new QLabel("Alternatives");
     if (!resultsFromDictionaries) resultsFromDictionaries = new QListWidget;
     resultsFromDictionaries->setMaximumWidth(200);
     resultsFromDictionaries->setMaximumHeight(100);
-    ui->inputLayout->addWidget(alternativeLabel);
+    resultsFromDictionaries->setFrameStyle(QFrame::NoFrame);
+    resultsFromDictionaries->setFocusPolicy(Qt::NoFocus);
     ui->inputLayout->addWidget(resultsFromDictionaries);
     QObject::connect(
                 resultsFromDictionaries, &QListWidget::itemClicked,
@@ -92,11 +95,6 @@ void MainWindow::clearResultFromDictionaries() {
         delete resultsFromDictionaries;
         resultsFromDictionaries = nullptr;
     }
-    if (alternativeLabel) {
-        alternativeLabel->clear();
-        delete alternativeLabel;
-        alternativeLabel = nullptr;
-    }
 }
 
 void MainWindow::initializeInflectionForms() {
@@ -104,6 +102,8 @@ void MainWindow::initializeInflectionForms() {
     inflectionForms->setHeaderLabel("Inflections");
     inflectionForms->setMaximumWidth(300);
     inflectionForms->setMinimumHeight(400);
+    inflectionForms->setFrameStyle(QFrame::NoFrame);
+    inflectionForms->setFocusPolicy(Qt::NoFocus);
     ui->inputLayout->addWidget(inflectionForms);
 }
 
@@ -1015,9 +1015,11 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
         inflStruct.erase(inflStruct.find(vec));
     }
 
+    /*
     for (auto && i : inflStruct) {
         qDebug() << i;
     }
+    */
 
     auto resultVec = ParseCheckStateChangeInfo();
 

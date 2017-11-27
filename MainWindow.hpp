@@ -78,7 +78,6 @@ private:
     PageDownloader * pageControl;
     QListWidget * resultsFromDictionaries;
     TreeWidget * inflectionForms;
-    QLabel * alternativeLabel;
     Inflection InflManager;
 
     /* POD members */
