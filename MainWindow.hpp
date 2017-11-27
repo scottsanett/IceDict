@@ -43,22 +43,22 @@
 #include "inflection.hpp"
 #include "macros.hpp"
 
-using map_t = std::multimap<std::string, int>;
+using map_t = std::multimap<QString, int>;
 using mapptr_t = std::shared_ptr<map_t>;
-using mapptrvec_t = std::vector<mapptr_t>;
+using mapptrvec_t = QVector<mapptr_t>;
 using mapptrvecptr_t = std::shared_ptr<mapptrvec_t>;
-using strset_t = std::set<std::string>;
+using strset_t = std::set<QString>;
 using strsetptr_t = std::shared_ptr<strset_t>;
-using strptr_t = std::shared_ptr<std::string>;
-using strvec_t = std::vector<std::string>;
+using strptr_t = std::shared_ptr<QString>;
+using strvec_t = QVector<QString>;
 using strvecptr_t = std::shared_ptr<strvec_t>;
-using vecstrvecptr_t = std::vector<strvecptr_t>;
+using vecstrvecptr_t = QVector<strvecptr_t>;
 using ptrvecstrvecptr_t = std::shared_ptr<vecstrvecptr_t>;
-using strvecptrmap_t = std::multimap<std::string, strvecptr_t>;
+using strvecptrmap_t = std::multimap<QString, strvecptr_t>;
 using strvecptrmapptr_t = std::shared_ptr<strvecptrmap_t>;
-using strvecptrmapptrvec_t = std::vector<strvecptrmapptr_t>;
+using strvecptrmapptrvec_t = QVector<strvecptrmapptr_t>;
 using strvecptrmapptrvecptr_t = std::shared_ptr<strvecptrmapptrvec_t>;
-using vecpair_t = std::vector<std::pair<std::string, strvec_t>>;
+using vecpair_t = QVector<std::pair<QString, strvec_t>>;
 
 namespace Ui {
 class MainWindow;
@@ -105,14 +105,14 @@ private:
         const char * Adverb = "<td>ao</td>";
     } PartOfSpeech;
 
-    std::string webpage;
-    std::string inputted;
-    std::string printOneWord;
-    std::string printOneForm;
+    QString webpage;
+    QString inputted;
+    QString printOneWord;
+    QString printOneForm;
 
 
     /* Abstract data types */
-    std::map<std::string, std::string> writeRules = {
+    std::map<QString, QString> writeRules = {
         std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
         std::make_pair("ú", "%FA"), std::make_pair("ý", "%FD"), std::make_pair("Á", "%C1"), std::make_pair("É", "%C9"),
         std::make_pair("Í", "%CD"), std::make_pair("Ó", "%D3"), std::make_pair("Ú", "%DA"), std::make_pair("Ý", "%DD"),
@@ -121,10 +121,10 @@ private:
     };
 
     std::set<QVector<QString>> inflStruct; // all selected inflection forms in TreeWidget (in the form of QVector>
-    std::vector<std::string> inflSelectResult;
+    QVector<QString> inflSelectResult;
 
-    std::vector<std::string> stored;
-    std::vector<bool> flags = {0, 0, 0, 0, 0, 0, 0};
+    QVector<QString> stored;
+    QVector<bool> flags = {0, 0, 0, 0, 0, 0, 0};
     mapptrvecptr_t inflectionals;
     mapptrvecptr_t definitions;
     mapptrvecptr_t originals;
@@ -132,9 +132,9 @@ private:
     strsetptr_t forms;
     strsetptr_t wordindex;
     vecpair_t resultsToPrint; // results of inflection queries
-    std::map<std::string, std::string> onlineEntries;
-    std::vector<std::pair<std::string, std::vector<std::string>>> definitionResults;
-    std::vector<std::pair<std::string, std::string>> textualResults;
+    std::map<QString, QString> onlineEntries;
+    QVector<std::pair<QString, QVector<QString>>> definitionResults;
+    QVector<std::pair<QString, QString>> textualResults;
 
 private slots:
     void search_norse_word();
@@ -186,8 +186,8 @@ private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
     TreeWidgetItem * constructItem(QString, TreeWidgetItem * parent);
 
-    std::string addStyleToResults(std::string str);
-    std::string wordToWrite(std::string);
+    QString addStyleToResults(QString str);
+    QString wordToWrite(QString);
 
     /* functions concerning user interface */
     void activateInput();
@@ -197,87 +197,89 @@ private:
     void clearInflectionForms();
     void newTab();
 
-    void fillInflectionForms(std::string const &);
+    void fillInflectionForms(QString const &);
 
     /* functions concerning inflectional menu */
     /* first level */
-    void fillVerbs(std::string const &);
-    void fillNouns(std::string const &);
-    void fillAdjectives(std::string const &);
-    void fillPronouns(std::string const &);
-    void fillAdverbs(std::string const &);
+    void fillVerbs(QString const &);
+    void fillNouns(QString const &);
+    void fillAdjectives(QString const &);
+    void fillPronouns(QString const &);
+    void fillAdverbs(QString const &);
 
-    /* second level */
+    /* second level, templates */
     template <bool D,
               Infl::Category cat,
               Infl::Forms ... args,
               class T = typename std::conditional<D, TreeWidget, TreeWidgetItem>::type>
-    void fillStructures(T * item, std::string const &);
+    void fillStructures(T * item, QString const &);
 
     template <int Size, Infl::Forms ... Forms>
-    std::array<bool, Size> fillStructuresHelper(std::string const &);
+    std::array<bool, Size> fillStructuresHelper(QString const &);
 
     template <int Size, Infl::Forms ... forms>
     void fillStructureItemConstructor(TreeWidgetItem * item, std::array<bool, Size> const &);
 
     /* CheckInfo Parser Functions */
-    std::vector<std::string> ParseCheckStateChangeInfo(); // returns new result to print
-    std::vector<std::string> ParseNoun() {}
-    std::vector<std::string> ParseVerb();
-    std::vector<std::string> ParseAdjective() {}
-    std::vector<std::string> ParseAdverb() {}
-    std::vector<std::string> ParsePronoun() {}
+    QVector<QString> ParseCheckStateChangeInfo(); // returns new result to print
+    QVector<QString> ParseNoun() {}
+    QVector<QString> ParseVerb();
+    QVector<QString> ParseAdjective() {}
+    QVector<QString> ParseAdverb() {}
+    QVector<QString> ParsePronoun() {}
 
-    bool findImpersonal(std::string const &);
-    bool findActive(std::string const &);
-    bool findMiddle(std::string const &);
-    bool findIndicative(std::string const &);
-    bool findSubjunctive(std::string const &);
-    bool findImperative(std::string const &);
-    bool findPresent(std::string const &);
-    bool findPast(std::string const &);
-    bool findFstPrs(std::string const &);
-    bool findSndPrs(std::string const &);
+    bool findImpersonal(QString const &);
+    bool findActive(QString const &);
+    bool findMiddle(QString const &);
+    bool findIndicative(QString const &);
+    bool findSubjunctive(QString const &);
+    bool findImperative(QString const &);
+    bool findPresent(QString const &);
+    bool findPast(QString const &);
+    bool findFstPrs(QString const &);
+    bool findSndPrs(QString const &);
+
+    QVector<QString> regexResult(QString const &, QString const &);
 
     /* functions concerning online query */
-    void downloadPage(std::string url);
+    void downloadPage(QString url);
     bool parsePage();
 
     /* importing functions */
     void importWordIndex();
     void importForms();
     void importInflections();
-    void importInflectionsThread(mapptrvecptr_t mapvec, int i);
-    void importWordIndexThread(mapptrvecptr_t mapvec, std::string const name, int i);
+    void importInflectionsThread(mapptrvecptr_t mapvec, size_t i);
+    void importWordIndexThread(mapptrvecptr_t mapvec, QString const name, size_t i);
     void importOriginal();
-    void importOriginalThread(mapptrvecptr_t mapvec, int i);
+    void importOriginalThread(mapptrvecptr_t mapvec, size_t i);
     void importDictionary();
-    void importDictionaryThread(std::string const name, int i);
+    void importDictionaryThread(QString const name, size_t i);
 
     /* query functions */
-    void findDefinition(std::string const & word);
-    void findDefinitionPrint(int index);
-    void findInflection(std::string const & word);
-    void onlineDefinition(std::string const & word);
-    void onlineText(std::string const & word);
-    void findInflectionThread(ptrvecstrvecptr_t dics, std::string word, int index);
-    void textualSearch(std::string const & word);
-    void textualSearchThread(std::string word, int index);
-    void textualSearchPrint(int index);
-    void printAll(std::string const & word);
-    void printAllThread(std::string word, int index);
-    void printAllPrint(int index);
-    void printOne(std::string const & word, std::string const & form);
-    void printOneThread(ptrvecstrvecptr_t dics, std::string word, std::string form, int index);
-    void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, std::string word, int index);
+    void findDefinition(QString const & word);
+    void findDefinitionPrint(size_t index);
+    void findInflection(QString const & word);
+    void onlineDefinition(QString const & word);
+    void onlineText(QString const & word);
+    void findInflectionThread(ptrvecstrvecptr_t dics, QString word, size_t index);
+    void textualSearch(QString const & word);
+    void textualSearchThread(QString word, size_t index);
+    void textualSearchPrint(size_t index);
+    void printAll(QString const & word);
+    void printAllThread(QString word, size_t index);
+    void printAllPrint(size_t index);
+    void printOne(QString const & word, QString const & form);
+    void printOneThread(ptrvecstrvecptr_t dics, QString word, QString form, size_t index);
+    void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, QString word, size_t index);
 };
 
 
 template <typename T>
 std::string to_string(T value) {
-  std::ostringstream os ;
-  os << value ;
-  return os.str() ;
+    std::ostringstream os;
+    os << value;
+    return os.str() ;
 }
 
 

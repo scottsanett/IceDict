@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="leftMargin">
      <number>5</number>
     </property>
@@ -37,25 +37,16 @@
      <number>5</number>
     </property>
     <item>
-     <widget class="QSplitter" name="splitter">
-      <property name="frameShape">
-       <enum>QFrame::Panel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="inputLayout">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetMaximumSize</enum>
+     <layout class="QVBoxLayout" name="centralLayout">
+      <item>
+       <widget class="QSplitter" name="mainSplitter">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <item>
+        <widget class="QSplitter" name="inputLayout">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
          <widget class="QLineEdit" name="input">
           <property name="enabled">
            <bool>false</bool>
@@ -69,13 +60,13 @@
           <property name="minimumSize">
            <size>
             <width>100</width>
-            <height>0</height>
+            <height>25</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
-            <height>16777215</height>
+            <height>25</height>
            </size>
           </property>
           <property name="font">
@@ -91,8 +82,6 @@
            <bool>false</bool>
           </property>
          </widget>
-        </item>
-        <item>
          <widget class="QListWidget" name="options">
           <property name="enabled">
            <bool>false</bool>
@@ -125,32 +114,32 @@
            <enum>QFrame::Sunken</enum>
           </property>
          </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="resultsLayout">
-        <property name="spacing">
-         <number>-1</number>
-        </property>
-        <item>
-         <widget class="QTabWidget" name="resultsTab">
-          <property name="font">
-           <font>
-            <family>Segoe UI</family>
-            <pointsize>10</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="currentIndex">
+        </widget>
+        <widget class="QWidget" name="layoutWidget">
+         <layout class="QVBoxLayout" name="resultsLayout">
+          <property name="spacing">
            <number>-1</number>
           </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
+          <item>
+           <widget class="QTabWidget" name="resultsTab">
+            <property name="font">
+             <font>
+              <family>Segoe UI</family>
+              <pointsize>10</pointsize>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="currentIndex">
+             <number>-1</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

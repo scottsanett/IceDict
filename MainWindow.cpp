@@ -88,12 +88,11 @@ void MainWindow::initializeResultFromDictionaries() {
 void MainWindow::clearResultFromDictionaries() {
     if (resultsFromDictionaries) {
         resultsFromDictionaries->clear();
-        ui->inputLayout->removeWidget(resultsFromDictionaries);
         delete resultsFromDictionaries;
         resultsFromDictionaries = nullptr;
     }
     if (alternativeLabel) {
-        ui->inputLayout->removeWidget(alternativeLabel);
+        alternativeLabel->clear();
         delete alternativeLabel;
         alternativeLabel = nullptr;
     }
@@ -102,7 +101,7 @@ void MainWindow::clearResultFromDictionaries() {
 void MainWindow::initializeInflectionForms() {
     if (!inflectionForms) inflectionForms = new TreeWidget;
     inflectionForms->setHeaderLabel("Inflections");
-    inflectionForms->setMaximumWidth(200);
+    inflectionForms->setMaximumWidth(300);
     inflectionForms->setMinimumHeight(400);
     ui->inputLayout->addWidget(inflectionForms);
 }
@@ -110,14 +109,14 @@ void MainWindow::initializeInflectionForms() {
 void MainWindow::clearInflectionForms() {
     if (inflectionForms) {
         inflectionForms->clear();
-        ui->inputLayout->removeWidget(inflectionForms);
         delete inflectionForms;
         inflectionForms = nullptr;
     }
 }
 
-std::string MainWindow::addStyleToResults(std::string line) {
-    std::istringstream iss(line);
+QString MainWindow::addStyleToResults(QString line) {
+    std::string result;
+    std::istringstream iss(line.toStdString());
     std::string key;
     iss >> key;
     if (key.back() != ';') {
@@ -144,8 +143,8 @@ std::string MainWindow::addStyleToResults(std::string line) {
     }
     arg4 = arg4.substr(0, arg4.length() - 1);
     arg4 = "<td>" + arg4 + "</td>";
-    line = "<tr>" + key + arg2 + arg3 + arg4 + "</tr>";
-    return line;
+    result = "<tr>" + key + arg2 + arg3 + arg4 + "</tr>";
+    return result.c_str();
 }
 
 void MainWindow::search_norse_word()
@@ -234,10 +233,11 @@ void MainWindow::search_one_inflection()
     initializeInflectionForms();
 }
 
-std::string MainWindow::wordToWrite(std::string str) {
+QString MainWindow::wordToWrite(QString arg) {
+    auto str = arg;
     for (auto && i : writeRules) {
-        while (str.find(i.first) != std::string::npos) {
-            auto pos = str.find(i.first);
+        while (str.contains(i.first)) {
+            auto pos = str.indexOf(i.first);
             str.replace(pos, i.first.length(), i.second);
         }
     }
@@ -246,13 +246,16 @@ std::string MainWindow::wordToWrite(std::string str) {
 
 void MainWindow::importForms() {
     QFile f(":/alphabet/forms");
+
     f.open(QIODevice::ReadOnly);
     QString qfile = f.readAll();
+
     std::istringstream file(qfile.toStdString());
     std::string line;
     while (std::getline(file, line)) {
-        forms->insert(line);
+        forms->insert(line.c_str());
     }
+
     f.close();
 }
 
@@ -260,26 +263,29 @@ void MainWindow::importForms() {
 
 void MainWindow::importWordIndex() {
     QFile wd(":/alphabet/wordindex");
+
     wd.open(QIODevice::ReadOnly);
     QString file = wd.readAll();
     std::istringstream wordindexfile(file.toStdString());
     std::string line;
     while (std::getline(wordindexfile, line)) {
-        wordindex->insert(line);
+        wordindex->insert(line.c_str());
     }
+
     wd.close();
 }
 
 void MainWindow::importInflections() {
-    for (auto i = 1; i <= 7; ++i) {
+    for (size_t i = 1; i <= 7; ++i) {
         importInflectionsThread(inflectionals, i);
     }
 }
 
 /*import all the inflection forms and its position*/
-void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, int i) {
-    std::string filename = ":/alphabet/source_reverse_index/part" + to_string(i);
-    QFile f(filename.c_str());
+void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
+    QString filename = ":/alphabet/source_reverse_index/part" + QString(to_string(i).c_str());
+    QFile f(filename);
+
     f.open(QIODevice::ReadOnly);
     QString qfile = f.readAll();
     std::istringstream file(qfile.toStdString());
@@ -287,15 +293,18 @@ void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, int i) {
     int index = 0;
     auto thisMap = mapvec->at(i - 1);
     while (std::getline(file, line)) {
-        thisMap->insert(std::make_pair(line, index));
+        thisMap->insert(std::make_pair(line.c_str(), index));
         ++index;
     }
+
+
     f.close();
 }
 
-void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, int i) {
-    std::string filename = ":/alphabet/sources_index/part" + to_string(i);
-    QFile f(filename.c_str());
+void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
+    QString filename = QString(":/alphabet/sources_index/part") + to_string(i).c_str();
+    QFile f(filename);
+
     f.open(QIODevice::ReadOnly);
     QString qfile = f.readAll();
     std::istringstream file(qfile.toStdString());
@@ -313,14 +322,16 @@ void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, int i) {
         std::string index;
         iss >> index;
         auto index_number = strtol(index.c_str(), 0, 10);
-        thisMap->insert(std::make_pair(key, index_number));
+        thisMap->insert(std::make_pair(key.c_str(), index_number));
 //        thisMap->insert(std::make_pair(key, std::stoul(index)));
     }
+
+
     f.close();
 }
 
 void MainWindow::importOriginal() {
-    for (auto i = 1; i <= 7; ++i) {
+    for (size_t i = 1; i <= 7; ++i) {
         importOriginalThread(originals, i);
     }
 }
@@ -330,9 +341,11 @@ void MainWindow::importDictionary() {
     importDictionaryThread("vifgusson", 1);
 }
 
-void MainWindow::importDictionaryThread(std::string const name, int i) {
-    std::string filename = ":/alphabet/" + name;
-    QFile f(filename.c_str());
+void MainWindow::importDictionaryThread(QString const name, size_t i) {
+    QString filename = ":/alphabet/" + name;
+    QFile f(filename);
+
+
     f.open(QIODevice::ReadOnly);
     QString qfile = f.readAll();
     std::istringstream file(qfile.toStdString());
@@ -349,12 +362,14 @@ void MainWindow::importDictionaryThread(std::string const name, int i) {
             sense += ' ' + temp;
             if (temp.back() == ';') {
                sense += '\n';
-               entry->push_back(sense);
+               entry->push_back(sense.c_str());
                sense = "";
             }
         }
-        thisMap->insert(std::make_pair(key, entry));
+        thisMap->insert(std::make_pair(key.c_str(), entry));
     }
+
+
     f.close();
 }
 
@@ -364,9 +379,9 @@ void MainWindow::importDictionaryThread(std::string const name, int i) {
  * find a way to separate the suggested words that the overlapping entries that two dictionaries provide
  */
 
-void MainWindow::findDefinition(std::string const & words) {
-    std::string word = "<b>" + words + "</b>";
-    auto upper = QString(words.c_str()).toUpper().toStdString();
+void MainWindow::findDefinition(QString const & words) {
+    QString word = "<b>" + words + "</b>";
+    auto upper = QString(words).toUpper();
     upper = "<b>" + upper + "</b>";
 
     auto zisspair = dictionaries->at(0)->equal_range(word);
@@ -402,9 +417,10 @@ void MainWindow::findDefinition(std::string const & words) {
 
     QStringList alternatives;
     for (auto && i : definitionResults) {
-        std::string key = i.first.c_str();
-        key = key.substr(3, key.length() - 7);
-        alternatives.push_back(key.c_str());
+        QString key = i.first;
+        key = key.mid(3, key.length() - 7);
+//        key = key.substr(3, key.length() - 7);
+        alternatives.push_back(key);
     }
 
     resultsFromDictionaries->clear();
@@ -412,25 +428,25 @@ void MainWindow::findDefinition(std::string const & words) {
     findDefinitionPrint(0);
 }
 
-void MainWindow::findDefinitionPrint(int index) {
+void MainWindow::findDefinitionPrint(size_t index) {
     auto thisEntry = definitionResults.at(index);
-    std::string key = thisEntry.first;
-    std::string value;
+    QString key = thisEntry.first;
+    QString value;
     for (auto i : thisEntry.second) {
         value += i + '\n';
     }
-    std::string display = key + ' ' + value;
+    QString display = key + ' ' + value;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20pt;\">" + display + "</span></p>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(display.c_str());
+    tabActive->setHtml(display);
 }
 
-void MainWindow::findInflection(std::string const & word) {
+void MainWindow::findInflection(QString const & word) {
     auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
     for (auto i = 0; i < 7; ++i) {
         results->push_back(strvecptr_t(new strvec_t));
     }
-    for (auto i = 0; i < 7; ++i) {
+    for (size_t i = 0; i < 7; ++i) {
         findInflectionThread(results, word, i);
     }
     auto resultSize = [&]() { int sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
@@ -440,7 +456,7 @@ void MainWindow::findInflection(std::string const & word) {
         tabActive->setText("Word not found");
         return;
     }
-    std::string toprint;
+    QString toprint;
     for (auto && i : *results) {
         for (auto && j : *i) {
             j = addStyleToResults(j);
@@ -449,17 +465,19 @@ void MainWindow::findInflection(std::string const & word) {
     }
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(toprint.c_str());
+    tabActive->setHtml(toprint);
 }
 
-void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, std::string word, int index) {
+void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, QString word, size_t index) {
     auto thisDic = inflectionals->at(index);
     auto thisResult = results->at(index);
     auto itr = thisDic->find(word);
     if (itr == thisDic->end()) { return; }
-    std::string filename = ":/alphabet/sources/part" + to_string(index + 1);
-    QFile file(filename.c_str());
+    QString filename = QString(":/alphabet/sources/part") + to_string(index + 1).c_str();
+    QFile file(filename);
     file.open(QIODevice::ReadOnly);
+
+
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
     std::string line;
@@ -472,34 +490,41 @@ void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, std::string wor
             continue; }
         else {
             if (itr->first != key) { break; }
-            thisResult->push_back(line);
+            thisResult->push_back(line.c_str());
             itr = std::next(itr);
             ++currentPos;
             pos = itr->second;
         }
     }
+
+
     file.close();
 }
 
-void MainWindow::textualSearchPrint(int index) {
+void MainWindow::textualSearchPrint(size_t index) {
     auto thisEntry = textualResults.at(index);
-    std::string key = thisEntry.first;
-    std::string display = thisEntry.second;
+    QString key = thisEntry.first;
+    QString display = thisEntry.second;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20pt;\">" + display + "</span></p>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(display.c_str());
+    tabActive->setHtml(display);
 }
 
-void MainWindow::textualSearchThread(std::string word, int index) {
+void MainWindow::textualSearchThread(QString word, size_t index) {
     auto thisDic = dictionaries->at(index);
     for (auto && i : *thisDic) {
-        std::string key = i.first;
+        QString key = i.first;
         for (auto && j : *i.second) {
+            /*
             auto pos = j.find(word);
             if (pos != std::string::npos) {
+            */
+
+            auto pos = j.indexOf(word);
+            if (pos != -1) {
                 auto subsitute = "<b><span style=\"color:#ff0000;\">" + word + "</span></b>";
                 j.replace(pos, word.length(), subsitute);
-                std::string value = key + ' ' + j;
+                QString value = key + ' ' + j;
                 textualResults.push_back(std::make_pair(key, value));
                 break;
             }
@@ -507,7 +532,7 @@ void MainWindow::textualSearchThread(std::string word, int index) {
     }
 }
 
-void MainWindow::textualSearch(std::string const & word) {
+void MainWindow::textualSearch(QString const & word) {
     ui->input->clear();
 //    ui->options->clear();
     textualSearchThread(word, 0);
@@ -521,22 +546,23 @@ void MainWindow::textualSearch(std::string const & word) {
     }
     QStringList alternatives;
     for (auto i : textualResults) {
-        std::string key = i.first;
+        QString key = i.first;
         if (key.length() > 7) {
-            key = key.substr(3, key.length() - 7);
-            alternatives.push_back(key.c_str());
+            key = key.mid(3, key.length() - 7);
+//            key = key.substr(3, key.length() - 7);
+            alternatives.push_back(key);
         }
     }
     ui->options->addItems(alternatives);
 }
 
 
-void MainWindow::printAll(std::string const & str) {
+void MainWindow::printAll(QString const & str) {
     ui->input->clear();
     ui->options->clear();
     auto word = str + ';';
     auto & results = resultsToPrint;
-    for (auto i = 0; i < 7; ++i) {
+    for (size_t i = 0; i < 7; ++i) {
         printAllThread(word, i);
     }
     auto resultSize = [&]() { int sz = 0; for (auto i : results) { sz += i.second.size(); } return sz; }();
@@ -547,19 +573,19 @@ void MainWindow::printAll(std::string const & str) {
         return;
     }
     for (auto && i : results) {
-            ui->options->addItem(i.first.c_str());
+            ui->options->addItem(i.first);
     }
     printAllPrint(0);
 }
 
-void MainWindow::printAllThread(std::string word, int index) {
+void MainWindow::printAllThread(QString word, size_t index) {
     auto thisDic = originals->at(index);
     auto & thisResult = resultsToPrint; // pointer to a vector of
     auto range = thisDic->equal_range(word);
     auto count = thisDic->count(word);
     if (count == 0) { return; }
-    std::string filename = ":/alphabet/sources/part" + to_string(index + 1);
-    QFile file(filename.c_str());
+    QString filename = QString(":/alphabet/sources/part") + to_string(index + 1).c_str();
+    QFile file(filename);
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
@@ -569,6 +595,7 @@ void MainWindow::printAllThread(std::string word, int index) {
         auto key = itr->first;
         strvec_t thisEntry;
         auto pos = itr->second;
+
         while (std::getline(issfile, line)) {
             if (currentPos < pos) { ++currentPos; continue; }
             else {
@@ -578,7 +605,7 @@ void MainWindow::printAllThread(std::string word, int index) {
                 std::string temp2;
                 iss >> temp2;
                 if (currentPos == pos) { partOfSpeech = temp2; }
-                if (temp1 != key) {
+                if (temp1.c_str() != key) {
                     ++currentPos;
                     break;
                 }
@@ -588,29 +615,31 @@ void MainWindow::printAllThread(std::string word, int index) {
                     partOfSpeech = temp2;
                     thisResult.push_back(std::make_pair(key, thisEntry));
                     thisEntry.clear();
-                    thisEntry.push_back(line);
+                    thisEntry.push_back(line.c_str());
                     continue;
                 }
-                thisEntry.push_back(line);
+                thisEntry.push_back(line.c_str());
                 ++currentPos;
             }
         }
+
+
         thisResult.push_back(std::make_pair(key, thisEntry));
     }
     file.close();
 }
 
-void MainWindow::printAllPrint(int index) {
+void MainWindow::printAllPrint(size_t index) {
     // thisResult is the vector that stores all the inflections of a given word
     auto thisResult = resultsToPrint[index];
 
     inflSelectResult.clear();
     inflSelectResult = thisResult.second;
 
-    std::string toprint;
+    QString toprint;
 
     for (auto i : thisResult.second) {
-       std::string temp = addStyleToResults(i);
+       QString temp = addStyleToResults(i);
        toprint += temp;
     }
 
@@ -624,17 +653,17 @@ void MainWindow::printAllPrint(int index) {
 
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(toprint.c_str());
+    tabActive->setHtml(toprint);
 }
 
-void MainWindow::printOneThread(ptrvecstrvecptr_t results, std::string word, std::string form, int index) {
+void MainWindow::printOneThread(ptrvecstrvecptr_t results, QString word, QString form, size_t index) {
     auto thisDic = originals->at(index);
     auto thisResult = results->at(index);
     auto range = thisDic->equal_range(word);
     auto count = thisDic->count(word);
     if (count == 0) { return; }
-    std::string filename = ":/alphabet/sources/part" + to_string(index + 1);
-    QFile file(filename.c_str());
+    QString filename = QString(":/alphabet/sources/part") + to_string(index + 1).c_str();
+    QFile file(filename);
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
@@ -643,15 +672,16 @@ void MainWindow::printOneThread(ptrvecstrvecptr_t results, std::string word, std
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
         auto pos = itr->second;
+
         while (std::getline(issfile, line)) {
             if (currentPos < pos) { ++currentPos; continue; }
             else {
                 std::istringstream iss(line);
                 std::string temp;
                 iss >> temp;
-                if (temp == key) {
-                    if (line.find(form) != std::string::npos) {
-                        thisResult->push_back(line);
+                if (temp.c_str() == key) {
+                    if (line.find(form.toStdString()) != std::string::npos) {
+                        thisResult->push_back(line.c_str());
                         ++currentPos;
                         break;
                     }
@@ -664,7 +694,7 @@ void MainWindow::printOneThread(ptrvecstrvecptr_t results, std::string word, std
     file.close();
 }
 
-void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
+void MainWindow::printOne(const QString &arg1, const QString &arg2) {
     ui->input->setPlaceholderText("Insert word here...");
     auto word = arg1 + ';';
     auto form = arg2 + ';';
@@ -672,7 +702,7 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
     for (auto i = 0; i < 7; ++i) {
         results->push_back(strvecptr_t(new strvec_t));
     }
-    for (auto i = 0; i < 7; ++i) {
+    for (size_t i = 0; i < 7; ++i) {
         printOneThread(results, word, form, i);
     }
     auto resultSize = [&]() { int sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
@@ -683,7 +713,7 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
 //        ui->input->clear();
         return;
     }
-    std::string toprint;
+    QString toprint;
     for (auto && i : * results) {
         for (auto && j : *i) {
             j = addStyleToResults(j);
@@ -692,7 +722,7 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
     }
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(toprint.c_str());
+    tabActive->setHtml(toprint);
     typeTimes = 0;
 //    ui->input->clear();
 }
@@ -700,7 +730,7 @@ void MainWindow::printOne(const std::string &arg1, const std::string &arg2) {
 
 void MainWindow::on_input_textEdited(const QString &arg1)
 {
-    std::string word = arg1.toStdString();
+    QString word = arg1;
     ui->options->clear();
     if (flags[0] == 1) // search icelandic on
     {
@@ -708,9 +738,10 @@ void MainWindow::on_input_textEdited(const QString &arg1)
         QStringList display;
         if (word.length() > 1) {
             for (auto && entry : *wordindex) {
-                auto pos = entry.find(word);
+                auto pos = entry.indexOf(word);
+//                auto pos = entry.find(word);
                 if (pos == 0) {
-                    display.push_back(entry.c_str());
+                    display.push_back(entry);
                 }
             }
             ui->options->addItems(display);
@@ -741,15 +772,21 @@ void MainWindow::on_input_textEdited(const QString &arg1)
             stored.clear();
             printOneForm = word;
             QStringList display;
-            std::istringstream iss(word);
+            std::istringstream iss(word.toStdString());
             std::string snippet;
+
             while (iss >> snippet) {
-                stored.push_back(snippet);
+                stored.push_back(snippet.c_str());
             }
+
             for (auto && entry : *forms) {
-                auto flag = [&]() { for (auto && snippet : stored) { if (entry.find(snippet) == std::string::npos) return false; } return true; }();
+                auto flag = [&]() { for (auto && snippet : stored) {
+                        if (!entry.contains(snippet))
+                            return false;
+                    } return true;
+                }();
                 if (flag == true) {
-                    display.push_back(entry.c_str());
+                    display.push_back(entry);
                 }
             }
 //            inflectionForms->addItems(display);
@@ -760,29 +797,29 @@ void MainWindow::on_input_textEdited(const QString &arg1)
 
 void MainWindow::on_input_editingFinished()
 {
-    std::string word = ui->input->text().toStdString();
+    QString word = ui->input->text();
     if (flags[0] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         findDefinition(word);
     }
     else if (flags[1] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         ui->options->clear();
         textualSearch(word);
     }
     else if (flags[2] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         ui->options->clear();
         onlineEntries.clear();
         inputted = word;
         onlineDefinition(word);
     }
     else if (flags[3] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         findInflection(word);
     }
     else if (flags[4] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         ui->options->clear();
         resultsToPrint.clear();
         printAll(word);
@@ -792,8 +829,8 @@ void MainWindow::on_input_editingFinished()
         if (typeTimes > 0) {
             ui->input->clear();
             ui->input->setPlaceholderText("Insert form here...");
-            std::string tag = word;
-            ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+            QString tag = word;
+            ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         }
         else {
             ui->input->clear();
@@ -801,7 +838,7 @@ void MainWindow::on_input_editingFinished()
         }
     }
     else if (flags[6] == 1 && word.length() > 0) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         ui->options->clear();
         onlineEntries.clear();
         inputted = word;
@@ -813,7 +850,7 @@ void MainWindow::on_input_editingFinished()
 void MainWindow::on_options_itemClicked(QListWidgetItem *item)
 {
     auto itemText = item->text();
-    auto tag = itemText.toStdString();
+    auto tag = itemText;
 
     if (flags[0] == 1) {
         ui->input->setText(itemText);
@@ -823,19 +860,19 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
 
     else if (flags[1] == 1) {
         ui->input->setText(itemText);
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         if (textualResults.size() == 0) {
             textualSearch(tag);
         }
         else {
-            int index = ui->options->currentRow();
+            size_t index = ui->options->currentRow();
             textualSearchPrint(index);
         }
     }
 
     else if (flags[2] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
-        std::string url;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
+        QString url;
         auto itr = onlineEntries.find(tag);
         if (itr != onlineEntries.end()) {
             url = itr->second;
@@ -843,22 +880,22 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
         downloadPage(url);
     }
     else if (flags[4] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
         tabActive->clear();
-        int index = ui->options->currentRow();
+        size_t index = ui->options->currentRow();
         printAllPrint(index);
 // a function that prints according to the index.
     }
     else if (flags[5] == 1) {
         ui->options->clear();
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         ui->input->setText(itemText);
         printOne(printOneWord, tag);
     }
     else if (flags[6] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
-        std::string url;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
+        QString url;
         auto itr = onlineEntries.find(tag);
         if (itr != onlineEntries.end()) {
             url = itr->second;
@@ -870,23 +907,23 @@ void MainWindow::on_options_itemClicked(QListWidgetItem *item)
 
 void MainWindow::resultsFromDictionaries_itemClicked(QListWidgetItem * item) {
     auto itemText = item->text();
-    auto tag = itemText.toStdString();
+    auto tag = itemText;
     if (flags[0] == 1) {
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag.c_str());
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
 
         if (definitionResults.size() == 0) {
             findDefinition(tag);
         }
         else {
-            int index = resultsFromDictionaries->currentRow();
+            size_t index = resultsFromDictionaries->currentRow();
             findDefinitionPrint(index);
         }
     }
 }
 
-void MainWindow::downloadPage(std::string url) {
+void MainWindow::downloadPage(QString url) {
     ui->input->clear();
-    QUrl pageUrl(url.c_str());
+    QUrl pageUrl(url);
     pageControl = new PageDownloader(pageUrl, this);
     connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
 }
@@ -894,112 +931,117 @@ void MainWindow::downloadPage(std::string url) {
 void MainWindow::loadPage() {
     QByteArray qPage = (pageControl->downloadedData());
     QString str = QString::fromLatin1(qPage);
-    webpage = str.toStdString();
+    webpage = str;
     if (parsePage()) {
         auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
         webpage = "<span style=\"font-family: Perpetua; font-size: 20pt;\">" + webpage + "</span>";
-        tabActive->setHtml(webpage.c_str());
+        tabActive->setHtml(webpage);
         webpage.clear();
     }
 }
 
-void MainWindow::onlineText(const std::string & word) {
-    std::string newWord = wordToWrite(word);
-    std::string url = textUrl1 + newWord + textUrl2;
-    downloadPage(url.c_str());
+void MainWindow::onlineText(const QString & word) {
+    QString newWord = wordToWrite(word);
+    QString url = textUrl1 + newWord + textUrl2;
+    downloadPage(url);
 }
 
-void MainWindow::onlineDefinition(const std::string &word) {
-    std::string newWord = wordToWrite(word);
-    std::string url = writeUrl1 + newWord + writeUrl2;
-    downloadPage(url.c_str());
+void MainWindow::onlineDefinition(const QString &word) {
+    QString newWord = wordToWrite(word);
+    QString url = writeUrl1 + newWord + writeUrl2;
+    downloadPage(url);
 }
 
 bool MainWindow::parsePage() {
-    if (webpage.find("produced no results.") != std::string::npos) {
-        auto pos = webpage.find("<h3>While searching in Icelandic Online Dictionary and Readings</h3>");
-        if (pos != std::string::npos) webpage = webpage.substr(pos, webpage.length() - pos);
-        pos = webpage.find("<div class=\"mainBackground\">");
-        if (pos != std::string::npos) webpage = webpage.substr(0, pos);
+    if (webpage.contains("produced no results.")) {
+        auto pos = webpage.indexOf("<h3>While searching in Icelandic Online Dictionary and Readings</h3>");
+        if (pos != -1) webpage = webpage.mid(pos, webpage.length() - pos);
+        pos = webpage.contains("<div class=\"mainBackground\">");
+        if (pos != -1) webpage = webpage.mid(0, pos);
         return true;
     }
-    else if (webpage.find("<div class=\"results\">") != std::string::npos) {
-        auto pos = webpage.find("<div class=\"results\">");
-        if (pos != std::string::npos) webpage = webpage.substr(pos, webpage.length() - pos);
-        pos = webpage.find("</div> <!-- results -->");
-        if (pos != std::string::npos) webpage = webpage.substr(0, pos);
-        std::vector<std::string> toBeDeleted = {
+    else if (webpage.contains("<div class=\"results\">")) {
+        auto pos = webpage.indexOf("<div class=\"results\">");
+        if (pos != -1) webpage = webpage.mid(pos, webpage.length() - pos);
+        pos = webpage.indexOf("</div> <!-- results -->");
+        if (pos != -1) webpage = webpage.mid(0, pos);
+        QVector<QString> toBeDeleted = {
             "<div class=\"results\">", "<div class=\"nestlevel\">", "<span class=\"lemma\">",
             "<small><sup>", "</sup></small>", "</a></span>", "<span class=\"pos\">", "</span>",
             "</div>", "<!-- results -->", "<a href=\""
         };
         auto results = webpage;
         for (auto && i : toBeDeleted) {
-            while (results.find(i) != std::string::npos) {
-                auto pos = results.find(i);
-                if (pos != std::string::npos) { results.erase(pos, i.length()); }
+            while (results.contains(i)) {
+                auto pos = results.indexOf(i);
+                if (pos != -1) { results.remove(pos, i.length()); }
             }
         }
-        std::istringstream iss(results);
-        std::vector<std::string> entries;
+
+        std::istringstream iss(results.toStdString());
+        QVector<QString> entries;
         std::string line;
         while (std::getline(iss, line)) {
             if (line.length() > 0) {
                 pos = line.find("\">");
+//                pos = line.find("\">");
                 if (pos != std::string::npos) {
                     line.replace(pos, 2, " ");
                 }
-                entries.push_back(line);
+                entries.push_back(line.c_str());
             }
         }
         for (auto i : entries) {
-            std::istringstream iss(i);
+            std::istringstream iss(i.toStdString());
             std::string link, key;
             iss >> link;
             link = "http://digicoll.library.wisc.edu" + link;
-            std::string temp;
+            QString temp;
             iss >> key;
-            if (key.back() == ',') {
+            if (*key.end() == ',') {
                 std::string temp;
                 iss >> temp;
                 key += ' ' + temp;
             }
-            onlineEntries.insert(std::make_pair(key, link));
+            onlineEntries.insert(std::make_pair(key.c_str(), link.c_str()));
         }
+
         QStringList alternatives;
         for (auto && i : onlineEntries) {
-            alternatives.push_back(i.first.c_str());
+            alternatives.push_back(i.first);
         }
         ui->options->addItems(alternatives);
         return false;
     }
     else {
-        auto pos = webpage.find("<div class=\"entry\">");
-        if (pos != std::string::npos) { webpage = webpage.substr(pos, webpage.length() - pos); }
-        pos = webpage.find("</div><!-- entry -->");
-        if (pos != std::string::npos) { webpage = webpage.substr(0, pos); }
-        pos = webpage.find("<span class=\"lemma\">");
-        if (pos != std::string::npos) {
-            std::string tag = "<span class=\"lemma\">";
+        auto pos = webpage.indexOf("<div class=\"entry\">");
+        if (pos != -1) { webpage = webpage.mid(pos, webpage.length() - pos); }
+        pos = webpage.indexOf("</div><!-- entry -->");
+        if (pos != -1) { webpage = webpage.mid(0, pos); }
+        pos = webpage.indexOf("<span class=\"lemma\">");
+        if (pos != -1) {
+            QString tag = "<span class=\"lemma\">";
             webpage.replace(pos, tag.length(), "<span style=\" font-weight:600; font-size:24pt;\" class=\"lemma\">");
         }
-        while (webpage.find("<span class=\"orth\">") != std::string::npos) {
-            std::string tag = "<span class=\"orth\">";
-            auto pos = webpage.find(tag);
-            if (pos != std::string::npos) {
+        while (webpage.contains("<span class=\"orth\">")) {
+            QString tag = "<span class=\"orth\">";
+            auto pos = webpage.indexOf(tag);
+ //           auto pos = webpage.find(tag);
+            if (pos != -1) {
                 webpage.replace(pos, tag.length(), "<span style=\" font-weight:600;\" class=\"orth\">");
             }
         }
-        while (webpage.find("<span class=\"trans\">") != std::string::npos) {
-            std::string tag = "<span class=\"trans\">";
-            auto pos = webpage.find(tag);
-            if (pos != std::string::npos) {
+        while (webpage.contains("<span class=\"trans\">")) {
+            QString tag = "<span class=\"trans\">";
+            auto pos = webpage.indexOf(tag);
+//            auto pos = webpage.find(tag);
+            if (pos != -1) {
                 webpage.replace(pos, tag.length(), "<span style=\" font-style:italic;\" class=\"trans\">");
             }
         }
         if (flags[6] == 1) {
-            auto pos = webpage.find(inputted);
-            if (pos != std::string::npos) {
+            auto pos = webpage.indexOf(inputted);
+            if (pos != -1) {
                 webpage.replace(pos, inputted.length(), "<span style=\" font-weight:600; color:#ff0000;\">" + inputted + "</span>");
             }
         }
@@ -1109,11 +1151,13 @@ void MainWindow::on_actionList_One_Specific_Form_triggered()
 }
 
 void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const vec) {
+    /*
     QString result;
     for (auto && i : vec) {
         result += i + " ";
     }
     result = result.trimmed();
+    */
 
     if (state == Qt::CheckState::Checked) {
         if (inflStruct.find(vec) == inflStruct.end()) {
@@ -1124,31 +1168,23 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
         inflStruct.erase(inflStruct.find(vec));
     }
 
+/*
     for (auto && i : inflStruct) {
         qDebug() << i;
     }
+*/
 
+    auto resultVec = ParseCheckStateChangeInfo();
 
-    // auto resultVec = ParseCheckStateChangeInfo();
-
-    //for (auto && i : resultVec) qDebug() << i.c_str();
-
-    /*
-    std::string toprint;
+    QString toprint;
     for (auto i : resultVec) {
-       std::string temp = addStyleToResults(i);
+       QString temp = addStyleToResults(i);
        toprint += temp;
     }
 
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14pt;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     auto * tabActive = dynamic_cast<QTextBrowser*>(ui->resultsTab->currentWidget());
-    tabActive->setHtml(toprint.c_str());
-    */
-
-    /*
-    qDebug() << result << "has changed to" << state;
-    qDebug() << " ";
-    */
+    tabActive->setHtml(toprint);
 }
 
 TreeWidgetItem * MainWindow::constructItem(QString label, TreeWidget * parent) {
@@ -1173,39 +1209,80 @@ TreeWidgetItem * MainWindow::constructItem(QString label, TreeWidgetItem * paren
     return item;
 }
 
-void MainWindow::fillInflectionForms(std::string const & str) {
-    if (str.find(PartOfSpeech.MasNoun) != std::string::npos) {
+template <bool D,
+          Infl::Category cat,
+          Infl::Forms ... args,
+          class T>
+void MainWindow::fillStructures(T * item, QString const & str) {
+    if (!item) return;
+    std::array<bool, sizeof... (args)> values;
+    for (unsigned i = 0; i < sizeof... (args); ++i) {
+        values = fillStructuresHelper<sizeof...(args), args...>(str);
+    }
+    bool boolSum = false;
+    for (auto && v : values) {
+        if (v == true) { boolSum = true; break; }
+    }
+    if (boolSum == false) return;
+
+    auto parent = constructItem(InflManager.categoryOf(cat), item);
+    fillStructureItemConstructor<sizeof...(args), args...>(parent, values);
+}
+
+
+template <int Size, Infl::Forms ... Forms>
+std::array<bool, Size> MainWindow::fillStructuresHelper(QString const & str) {
+    std::array<bool, Size> result;
+    auto values = {Forms...}; // initializer list
+    unsigned index = 0;
+    std::for_each(values.begin(), values.end(), [&](Infl::Forms n){result[index] = InflManager.find(str, Infl::Short, n); ++index; });
+    return result;
+}
+
+template <int Size, Infl::Forms ... Forms>
+void MainWindow::fillStructureItemConstructor(TreeWidgetItem * item, std::array<bool, Size> const & array) {
+    auto values = {Forms...};
+    unsigned index = 0;
+    std::for_each(values.begin(), values.end(), [&](Infl::Forms f){
+        if (array.at(index) == true) {
+            constructItem(InflManager.nameOf(f), item);
+        }
+    });
+}
+
+void MainWindow::fillInflectionForms(QString const & str) {
+    if (str.contains(PartOfSpeech.MasNoun)) {
         currentPOS = POS::Noun;
         fillNouns(str);
     }
-    else if (str.find(PartOfSpeech.FemNoun) != std::string::npos) {
+    else if (str.contains(PartOfSpeech.FemNoun)) {
         currentPOS = POS::Noun;
         fillNouns(str);
     }
-    else if (str.find(PartOfSpeech.NetNoun) != std::string::npos) {
+    else if (str.contains(PartOfSpeech.NetNoun)) {
         currentPOS = POS::Noun;
         fillNouns(str);
     }
-    else if (str.find(PartOfSpeech.Verb) != std::string::npos) {
+    else if (str.contains(PartOfSpeech.Verb)) {
         currentPOS = POS::Verb;
         fillVerbs(str);
     }
-    else if (str.find(PartOfSpeech.Adjective) != std::string::npos) {
+    else if (str.contains(PartOfSpeech.Adjective)) {
         currentPOS = POS::Adjective;
         fillAdjectives(str);
     }
-    else if (str.find(PartOfSpeech.Pronoun) != std::string::npos) {
+    else if (str.contains(PartOfSpeech.Pronoun)) {
         currentPOS = POS::Pronoun;
         fillPronouns(str);
     }
-    else if (str.find(PartOfSpeech.Adverb) != std::string::npos) {
+    else if (str.contains(PartOfSpeech.Adverb)) {
         currentPOS = POS::Adverb;
         fillAdverbs(str);
     }
     else ;
 }
 
-void MainWindow::fillVerbs(const std::string & str) {
+void MainWindow::fillVerbs(QString const & str) {
     if (!inflectionForms) return;
 
     auto none = constructItem("Verb", inflectionForms);
@@ -1216,43 +1293,64 @@ void MainWindow::fillVerbs(const std::string & str) {
     fillStructures<false, TYPE_PERSON>(none, str);
     fillStructures<false, TYPE_NUMBER>(none, str);
 
-    bool findInfinitive = InflManager.find(str, Infl::Full, Infl::Infinitive);
+    bool findInfinitive = InflManager.find(str, Infl::Short, Infl::Infinitive);
     if (findInfinitive) {
-        auto infinitive = constructItem("Infinitive", inflectionForms);
+        auto infinitive = constructItem(InflManager.nameOf(Infl::Infinitive), inflectionForms);
         fillStructures<false, TYPE_VOICE>(infinitive, str);
-        fillStructures<false, TYPE_NUMBER>(infinitive, str);
     }
 
-    bool findSupine = InflManager.find(str, Infl::Full, Infl::Supine);
+    bool findImperative = InflManager.find(str, Infl::Short, Infl::Imperative);
+    if (findImperative) {
+        auto imperative = constructItem(InflManager.nameOf(Infl::Imperative), inflectionForms);
+        fillStructures<false, TYPE_IMPERAT_NUMBER>(imperative, str);
+    }
+
+    bool findSupine = InflManager.find(str, Infl::Short, Infl::Supine);
     if (findSupine) {
-        auto supine = constructItem("Supine", inflectionForms);
+        auto supine = constructItem(InflManager.nameOf(Infl::Supine), inflectionForms);
         fillStructures<false, TYPE_VOICE>(supine, str);
     }
 
-    bool findParticiple = InflManager.find(str, Infl::Full, Infl::Participle);
+    bool findPresParticiple = InflManager.find(str, Infl::Short, Infl::PresentParticiple);
+    if (findPresParticiple) {
+        auto participle = constructItem(InflManager.nameOf(Infl::PresentParticiple), inflectionForms);
+    }
+
+    bool findPastParticiple = InflManager.find(str, Infl::Short, Infl::PastParticiple);
+    if (findPastParticiple) {
+        auto participle = constructItem(InflManager.nameOf(Infl::PastParticiple), inflectionForms);
+        fillStructures<false, TYPE_DEFINITENESS>(participle, str);
+        fillStructures<false, TYPE_GENDER>(participle, str);
+        fillStructures<false, TYPE_CASE>(participle, str);
+        fillStructures<false, TYPE_NUMBER>(participle, str);
+    }
+
+    /*
+    bool findParticiple = InflManager.find(str, Infl::Short, Infl::Participle);
     if (findParticiple) {
-        auto participle = constructItem("Participle", inflectionForms);
+        auto participle = constructItem(InflManager.nameOf(Infl::Participle), inflectionForms);
         fillStructures<false, TYPE_PARTICIPLE_TENSE>(participle, str);
         fillStructures<false, TYPE_DEFINITENESS>(participle, str);
         fillStructures<false, TYPE_GENDER>(participle, str);
         fillStructures<false, TYPE_CASE>(participle, str);
         fillStructures<false, TYPE_NUMBER>(participle, str);
     }
+    */
 }
 
-void MainWindow::fillNouns(std::string const & str) {
+void MainWindow::fillNouns(QString const & str) {
     if (!inflectionForms) return;
     fillStructures<true, TYPE_CASE>(inflectionForms, str);
     fillStructures<true, TYPE_NUMBER>(inflectionForms, str);
     fillStructures<true, TYPE_DEFINITENESS>(inflectionForms, str);
 }
 
-void MainWindow::fillAdjectives(std::string const & str) {
+void MainWindow::fillAdjectives(QString const & str) {
     if (!inflectionForms) return;
 
-    bool findPositive = InflManager.find(str, Infl::Full, Infl::Positive);
-    bool findComparat = InflManager.find(str, Infl::Full, Infl::Comparative);
-    bool findSuperlat = InflManager.find(str, Infl::Full, Infl::Superlative);
+    bool findPositive = InflManager.find(str, Infl::Short, Infl::Positive);
+    bool findComparat = InflManager.find(str, Infl::Short, Infl::Comparative);
+    bool findSuperlat = InflManager.find(str, Infl::Short, Infl::Superlative);
 
     if (!(findPositive || findComparat || findSuperlat)) return;
 
@@ -1278,20 +1376,20 @@ void MainWindow::fillAdjectives(std::string const & str) {
     }
 }
 
-void MainWindow::fillPronouns(std::string const & str) {
+void MainWindow::fillPronouns(QString const & str) {
     if (!inflectionForms) return;
     fillStructures<true, TYPE_GENDER>(inflectionForms, str);
     fillStructures<true, TYPE_CASE>(inflectionForms, str);
     fillStructures<true, TYPE_NUMBER>(inflectionForms, str);
 }
 
-void MainWindow::fillAdverbs(std::string const & str) {
+void MainWindow::fillAdverbs(QString const & str) {
     if (!inflectionForms) return;
     fillStructures<true, TYPE_FORM>(inflectionForms, str);
 }
 
 
-std::vector<std::string> MainWindow::ParseCheckStateChangeInfo() {
+QVector<QString> MainWindow::ParseCheckStateChangeInfo() {
     switch (currentPOS) {
     case (POS::Verb): {
         return ParseVerb();
@@ -1311,105 +1409,196 @@ std::vector<std::string> MainWindow::ParseCheckStateChangeInfo() {
     }
 }
 
-std::vector<std::string> MainWindow::ParseVerb() {
-    /*
-    std::vector<std::string> result;
-    for (auto && i : inflSelectResult) {
-        auto findInfin = InflManager.find(i, Infl::Short, Infl::Infinitive);
-        auto findSupin = InflManager.find(i, Infl::Short, Infl::Supine);
-        auto findParti = InflManager.find(i, Infl::Short, Infl::Participle);
+QVector<QString> MainWindow::ParseVerb() {
+    QVector<QString> result;
 
-        auto itr = inflStruct.cbegin();
-        while (itr != inflStruct.cend()) {
-            if (itr->at(0) == "Verb") {
-                if (!findInfin && !findSupin && !findParti) {
-                    if (itr->at(1) == "Impersonality") {
+    if (inflStruct.empty()) return strvec_t{};
 
-                        itr = std::next(itr);
-                    }
-                    else if (itr->at(1) == "Voices") {
+    auto end = inflStruct.cend();
+    auto itr = inflStruct.cbegin();
 
-                    }
-                    else if (itr->at(1) == "Moods") {
-                    }
-                    else if (itr->at(1) == "Tenses") {
-                    }
-                    else if (itr->at(1) == "Persons") {
-                    }
-                    else if (itr->at(1) == "Numbers") {
-                        if (itr->at(2) == InflManager.nameOf(Infl::Singular).c_str()) {
-                            if (InflManager.find(i, Infl::Short, Infl::Singular)) {
+    std::array<QVector<Infl::Forms>, 6> verbContainer;
+    verbContainer.fill(QVector<Infl::Forms>{});
 
+    while (itr != end && itr->at(0) != "Verb") itr = std::next(itr);
+
+    while (itr != end && itr->at(0) == "Verb") {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Impersonality)) {
+            verbContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+            verbContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
+            verbContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
+            verbContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
+            verbContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+            verbContainer.at(5).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : verbContainer.at(0)) {
+            for (auto && b : verbContainer.at(1)) {
+                for (auto && c : verbContainer.at(2)) {
+                    for (auto && d : verbContainer.at(3)) {
+                        for (auto && e : verbContainer.at(4)) {
+                            for (auto && f : verbContainer.at(5)) {
+
+                                bool impers;
+                                if (a == Infl::Impersonal)
+                                    impers = InflManager.find(entry, Infl::Short, Infl::Impersonal);
+                                else if (a == Infl::Other) {
+                                    impers = !InflManager.find(entry, Infl::Short, Infl::Impersonal);
+                                }
+
+                                auto satisfied = !InflManager.find(entry, Infl::Short, Infl::Infinitive) &&
+                                                 !InflManager.find(entry, Infl::Short, Infl::Imperative) &&
+                                                 !InflManager.find(entry, Infl::Short, Infl::Supine) &&
+                                                 !InflManager.find(entry, Infl::Short, Infl::Participle) &&
+                                                 impers &&
+                                                 InflManager.find(entry, Infl::Short, b) &&
+                                                 InflManager.find(entry, Infl::Short, c) &&
+                                                 InflManager.find(entry, Infl::Short, d) &&
+                                                 InflManager.find(entry, Infl::Short, e) &&
+                                                 InflManager.find(entry, Infl::Short, f);
+                                if (satisfied) {
+                                    result.push_back(entry);
+                                }
                             }
                         }
-                        else if (itr->at(2) == InflManager.nameOf(Infl::Plural).c_str()) {
-                            if (InflManager.find(i, Infl::Short, Infl::Plural)) {
-
-                            }
-                        }
                     }
-                }
- //               level1 = level1 || level3;
-            }
-            else if (itr->at(0) == InflManager.nameOf(Infl::Infinitive).c_str()) {
-                if (findInfin) {
-
-                }
-            }
-            else if (itr->at(0) == InflManager.nameOf(Infl::Supine).c_str()) {
-                if (findSupin) {
-
-                }
-            }
-            else if (itr->at(0) == InflManager.nameOf(Infl::Participle).c_str()) {
-                if (findParti) {
-
                 }
             }
         }
     }
-    return result;
-    */
-}
 
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Infinitive)) itr = std::next(itr);
 
-template <bool D,
-          Infl::Category cat,
-          Infl::Forms ... args,
-          class T>
-void MainWindow::fillStructures(T * item, std::string const & str) {
-    if (!item) return;
-    std::array<bool, sizeof... (args)> values;
-    for (unsigned i = 0; i < sizeof... (args); ++i) {
-        values = fillStructuresHelper<sizeof...(args), args...>(str);
-    }
-    bool boolSum = false;
-    for (auto && v : values) {
-        if (v == true) { boolSum = true; break; }
-    }
-    if (boolSum == false) return;
-
-    auto parent = constructItem(InflManager.categoryOf(cat).c_str(), item);
-    fillStructureItemConstructor<sizeof...(args), args...>(parent, values);
-}
-
-
-template <int Size, Infl::Forms ... Forms>
-std::array<bool, Size> MainWindow::fillStructuresHelper(std::string const & str) {
-    std::array<bool, Size> result;
-    auto values = {Forms...}; // initializer list
-    unsigned index = 0;
-    std::for_each(values.begin(), values.end(), [&](Infl::Forms n){result[index] = InflManager.find(str, Infl::Full, n); ++index; });
-    return result;
-}
-
-template <int Size, Infl::Forms ... Forms>
-void MainWindow::fillStructureItemConstructor(TreeWidgetItem * item, std::array<bool, Size> const & array) {
-    auto values = {Forms...};
-    unsigned index = 0;
-    std::for_each(values.begin(), values.end(), [&](Infl::Forms f){
-        if (array.at(index) == true) {
-            constructItem(InflManager.nameOf(f).c_str(), item);
+    QVector<Infl::Forms> infinitiveContainer;
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Infinitive)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+            infinitiveContainer.push_back(InflManager.enumOfForms(itr->at(2)));
         }
-    });
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : infinitiveContainer) {
+            auto satisfied = InflManager.find(entry, Infl::Short, Infl::Infinitive) &&
+                             InflManager.find(entry, Infl::Short, a);
+            if (satisfied) {
+                result.push_back(entry);
+            }
+        }
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Imperative)) itr = std::next(itr);
+    QVector<Infl::Forms> imperativeContainer;
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Imperative)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+            imperativeContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : imperativeContainer) {
+            auto satisfied = InflManager.find(entry, Infl::Short, Infl::Imperative) &&
+                             InflManager.find(entry, Infl::Short, a);
+            if (satisfied) {
+                result.push_back(entry);
+            }
+        }
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Supine)) itr = std::next(itr);
+    QVector<Infl::Forms> supineContainer;
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Supine)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+            supineContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : supineContainer) {
+            auto satisfied = InflManager.find(entry, Infl::Short, Infl::Supine) &&
+                             InflManager.find(entry, Infl::Short, a);
+            if (satisfied) {
+                result.push_back(entry);
+            }
+        }
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::PresentParticiple)) itr = std::next(itr);
+    QVector<Infl::Forms> presPartContainer;
+
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::PresentParticiple)) {
+        presPartContainer.push_back(InflManager.enumOfForms(itr->at(0)));
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : presPartContainer) {
+            auto satisfied = InflManager.find(entry, Infl::Short, Infl::PresentParticiple) &&
+                             InflManager.find(entry, Infl::Short, a);
+            if (satisfied) {
+                result.push_back(entry);
+            }
+        }
+    }
+
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::PastParticiple)) itr = std::next(itr);
+    std::array<QVector<Infl::Forms>, 4> participleContainter;
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::PastParticiple)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Definiteness)) {
+            participleContainter.at(0).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Gender)) {
+            participleContainter.at(1).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Case)) {
+            participleContainter.at(2).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+            participleContainter.at(3).push_back(InflManager.enumOfForms(itr->at(2)));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : participleContainter.at(0)) {
+            for (auto && b : participleContainter.at(1)) {
+                for (auto && c : participleContainter.at(2)) {
+                    for (auto && d : participleContainter.at(3)) {
+                        auto satisfied = InflManager.find(entry, Infl::Short, Infl::Participle) &&
+                                    InflManager.find(entry, Infl::Short, a) &&
+                                    InflManager.find(entry, Infl::Short, b) &&
+                                    InflManager.find(entry, Infl::Short, c) &&
+                                    InflManager.find(entry, Infl::Short, d);
+                        if (satisfied) {
+                            result.push_back(entry);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
 }
+
+

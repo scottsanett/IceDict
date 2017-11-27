@@ -1,11 +1,11 @@
 #ifndef INFLECTION_HPP
 #define INFLECTION_HPP
 
-#include <string>
-#include <vector>
 #include <array>
 #include <utility>
-#include <map>
+#include <algorithm>
+#include <QString>
+#include <QVector>
 
 namespace Infl {
     enum Policy { Full, Short };
@@ -17,7 +17,7 @@ namespace Infl {
         Indicative, Subjunctive, Imperative,
         Present, Past,
         FirstPerson, SecondPerson, ThirdPerson,
-        Singular, Plural,
+        Singular, Plural, Clipped,
         Nominative, Accusative, Dative, Genitive,
         Masculine, Feminine, Neuter,
         Definite, Indefinite,
@@ -30,33 +30,37 @@ namespace Infl {
         Case, Gender, Definiteness, Form
     };
 
+    template <typename T>
+    T enumAt(long i) {
+        return static_cast<T>(i);
+    }
 };
 
 class Inflection
 {
 private:
-    std::array<const char *, 31> InflName {
-        {"Participle", "Present", "Past",
+    std::array<const char *, 32> InflName {
+        {"Participle", "Present Participle", "Past Participle",
         "Infinitive", "Supine", "Impersonal", "Other",
         "Active", "Middle",
         "Indicative", "Subjunctive", "Imperative",
         "Present", "Past",
         "First", "Second", "Third",
-        "Singular", "Plural",
+        "Singular", "Plural", "Clipped",
         "Nominative", "Accusative", "Dative", "Genitive",
         "Masculine", "Feminine", "Neuter",
         "Definite", "Indefinite",
         "Positive", "Comparative", "Superlative"}
     };
 
-    std::array<const char *, 31> InflStruct {
+    std::array<const char *, 32> InflStruct {
         {"part.", "pres. part.", "past part.",
         "infin.", " supine", "impers.", "other",
         "act.", "mid.",
         "indic.", "subj.", "imperat.",
         " pres. ", " past ",
         "1st", "2nd", "3rd",
-        "sg.", "pl.",
+        "sg.", "pl.", "clipped",
         "nom.", "acc.", "dat.", "gen.",
         " m.", " f.", " n.",
         " def.", " ind.",
@@ -69,16 +73,19 @@ private:
         "Case", "Gender", "Definiteness", "Form"}
     };
 
+    QVector<std::pair<QString, QString>> InflVec;
 
-    std::vector<std::pair<std::string, std::string>> InflVec;
 
 public:
     Inflection();
 
-    bool find(std::string const &, enum Infl::Policy, enum Infl::Forms);
-    std::string nameOf(enum Infl::Forms);
-    std::string structOf(enum Infl::Forms);
-    std::string categoryOf(enum Infl::Category);
+    bool find(QString const &, enum Infl::Policy, enum Infl::Forms);
+    QString nameOf(enum Infl::Forms);
+    QString structOf(enum Infl::Forms);
+    QString categoryOf(enum Infl::Category);
+
+    Infl::Forms enumOfForms(QString const &);
+    Infl::Category enumOfCategory(QString const &);
 };
 
 #endif // INFLECTION_HPP
