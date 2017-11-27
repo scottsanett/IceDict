@@ -101,7 +101,7 @@ void MainWindow::initializeInflectionForms() {
     if (!inflectionForms) inflectionForms = new TreeWidget;
     inflectionForms->setHeaderLabel("Inflections");
     inflectionForms->setMaximumWidth(300);
-    inflectionForms->setMinimumHeight(400);
+    inflectionForms->setMinimumHeight(450);
     inflectionForms->setFrameStyle(QFrame::NoFrame);
     inflectionForms->setFocusPolicy(Qt::NoFocus);
     ui->inputLayout->addWidget(inflectionForms);
@@ -1015,11 +1015,11 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
         inflStruct.erase(inflStruct.find(vec));
     }
 
-    /*
+/*
     for (auto && i : inflStruct) {
         qDebug() << i;
     }
-    */
+*/
 
     auto resultVec = ParseCheckStateChangeInfo();
 
@@ -1137,13 +1137,22 @@ void MainWindow::fillInflectionForms(QString const & str) {
 void MainWindow::fillVerbs(QString const & str) {
     if (!inflectionForms) return;
 
-    auto none = constructItem("Verb", inflectionForms);
-    fillStructures<false, TYPE_IMPERSONALITY>(none, str);
+    auto none = constructItem("Non-Impersonal", inflectionForms);
     fillStructures<false, TYPE_VOICE>(none, str);
     fillStructures<false, TYPE_MOOD>(none, str);
     fillStructures<false, TYPE_TENSE>(none, str);
     fillStructures<false, TYPE_PERSON>(none, str);
     fillStructures<false, TYPE_NUMBER>(none, str);
+
+    bool findImpersonal = InflManager.find(str, Infl::Short, Infl::Impersonal);
+    if (findImpersonal) {
+        auto impersonal = constructItem(InflManager.nameOf(Infl::Impersonal), inflectionForms);
+        fillStructures<false, TYPE_VOICE>(impersonal, str);
+        fillStructures<false, TYPE_MOOD>(impersonal, str);
+        fillStructures<false, TYPE_TENSE>(impersonal, str);
+        fillStructures<false, TYPE_PERSON>(impersonal, str);
+        fillStructures<false, TYPE_NUMBER>(impersonal, str);
+    }
 
     bool findInfinitive = InflManager.find(str, Infl::Short, Infl::Infinitive);
     if (findInfinitive) {
@@ -1267,29 +1276,25 @@ QVector<QString> MainWindow::ParseVerb() {
     auto end = inflStruct.cend();
     auto itr = inflStruct.cbegin();
 
-    std::array<QVector<Infl::Forms>, 6> verbContainer;
+    std::array<QVector<Infl::Forms>, 5> verbContainer;
     verbContainer.fill(QVector<Infl::Forms>{});
 
-    while (itr != end && itr->at(0) != "Verb") itr = std::next(itr);
-
-    while (itr != end && itr->at(0) == "Verb") {
-        if (itr->at(1) == InflManager.categoryOf(Infl::Impersonality)) {
+    while (itr != end && itr->at(0) != "Non-Impersonal") itr = std::next(itr);
+    while (itr != end && itr->at(0) == "Non-Impersonal") {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
             verbContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
         }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
             verbContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
         }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
             verbContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
         }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
             verbContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
         }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
-            verbContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
         else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
-            verbContainer.at(5).push_back(InflManager.enumOfForms((itr->at(2))));
+            verbContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
         }
         itr = std::next(itr);
     }
@@ -1300,27 +1305,62 @@ QVector<QString> MainWindow::ParseVerb() {
                 for (auto && c : verbContainer.at(2)) {
                     for (auto && d : verbContainer.at(3)) {
                         for (auto && e : verbContainer.at(4)) {
-                            for (auto && f : verbContainer.at(5)) {
+                            auto satisfied = !InflManager.find(entry, Infl::Short, Infl::Impersonal) &&
+                                             !InflManager.find(entry, Infl::Short, Infl::Infinitive) &&
+                                             !InflManager.find(entry, Infl::Short, Infl::Imperative) &&
+                                             !InflManager.find(entry, Infl::Short, Infl::Supine) &&
+                                             !InflManager.find(entry, Infl::Short, Infl::PresentParticiple) &&
+                                             !InflManager.find(entry, Infl::Short, Infl::PastParticiple) &&
+                                             InflManager.find(entry, Infl::Short, a) &&
+                                             InflManager.find(entry, Infl::Short, b) &&
+                                             InflManager.find(entry, Infl::Short, c) &&
+                                             InflManager.find(entry, Infl::Short, d) &&
+                                             InflManager.find(entry, Infl::Short, e);
+                            if (satisfied) result.push_back(entry);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-                                bool impers;
-                                if (a == Infl::Impersonal)
-                                    impers = InflManager.find(entry, Infl::Short, Infl::Impersonal);
-                                else if (a == Infl::Other) {
-                                    impers = !InflManager.find(entry, Infl::Short, Infl::Impersonal);
-                                }
+    std::array<QVector<Infl::Forms>, 5> impersonalContainer;
+    impersonalContainer.fill(QVector<Infl::Forms>{});
 
-                                auto satisfied = !InflManager.find(entry, Infl::Short, Infl::Infinitive) &&
-                                                 !InflManager.find(entry, Infl::Short, Infl::Imperative) &&
-                                                 !InflManager.find(entry, Infl::Short, Infl::Supine) &&
-                                                 !InflManager.find(entry, Infl::Short, Infl::Participle) &&
-                                                 impers &&
-                                                 InflManager.find(entry, Infl::Short, b) &&
-                                                 InflManager.find(entry, Infl::Short, c) &&
-                                                 InflManager.find(entry, Infl::Short, d) &&
-                                                 InflManager.find(entry, Infl::Short, e) &&
-                                                 InflManager.find(entry, Infl::Short, f);
-                                if (satisfied) result.push_back(entry);
-                            }
+    itr = inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Impersonal)) itr = std::next(itr);
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Impersonal)) {
+        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+            impersonalContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
+            impersonalContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
+            impersonalContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
+            impersonalContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+            impersonalContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : inflSelectResult) {
+        for (auto && a : impersonalContainer.at(0)) {
+            for (auto && b : impersonalContainer.at(1)) {
+                for (auto && c : impersonalContainer.at(2)) {
+                    for (auto && d : impersonalContainer.at(3)) {
+                        for (auto && e : impersonalContainer.at(4)) {
+                            auto satisfied = InflManager.find(entry, Infl::Short, Infl::Impersonal) &&
+                                             InflManager.find(entry, Infl::Short, a) &&
+                                             InflManager.find(entry, Infl::Short, b) &&
+                                             InflManager.find(entry, Infl::Short, c) &&
+                                             InflManager.find(entry, Infl::Short, d) &&
+                                             InflManager.find(entry, Infl::Short, e);
+                            if (satisfied) result.push_back(entry);
                         }
                     }
                 }
@@ -1348,8 +1388,8 @@ QVector<QString> MainWindow::ParseVerb() {
     }
 
     itr = inflStruct.cbegin();
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Imperative)) itr = std::next(itr);
     QVector<Infl::Forms> imperativeContainer;
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Imperative)) itr = std::next(itr);
     while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Imperative)) {
         if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
             imperativeContainer.push_back(InflManager.enumOfForms(itr->at(2)));
