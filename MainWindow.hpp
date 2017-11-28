@@ -75,6 +75,14 @@ public:
 
 private:
     struct Pimpl {
+#ifdef __APPLE__
+        size_t perpetuaFontSize = 20;
+        size_t segoeFontSize = 14;
+#else
+        size_t perpetuaFontSize = 25;
+        size_t segoeFontSize = 22;
+#endif
+
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
         QString webpage;
         QString inputted;
@@ -104,7 +112,7 @@ private:
 
     /* POD members */
     int tabIndex;
-    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24pt;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20pt;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
+    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20px;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ </span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
     const char * writeUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
     const char * writeUrl2 = "&submit=Search";
     const char * textUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=dentry"
@@ -192,6 +200,13 @@ private slots:
     void onContextMenuSearchInfReverseTriggered();
     void onContextMenuSearchInfTriggered();
 
+    void onContextMenuZoomInTriggered();
+    void onContextMenuZoomOutTriggered();
+
+
+    void on_actionZoom_In_triggered();
+
+    void on_actionZoom_Out_triggered();
 
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
