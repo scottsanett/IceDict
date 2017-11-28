@@ -30,5 +30,8 @@
         <file>alphabet/source_index/part6</file>
         <file>alphabet/source_index/part7</file>
         <file>alphabet/source_index/part8</file>
+        <file>alphabet/perpetua.ttf</file>
+        <file>alphabet/perpetuab.ttf</file>
+        <file>alphabet/segoeui.ttf</file>
     </qresource>
 </RCC>

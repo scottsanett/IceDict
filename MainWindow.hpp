@@ -23,6 +23,7 @@
 #include "QIcon"
 #include "QToolButton"
 #include "QShortcut"
+#include "QSplitter"
 #include <cstdlib>
 
 #include <map>
@@ -73,17 +74,35 @@ public:
     ~MainWindow();
 
 private:
+    struct Pimpl {
+        std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
+        QString webpage;
+        QString inputted;
+        std::map<QString, QString> onlineEntries;
+        std::set<QVector<QString>> inflStruct;
+        QVector<QString> inflSelectResult;
+        QVector<std::pair<QString, QString>> textualResults;
+        QVector<std::pair<QString, QVector<QString>>> definitionResults;
+        QVector<std::pair<QString, QVector<QString>>> resultsToPrint;
+
+        QVBoxLayout * centralLayout;
+        QSplitter * mainSplitter;
+        QSplitter * inputLayout;
+        QLineEdit * input;
+        QListWidget * options;
+        QTextBrowser * result;
+        PageDownloader * pageControl;
+        QListWidget * resultsFromDictionaries;
+        TreeWidget * inflectionForms;
+    };
+
     /* pointers */
     Ui::MainWindow * ui;
     PageDownloader * pageControl;
-    QListWidget * resultsFromDictionaries;
-    TreeWidget * inflectionForms;
     Inflection InflManager;
 
     /* POD members */
-    bool textReady = false;
-    int typeTimes = 0;
-
+    int tabIndex;
     const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24pt;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20pt;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
     const char * writeUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
     const char * writeUrl2 = "&submit=Search";
@@ -105,12 +124,6 @@ private:
         const char * Numerical = "<td>to</td>";
     } PartOfSpeech;
 
-    QString webpage;
-    QString inputted;
-    QString printOneWord;
-    QString printOneForm;
-
-
     /* Abstract data types */
     std::map<QString, QString> writeRules = {
         std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
@@ -120,31 +133,23 @@ private:
         std::make_pair("þ", "%FE"), std::make_pair("ð", "%F0"), std::make_pair("Þ", "%DE"), std::make_pair("Ð", "%D0"),
     };
 
-    std::set<QVector<QString>> inflStruct; // all selected inflection forms in TreeWidget (in the form of QVector>
-    QVector<QString> inflSelectResult;
+//    QList<std::shared_ptr<Pimpl>> tabs;
+    std::map<QWidget*, std::shared_ptr<Pimpl>> tabIndices;
 
-    QVector<QString> stored;
-    QVector<bool> flags = {0, 0, 0, 0, 0, 0, 0};
     mapptrvecptr_t inflectionals;
     mapptrvecptr_t definitions;
     mapptrvecptr_t originals;
     strvecptrmapptrvecptr_t dictionaries;
     strsetptr_t forms;
     strsetptr_t wordindex;
-    vecpair_t resultsToPrint; // results of inflection queries
-    std::map<QString, QString> onlineEntries;
-    QVector<std::pair<QString, QVector<QString>>> definitionResults;
-    QVector<std::pair<QString, QString>> textualResults;
 
 private slots:
     void search_norse_word();
     void search_norse_text();
     void search_original();
     void search_all_inflections();
-    void search_one_inflection();
     void search_icelandic_word();
     void search_icelandic_text();
-    void resultsFromDictionaries_itemClicked(QListWidgetItem * item);
 
     void loadPage();
     void addTab_clicked();
@@ -152,12 +157,10 @@ private slots:
 
     /* slots concerning selection changes in the InflectionForms tree */
     void checkStateChanged(Qt::CheckState, QVector<QString> const);
-
-    void on_input_textEdited(const QString &arg1);
-
-    void on_input_editingFinished();
-
-    void on_options_itemClicked(QListWidgetItem *item);
+    void onInputTextEdited(const QString &arg1);
+    void onInputEditingFinished();
+    void onOptionsItemClicked(QListWidgetItem *item);
+    void resultsFromDictionariesItemClicked(QListWidgetItem * item);
 
     void on_actionMinimize_triggered();
 
