@@ -99,6 +99,7 @@ private:
     /* pointers */
     Ui::MainWindow * ui;
     PageDownloader * pageControl;
+//    QMenu * resultContextMenu;
     Inflection InflManager;
 
     /* POD members */
@@ -162,6 +163,8 @@ private slots:
     void onOptionsItemClicked(QListWidgetItem *item);
     void resultsFromDictionariesItemClicked(QListWidgetItem * item);
 
+    void onResultContextMenuRequested(QPoint const & p);
+
     void on_actionMinimize_triggered();
 
     void on_actionFullscreen_triggered();
@@ -181,6 +184,13 @@ private slots:
     void on_actionSearch_Inflections_triggered();
 
     void on_actionList_All_Forms_triggered();
+
+    void onContextMenuIceToEngTriggered();
+    void onContextMenuEngToIceTriggered();
+    void onContextMenuNorToEngTriggered();
+    void onContextMenuEngToNorTriggered();
+    void onContextMenuSearchInfReverseTriggered();
+    void onContextMenuSearchInfTriggered();
 
 
 private:

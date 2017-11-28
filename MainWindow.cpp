@@ -89,8 +89,12 @@ void MainWindow::addTab_clicked() {
     currentTab->result = new QTextBrowser;
     currentTab->result->setHtml(startScreen);
     currentTab->result->setFrameStyle(QFrame::NoFrame);
+    currentTab->result->setContextMenuPolicy(Qt::CustomContextMenu);
     currentTab->mainSplitter->addWidget(currentTab->result);
     auto index = ui->resultsTab->addTab(currentTab->mainSplitter, "(empty)");
+    QObject::connect(currentTab->result, &QTextBrowser::customContextMenuRequested,
+                     this, &MainWindow::onResultContextMenuRequested);
+
     ui->resultsTab->setCurrentIndex(index);
 }
 
@@ -118,7 +122,6 @@ void MainWindow::initializeResultFromDictionaries() {
     currentTab->resultsFromDictionaries->setMaximumWidth(200);
     currentTab->resultsFromDictionaries->setMaximumHeight(150);
     currentTab->resultsFromDictionaries->setFrameStyle(QFrame::NoFrame);
-    currentTab->resultsFromDictionaries->setFocusPolicy(Qt::NoFocus);
     currentTab->inputLayout->addWidget(currentTab->resultsFromDictionaries);
     QObject::connect(
                 currentTab->resultsFromDictionaries, &QListWidget::itemClicked,
@@ -143,7 +146,6 @@ void MainWindow::initializeInflectionForms() {
     currentTab->inflectionForms->setMaximumWidth(300);
     currentTab->inflectionForms->setMinimumHeight(450);
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
-    currentTab->inflectionForms->setFocusPolicy(Qt::NoFocus);
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
 }
 
@@ -526,7 +528,7 @@ void MainWindow::textualSearchThread(QString word, size_t index) {
         QString key = i.first;
         QString value;
         bool found = false;
-        for (auto && j : *i.second) {
+        for (auto j : *i.second) {
             auto pos = j.indexOf(word);
             if (pos != -1) {
                 found = true;
@@ -1767,3 +1769,117 @@ QVector<QString> MainWindow::ParseAdverb() {
     return result;
 }
 
+void MainWindow::onResultContextMenuRequested(QPoint const & p) {
+    auto global = QWidget::mapToGlobal(p);
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto windowX = MainWindow::x();
+    auto widgetX = currentTab->result->x();
+
+    auto resultContextMenu = currentTab->result->createStandardContextMenu();
+    resultContextMenu->move(windowX + widgetX + p.x(), global.y());
+    resultContextMenu->addSeparator();
+
+    QAction * act1 = new QAction("Search Icelandic -> English");
+    QObject::connect(act1, &QAction::triggered,
+                     this, &MainWindow::onContextMenuIceToEngTriggered);
+
+    QAction * act2 = new QAction("Search Text In Icelandic Dictionary");
+    QObject::connect(act2, &QAction::triggered,
+                     this, &MainWindow::onContextMenuEngToIceTriggered);
+
+    QAction * act3 = new QAction("Search Old Icelandic -> English");
+    QObject::connect(act3, &QAction::triggered,
+                     this, &MainWindow::onContextMenuNorToEngTriggered);
+
+    QAction * act4 = new QAction("Search Text In Old Icelandic Dictionaries");
+    QObject::connect(act4, &QAction::triggered,
+                     this, &MainWindow::onContextMenuEngToNorTriggered);
+
+    QAction * act5 = new QAction("Search Inflections Reversely");
+    QObject::connect(act5, &QAction::triggered,
+                     this, &MainWindow::onContextMenuSearchInfReverseTriggered);
+
+    QAction * act6 = new QAction("Search Inflections");
+    QObject::connect(act6, &QAction::triggered,
+                     this, &MainWindow::onContextMenuSearchInfTriggered);
+
+    resultContextMenu->addAction(act1);
+    resultContextMenu->addAction(act2);
+    resultContextMenu->addAction(act3);
+    resultContextMenu->addAction(act4);
+    resultContextMenu->addAction(act5);
+    resultContextMenu->addAction(act6);
+    resultContextMenu->show();
+}
+
+void MainWindow::onContextMenuIceToEngTriggered() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto cursor = currentTab->result->textCursor();
+    auto text = cursor.selectedText();
+    if (text.length() == 0) return;
+    addTab_clicked();
+    currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    on_actionModern_Icelandic_triggered();
+    currentTab->input->setText(text);
+    onInputEditingFinished();
+}
+
+void MainWindow::onContextMenuEngToIceTriggered() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto cursor = currentTab->result->textCursor();
+    auto text = cursor.selectedText();
+    if (text.length() == 0) return;
+    addTab_clicked();
+    currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    on_actionEnglish_Modern_Icelandic_triggered();
+    currentTab->input->setText(text);
+    onInputEditingFinished();
+}
+
+void MainWindow::onContextMenuNorToEngTriggered() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto cursor = currentTab->result->textCursor();
+    auto text = cursor.selectedText();
+    if (text.length() == 0) return;
+    addTab_clicked();
+    currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    on_actionOld_Icelandic_English_triggered();
+    currentTab->input->setText(text);
+    onInputEditingFinished();
+}
+
+void MainWindow::onContextMenuEngToNorTriggered() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto cursor = currentTab->result->textCursor();
+    auto text = cursor.selectedText();
+    if (text.length() == 0) return;
+    addTab_clicked();
+    currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    on_actionOld_Icelandic_Text_Search_triggered();
+    currentTab->input->setText(text);
+    onInputEditingFinished();
+}
+
+void MainWindow::onContextMenuSearchInfReverseTriggered() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto cursor = currentTab->result->textCursor();
+    auto text = cursor.selectedText();
+    if (text.length() == 0) return;
+    addTab_clicked();
+    currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    on_actionSearch_Inflections_triggered();
+    currentTab->input->setText(text);
+    onInputEditingFinished();
+}
+
+void MainWindow::onContextMenuSearchInfTriggered() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto cursor = currentTab->result->textCursor();
+    auto text = cursor.selectedText();
+    if (text.length() == 0) return;
+    addTab_clicked();
+    currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    on_actionList_All_Forms_triggered();
+    currentTab->input->setText(text);
+    onInputEditingFinished();
+}
