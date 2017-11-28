@@ -65,6 +65,7 @@ void MainWindow::addTab_clicked() {
 
     currentTab->input = new QLineEdit;
     currentTab->input->setPlaceholderText("Select a dictionary first...");
+    currentTab->input->setStyleSheet("font-family: Segoe UI");
     currentTab->input->setMaximumHeight(25);
     currentTab->input->setMinimumWidth(150);
     currentTab->input->setMaximumWidth(200);
@@ -523,16 +524,19 @@ void MainWindow::textualSearchThread(QString word, size_t index) {
     auto thisDic = dictionaries->at(index);
     for (auto && i : *thisDic) {
         QString key = i.first;
+        QString value;
+        bool found = false;
         for (auto && j : *i.second) {
             auto pos = j.indexOf(word);
             if (pos != -1) {
+                found = true;
                 auto subsitute = "<b><span style=\"color:#ff0000;\">" + word + "</span></b>";
                 j.replace(pos, word.length(), subsitute);
-                QString value = key + ' ' + j;
-                currentTab->textualResults.push_back(std::make_pair(key, value));
-                break;
             }
+            value += ' ' + j;
         }
+        value = key + ' ' + value;
+        if (found) currentTab->textualResults.push_back(std::make_pair(key, value));
     }
 }
 
