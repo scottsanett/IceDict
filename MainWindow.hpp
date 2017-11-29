@@ -76,11 +76,11 @@ public:
 private:
     struct Pimpl {
 #ifdef __APPLE__
-        size_t perpetuaFontSize = 20;
+        size_t perpetuaFontSize = 40;
         size_t segoeFontSize = 14;
 #else
         size_t perpetuaFontSize = 25;
-        size_t segoeFontSize = 22;
+        size_t segoeFontSize = 28;
 #endif
 
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};

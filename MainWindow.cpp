@@ -35,9 +35,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setMovable(true);
     ui->resultsTab->tabBar()->setAutoHide(true);
     ui->resultsTab->tabBar()->setExpanding(true);
-#ifndef __APPLE__
-    ui->centralLayout->setMargin(5);
-#endif
+    ui->centralLayout->setContentsMargins(0, 0, 0, 0);
     ui->statusBar->hide();
     connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
@@ -56,40 +54,25 @@ void MainWindow::addTab_clicked() {
     auto currentTab = std::make_shared<Pimpl>();
     currentTab->centralLayout = new QVBoxLayout;
     currentTab->mainSplitter = new QSplitter;
-
-#ifdef __APPLE__
-    currentTab->centralLayout->setMargin(0);
     currentTab->mainSplitter->setHandleWidth(0);
-#endif
-
     tabIndices.insert(std::make_pair(currentTab->mainSplitter, currentTab));
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
     currentTab->inputLayout = new QSplitter;
-
-#ifdef __APPLE__
     currentTab->inputLayout->setHandleWidth(0);
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
-#endif
-
     currentTab->inputLayout->setOrientation(Qt::Vertical);
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
     currentTab->input = new QLineEdit;
     currentTab->input->setPlaceholderText("Select a dictionary first...");
 
-#ifdef __APPLE__
     currentTab->input->setMaximumHeight(25);
     currentTab->input->setMinimumWidth(150);
     currentTab->input->setMaximumWidth(200);
+#ifdef __APPLE__
     currentTab->input->setFrame(false);
-    currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 13px");
-#else
-    currentTab->input->setMaximumHeight(40);
-    currentTab->input->setMinimumWidth(250);
-    currentTab->input->setMaximumWidth(300);
-    currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 25px");
 #endif
-
+    currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->input->setEnabled(false);
     currentTab->inputLayout->addWidget(currentTab->input);
     QObject::connect(currentTab->input, &QLineEdit::textEdited,
@@ -98,17 +81,12 @@ void MainWindow::addTab_clicked() {
                      this, &MainWindow::onInputEditingFinished);
 
     currentTab->options = new QListWidget;
-
-#ifdef __APPLE__
     currentTab->options->setMinimumWidth(150);
     currentTab->options->setMaximumWidth(200);
+#ifdef __APPLE__
     currentTab->options->setFrameStyle(QFrame::NoFrame);
-    currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 13px");
-#else
-    currentTab->options->setMinimumWidth(250);
-    currentTab->options->setMaximumWidth(300);
-    currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 25px");
 #endif
+    currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 13px");
 
     currentTab->options->setEnabled(false);
     currentTab->inputLayout->addWidget(currentTab->options);
@@ -149,17 +127,12 @@ void MainWindow::initializeResultFromDictionaries() {
     if (!currentTab->resultsFromDictionaries)
         currentTab->resultsFromDictionaries = new QListWidget;
 
-#ifdef __APPLE__
     currentTab->resultsFromDictionaries->setMaximumWidth(200);
     currentTab->resultsFromDictionaries->setMaximumHeight(150);
-    currentTab->resultsFromDictionaries->setStyleSheet("font-family: Segoe UI; font-size: 13px");
-#else
-    currentTab->resultsFromDictionaries->setMaximumWidth(300);
-    currentTab->resultsFromDictionaries->setMaximumHeight(200);
-    currentTab->resultsFromDictionaries->setStyleSheet("font-family: Segoe UI; font-size: 25px");
+#ifdef __APPLE__
+    currentTab->resultsFromDictionaries->setFrameShape(QFrame::NoFrame);
 #endif
 
-    currentTab->resultsFromDictionaries->setFrameStyle(QFrame::NoFrame);
     currentTab->inputLayout->addWidget(currentTab->resultsFromDictionaries);
     QObject::connect(
                 currentTab->resultsFromDictionaries, &QListWidget::itemClicked,
@@ -174,13 +147,8 @@ void MainWindow::clearResultFromDictionaries() {
         delete currentTab->resultsFromDictionaries;
         currentTab->resultsFromDictionaries = nullptr;
     }
-#ifdef __APPLE__
-        currentTab->perpetuaFontSize = 20;
-        currentTab->segoeFontSize = 14;
-#else
-        currentTab->perpetuaFontSize = 40;
-        currentTab->segoeFontSize = 28;
-#endif
+    currentTab->perpetuaFontSize = 20;
+    currentTab->segoeFontSize = 14;
 }
 
 void MainWindow::initializeInflectionForms() {
@@ -188,17 +156,12 @@ void MainWindow::initializeInflectionForms() {
     if (!currentTab->inflectionForms)
         currentTab->inflectionForms = new TreeWidget;
     currentTab->inflectionForms->setHeaderLabel("Inflections");
-#ifdef __APPLE__
     currentTab->inflectionForms->setMaximumWidth(300);
     currentTab->inflectionForms->setMinimumHeight(450);
+#ifdef __APPLE__
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
-    currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 13px");
-#else
-    currentTab->inflectionForms->setMaximumWidth(350);
-    currentTab->inflectionForms->setMinimumHeight(500);
-    currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 28px");
 #endif
-
+    currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
 }
 
@@ -499,13 +462,7 @@ void MainWindow::findDefinitionPrint(size_t index) {
         value += i + '\n';
     }
     QString display = key + ' ' + value;
-
-#ifdef __APPLE__
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20px;\">" + display + "</span></p>";
-#else
-    display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 40px;\">" + display + "</span></p>";
-#endif
-
     currentTab->result->setHtml(display);
 }
 
@@ -535,12 +492,7 @@ void MainWindow::findInflection(QString const & word) {
         }
     }
 
-#ifdef __APPLE__
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-#else
-        toprint = "<span style=\"font-family: Segoe UI; font-size: 28px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-#endif
-
     currentTab->result->setHtml(toprint);
 }
 
@@ -580,11 +532,7 @@ void MainWindow::textualSearchPrint(size_t index) {
     auto thisEntry = currentTab->textualResults.at(index);
     QString key = thisEntry.first;
     QString display = thisEntry.second;
-#ifdef __APPLE__
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20px;\">" + display + "</span></p>";
-#else
-    display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 40px;\">" + display + "</span></p>";
-#endif
     currentTab->result->setHtml(display);
 }
 
@@ -728,11 +676,7 @@ void MainWindow::printAllPrint(size_t index) {
     clearInflectionForms();
     initializeInflectionForms();
     fillInflectionForms(toprint);
-#ifdef __APPLE__
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-#else
-        toprint = "<span style=\"font-family: Segoe UI; font-size: 28px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-#endif
     currentTab->result->setHtml(toprint);
 }
 
@@ -901,11 +845,7 @@ void MainWindow::loadPage() {
     currentTab->webpage = str;
 
     if (parsePage()) {
-#ifdef __APPLE__
         currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
-#else
-        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 40px;\">" + currentTab->webpage + "</span>";
-#endif
         currentTab->result->setHtml(currentTab->webpage);
         currentTab->webpage.clear();
     }
@@ -1158,11 +1098,7 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
        QString temp = addStyleToResults(i);
        toprint += temp;
     }
-#ifdef __APPLE__
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-#else
-    toprint = "<span style=\"font-family: Segoe UI; font-size: 28px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-#endif
     currentTab->result->setHtml(toprint);
 }
 
@@ -1892,19 +1828,6 @@ void MainWindow::onResultContextMenuRequested(QPoint const & p) {
     QAction * act6 = new QAction("Search Inflections");
     QObject::connect(act6, &QAction::triggered,
                      this, &MainWindow::onContextMenuSearchInfTriggered);
-
-    /*
-    QAction * zoomIn = new QAction("Zoom In");
-    QObject::connect(zoomIn, &QAction::triggered,
-                     this, &MainWindow::onContextMenuZoomInTriggered);
-    zoomIn->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus));
-
-    QAction * zoomOut = new QAction("Zoom Out");
-    QObject::connect(zoomOut, &QAction::triggered,
-                     this, &MainWindow::onContextMenuZoomOutTriggered);
-//    zoomOut->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Minus));
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_hyphen), this, SLOT(onContextMenuZoomOutTriggered()));
-    */
 
     resultContextMenu->addAction(act1);
     resultContextMenu->addAction(act2);
