@@ -59,7 +59,11 @@ void MainWindow::addTab_clicked() {
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
     currentTab->inputLayout = new QSplitter;
     currentTab->inputLayout->setHandleWidth(0);
+#ifdef __APPLE__
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
+#else
+    currentTab->inputLayout->setFrameStyle(QFrame::VLine);
+#endif
     currentTab->inputLayout->setOrientation(Qt::Vertical);
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
@@ -69,9 +73,7 @@ void MainWindow::addTab_clicked() {
     currentTab->input->setMaximumHeight(25);
     currentTab->input->setMinimumWidth(150);
     currentTab->input->setMaximumWidth(200);
-#ifdef __APPLE__
     currentTab->input->setFrame(false);
-#endif
     currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->input->setEnabled(false);
     currentTab->inputLayout->addWidget(currentTab->input);
@@ -85,6 +87,8 @@ void MainWindow::addTab_clicked() {
     currentTab->options->setMaximumWidth(200);
 #ifdef __APPLE__
     currentTab->options->setFrameStyle(QFrame::NoFrame);
+#else
+    currentTab->options->setFrameStyle(QFrame::VLine);
 #endif
     currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 13px");
 
@@ -131,8 +135,9 @@ void MainWindow::initializeResultFromDictionaries() {
     currentTab->resultsFromDictionaries->setMaximumHeight(150);
 #ifdef __APPLE__
     currentTab->resultsFromDictionaries->setFrameShape(QFrame::NoFrame);
+#else
+    currentTab->resultsFromDictionaries->setFrameStyle(QFrame::VLine);
 #endif
-
     currentTab->inputLayout->addWidget(currentTab->resultsFromDictionaries);
     QObject::connect(
                 currentTab->resultsFromDictionaries, &QListWidget::itemClicked,
@@ -160,6 +165,8 @@ void MainWindow::initializeInflectionForms() {
     currentTab->inflectionForms->setMinimumHeight(450);
 #ifdef __APPLE__
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
+#else
+    currentTab->inflectionForms->setFrameStyle(QFrame::VLine);
 #endif
     currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
