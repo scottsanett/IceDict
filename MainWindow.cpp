@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setMovable(true);
     ui->resultsTab->tabBar()->setAutoHide(true);
     ui->resultsTab->tabBar()->setExpanding(true);
+    QObject::connect(ui->resultsTab->tabBar(), &QTabBar::tabCloseRequested,
+                     this, &MainWindow::onTabCloseButtonClicked);
 //    ui->centralLayout->setMargin(0);
 //    ui->centralLayout->setContentsMargins(0, 0, 0, 0);
     ui->statusBar->hide();
@@ -96,21 +98,17 @@ void MainWindow::addTab_clicked() {
     currentTab->result->setFrameStyle(QFrame::NoFrame);
     currentTab->result->setContextMenuPolicy(Qt::CustomContextMenu);
     currentTab->mainSplitter->addWidget(currentTab->result);
-    auto index = ui->resultsTab->addTab(currentTab->mainSplitter, "(empty)");
+    auto index = ui->resultsTab->currentIndex();
+    ui->resultsTab->insertTab(++index, currentTab->mainSplitter, ("empty"));
     QObject::connect(currentTab->result, &QTextBrowser::customContextMenuRequested,
                      this, &MainWindow::onResultContextMenuRequested);
     ui->resultsTab->setCurrentIndex(index);
 }
 
 void MainWindow::closeTab(int index) {
-    auto currentSplitter = ui->resultsTab->currentWidget();
+    auto currentSplitter = ui->resultsTab->widget(index);
     if (tabIndices.find(currentSplitter) != tabIndices.end())
         tabIndices.erase(currentSplitter);
-    auto widget = ui->resultsTab->widget(index);
-    if (ui->resultsTab->count() > 1) {
-        ui->resultsTab->removeTab(index);
-        if (widget) delete widget;
-    }
 }
 
 void MainWindow::activateInput() {
@@ -1000,6 +998,7 @@ void MainWindow::on_actionNew_Tab_triggered()
     addTab_clicked();
 }
 
+
 void MainWindow::on_actionClose_Tab_triggered()
 {
     if (ui->resultsTab->count() > 1) {
@@ -1008,6 +1007,12 @@ void MainWindow::on_actionClose_Tab_triggered()
     }
 }
 
+
+void MainWindow::onTabCloseButtonClicked(int index) {
+    if (ui->resultsTab->count() > 1) {
+        closeTab(index);
+    }
+}
 
 void MainWindow::on_actionModern_Icelandic_triggered()
 {

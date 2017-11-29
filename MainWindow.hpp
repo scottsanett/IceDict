@@ -203,6 +203,7 @@ private slots:
     void onContextMenuZoomInTriggered();
     void onContextMenuZoomOutTriggered();
 
+    void onTabCloseButtonClicked(int index);
 
     void on_actionZoom_In_triggered();
     void on_actionZoom_Out_triggered();
@@ -220,7 +221,6 @@ private:
     void clearResultFromDictionaries();
     void initializeInflectionForms();
     void clearInflectionForms();
-    void newTab();
 
     void fillInflectionForms(QString const &);
 
