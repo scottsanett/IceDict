@@ -1,6 +1,7 @@
 #ifndef MACROS_HPP
 #define MACROS_HPP
 
+
 #define TYPE_IMPERSONALITY Infl::Impersonality, Infl::Impersonal, Infl::Other
 #define TYPE_VOICE Infl::Voice, Infl::Active, Infl::Middle
 #define TYPE_MOOD Infl::Mood, Infl::Indicative, Infl::Subjunctive //, Infl::Imperative

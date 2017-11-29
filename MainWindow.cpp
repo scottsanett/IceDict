@@ -5,22 +5,11 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     Q_INIT_RESOURCE(resource);
-    inflectionals = vecmap_t{};
-    definitions = vecmap_t{};
-    originals = vecmap_t{};
-    wordindex = setstr_t{};
-    dictionaries = vecmapvecstr_t{};
-    forms = setstr_t{};
 
-    for (int i = 0; i < 8; ++i) {
-        inflectionals.push_back(map_t{});
-        originals.push_back(map_t{});
-    }
-
-    for (int i = 0; i < 2; ++i) {
-        definitions.push_back(map_t{});
-        dictionaries.push_back(mapvecstr_t{});
-    }
+    inflectionals.fill(map_t{});
+    originals.fill(map_t{});
+    definitions.fill(map_t{});
+    dictionaries.fill(mapvecstr_t{});
 
     importWordIndex();
     importDictionary();
@@ -315,7 +304,7 @@ void MainWindow::importInflections() {
 
 
 /*import all the inflection forms and its position*/
-void MainWindow::importInflectionsThread(vecmap_t & mapvec, size_t i) {
+void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i) {
     QString filename = ":/alphabet/source_reverse_index/part" + QString(to_string(i).c_str());
     QFile f(filename);
 
@@ -339,7 +328,7 @@ void MainWindow::importOriginal() {
     }
 }
 
-void MainWindow::importOriginalThread(vecmap_t & mapvec, size_t i) {
+void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
     QString filename = QString(":/alphabet/source_index/part") + to_string(i).c_str();
     QFile f(filename);
 
@@ -416,11 +405,18 @@ void MainWindow::findDefinition(QString const & words) {
     auto upper = QString(words).toUpper();
     upper = "<b>" + upper + "</b>";
 
+    auto IsAllUpper = [](QString const & str){
+        for (auto && i : str) {
+            if (!i.isUpper()) return false;
+        }
+        return true;
+    };
+
     auto zisspair = dictionaries.at(0).equal_range(word);
     auto visspair = dictionaries.at(1).equal_range(word);
     auto uisspair = dictionaries.at(1).equal_range(upper);
 
-    if ((zisspair.first == zisspair.second) && (visspair.first == visspair.second))
+    if ((zisspair.first == zisspair.second) && (visspair.first == visspair.second) && (uisspair.first == uisspair.second))
     {
         currentTab->result->setFontFamily("Perpetua");
         currentTab->result->setFontPointSize(20);
@@ -434,17 +430,20 @@ void MainWindow::findDefinition(QString const & words) {
     for (auto itr = zisspair.first; itr != zisspair.second; ++itr) {
         auto key = itr->first;
         auto thisEntry = itr->second;
-        currentTab->definitionResults.push_back(std::make_pair(key, thisEntry));
+        currentTab->definitionResults.insert(std::make_pair(key, thisEntry));
     }
     for (auto itr = visspair.first; itr != visspair.second; ++itr) {
         auto key = itr->first;
         auto thisEntry = itr->second;
-        currentTab->definitionResults.push_back(std::make_pair(key, thisEntry));
+        currentTab->definitionResults.insert(std::make_pair(key, thisEntry));
     }
-    for (auto itr = uisspair.first; itr != uisspair.second; ++itr) {
-        auto key = itr->first;
-        auto thisEntry = itr->second;
-        currentTab->definitionResults.push_back(std::make_pair(key, thisEntry));
+
+    if (!IsAllUpper(words)) {
+        for (auto itr = uisspair.first; itr != uisspair.second; ++itr) {
+            auto key = itr->first;
+            auto thisEntry = itr->second;
+            currentTab->definitionResults.insert(std::make_pair(key, thisEntry));
+        }
     }
 
     QStringList alternatives;
@@ -461,11 +460,12 @@ void MainWindow::findDefinition(QString const & words) {
 
 void MainWindow::findDefinitionPrint(size_t index) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto thisEntry = currentTab->definitionResults.at(index);
+    auto thisEntry = currentTab->definitionResults.cbegin();
+    for (auto i = 0; i < index; ++i) thisEntry = std::next(thisEntry);
 
-    QString key = thisEntry.first;
+    QString key = thisEntry->first;
     QString value;
-    for (auto i : thisEntry.second) {
+    for (auto i : thisEntry->second) {
         value += i + '\n';
     }
     QString display = key + ' ' + value;
@@ -537,9 +537,11 @@ void MainWindow::findInflectionThread(vecvecstr_t & results, QString word, size_
 
 void MainWindow::textualSearchPrint(size_t index) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto thisEntry = currentTab->textualResults.at(index);
-    QString key = thisEntry.first;
-    QString display = thisEntry.second;
+    auto thisEntry = currentTab->textualResults.cbegin();
+    for (auto i = 0; i < index; ++i) thisEntry = std::next(thisEntry);
+//    auto thisEntry = currentTab->textualResults.at(index);
+    QString key = thisEntry->first;
+    QString display = thisEntry->second;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20px;\">" + display + "</span></p>";
     currentTab->result->setHtml(display);
 }
@@ -561,7 +563,7 @@ void MainWindow::textualSearchThread(QString word, size_t index) {
             value += ' ' + j;
         }
         value = key + ' ' + value;
-        if (found) currentTab->textualResults.push_back(std::make_pair(key, value));
+        if (found) currentTab->textualResults.insert(std::make_pair(key, value));
     }
 }
 

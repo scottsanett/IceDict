@@ -53,6 +53,13 @@ using mapvecstr_t = std::multimap<QString, vecstr_t>; // std::multimap<QString, 
 using vecmapvecstr_t = QVector<mapvecstr_t>; // QVector<std::multimap<QString, QVector<QString>>>
 using vecpair_t = QVector<std::pair<QString, vecstr_t>>; // QVector<std::pair<QString, QVector<QString>>>
 
+struct QStringCaseInsensitiveComparator {
+    bool operator() (QString const & lhs, QString const & rhs) const {
+        if (QString::compare(lhs, rhs, Qt::CaseInsensitive) < 0) return true;
+        else return false;
+    }
+};
+
 namespace Ui {
 class MainWindow;
 }
@@ -80,9 +87,10 @@ private:
         QString inputted;
         std::map<QString, QString> onlineEntries;
         std::set<QVector<QString>> inflStruct;
+        std::multimap<QString, QString, QStringCaseInsensitiveComparator> textualResults;
         QVector<QString> inflSelectResult;
-        QVector<std::pair<QString, QString>> textualResults;
-        QVector<std::pair<QString, QVector<QString>>> definitionResults;
+        std::multimap<QString, QVector<QString>, QStringCaseInsensitiveComparator> definitionResults;
+//        QVector<std::pair<QString, QVector<QString>>> definitionResults;
         QVector<std::pair<QString, QVector<QString>>> resultsToPrint;
 
         QVBoxLayout * centralLayout;
@@ -137,10 +145,11 @@ private:
 //    QList<std::shared_ptr<Pimpl>> tabs;
     std::map<QWidget*, std::shared_ptr<Pimpl>> tabIndices;
 
-    vecmap_t inflectionals;
-    vecmap_t definitions;
-    vecmap_t originals;
-    vecmapvecstr_t dictionaries;
+    std::array<map_t, 8> inflectionals;
+    std::array<map_t, 8> originals;
+    std::array<map_t, 2> definitions;
+    std::array<mapvecstr_t, 2> dictionaries;
+
     setstr_t forms;
     setstr_t wordindex;
 
@@ -266,9 +275,9 @@ private:
     /* importing functions */
     void importWordIndex();
     void importInflections();
-    void importInflectionsThread(vecmap_t & mapvec, size_t i);
+    void importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i);
     void importOriginal();
-    void importOriginalThread(vecmap_t & mapvec, size_t i);
+    void importOriginalThread(std::array<map_t, 8> & mapvec, size_t i);
     void importDictionary();
     void importDictionaryThread(QString const name, size_t i);
 
