@@ -23,7 +23,7 @@
    <bool>true</bool>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -60,8 +60,14 @@
         <property name="styleSheet">
          <string notr="true"/>
         </property>
+        <property name="tabShape">
+         <enum>QTabWidget::Rounded</enum>
+        </property>
         <property name="currentIndex">
          <number>-1</number>
+        </property>
+        <property name="usesScrollButtons">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

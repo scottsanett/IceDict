@@ -28,7 +28,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setMovable(true);
     ui->resultsTab->tabBar()->setAutoHide(true);
     ui->resultsTab->tabBar()->setExpanding(true);
-    ui->centralLayout->setContentsMargins(0, 0, 0, 0);
+//    ui->centralLayout->setMargin(0);
+//    ui->centralLayout->setContentsMargins(0, 0, 0, 0);
     ui->statusBar->hide();
     connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
