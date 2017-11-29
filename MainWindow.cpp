@@ -5,27 +5,28 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     Q_INIT_RESOURCE(resource);
-    inflectionals = mapptrvecptr_t(new mapptrvec_t);
-    definitions = mapptrvecptr_t(new mapptrvec_t);
-    originals = mapptrvecptr_t(new mapptrvec_t);
-    wordindex = strsetptr_t(new strset_t);
-    dictionaries = strvecptrmapptrvecptr_t(new strvecptrmapptrvec_t);
-    forms = strsetptr_t(new strset_t);
+    inflectionals = vecmap_t{};
+    definitions = vecmap_t{};
+    originals = vecmap_t{};
+    wordindex = setstr_t{};
+    dictionaries = vecmapvecstr_t{};
+    forms = setstr_t{};
 
     for (int i = 0; i < 8; ++i) {
-        inflectionals->push_back(mapptr_t(new map_t));
-        originals->push_back(mapptr_t(new map_t));
+        inflectionals.push_back(map_t{});
+        originals.push_back(map_t{});
     }
 
     for (int i = 0; i < 2; ++i) {
-        definitions->push_back(mapptr_t(new map_t));
-        dictionaries->push_back(strvecptrmapptr_t(new strvecptrmap_t));
+        definitions.push_back(map_t{});
+        dictionaries.push_back(mapvecstr_t{});
     }
 
     importWordIndex();
     importDictionary();
     importOriginal();
     importInflections();
+
     ui->setupUi(this);
     this->setWindowTitle("IceDict");
     QIcon icon(":/alphabet/icon.ico");
@@ -301,9 +302,8 @@ void MainWindow::importWordIndex() {
     std::istringstream wordindexfile(file.toStdString());
     std::string line;
     while (std::getline(wordindexfile, line)) {
-        wordindex->insert(line.c_str());
+        wordindex.insert(line.c_str());
     }
-
     wd.close();
 }
 
@@ -315,7 +315,7 @@ void MainWindow::importInflections() {
 
 
 /*import all the inflection forms and its position*/
-void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
+void MainWindow::importInflectionsThread(vecmap_t & mapvec, size_t i) {
     QString filename = ":/alphabet/source_reverse_index/part" + QString(to_string(i).c_str());
     QFile f(filename);
 
@@ -324,9 +324,9 @@ void MainWindow::importInflectionsThread(mapptrvecptr_t mapvec, size_t i) {
     std::istringstream file(qfile.toStdString());
     std::string line;
     int index = 0;
-    auto thisMap = mapvec->at(i - 1);
+    auto && thisMap = mapvec[i - 1];
     while (std::getline(file, line)) {
-        thisMap->insert(std::make_pair(line.c_str(), index));
+        thisMap.insert(std::make_pair(line.c_str(), index));
         ++index;
     }
 
@@ -339,7 +339,7 @@ void MainWindow::importOriginal() {
     }
 }
 
-void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
+void MainWindow::importOriginalThread(vecmap_t & mapvec, size_t i) {
     QString filename = QString(":/alphabet/source_index/part") + to_string(i).c_str();
     QFile f(filename);
 
@@ -347,7 +347,7 @@ void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
     QString qfile = f.readAll();
     std::istringstream file(qfile.toStdString());
     std::string line;
-    auto thisMap = mapvec->at(i - 1);
+    auto && thisMap = mapvec[i - 1];
     while (std::getline(file, line)) {
         std::string key;
         std::istringstream iss(line);
@@ -360,7 +360,7 @@ void MainWindow::importOriginalThread(mapptrvecptr_t mapvec, size_t i) {
         std::string index;
         iss >> index;
         auto index_number = strtol(index.c_str(), 0, 10);
-        thisMap->insert(std::make_pair(key.c_str(), index_number));
+        thisMap.insert(std::make_pair(key.c_str(), index_number));
     }
 
     f.close();
@@ -380,9 +380,9 @@ void MainWindow::importDictionaryThread(QString const name, size_t i) {
     QString qfile = f.readAll();
     std::istringstream file(qfile.toStdString());
     std::string line;
-    auto thisMap = dictionaries->at(i);
+    auto && thisMap = dictionaries[i];
     while (std::getline(file, line)) {
-        auto entry = strvecptr_t(new strvec_t);
+        auto entry = vecstr_t{};
         std::istringstream iss(line);
         std::string key;
         iss >> key;
@@ -392,11 +392,11 @@ void MainWindow::importDictionaryThread(QString const name, size_t i) {
             sense += ' ' + temp;
             if (temp.back() == ';') {
                sense += '\n';
-               entry->push_back(sense.c_str());
+               entry.push_back(sense.c_str());
                sense = "";
             }
         }
-        thisMap->insert(std::make_pair(key.c_str(), entry));
+        thisMap.insert(std::make_pair(key.c_str(), entry));
     }
 
 
@@ -416,9 +416,9 @@ void MainWindow::findDefinition(QString const & words) {
     auto upper = QString(words).toUpper();
     upper = "<b>" + upper + "</b>";
 
-    auto zisspair = dictionaries->at(0)->equal_range(word);
-    auto visspair = dictionaries->at(1)->equal_range(word);
-    auto uisspair = dictionaries->at(1)->equal_range(upper);
+    auto zisspair = dictionaries.at(0).equal_range(word);
+    auto visspair = dictionaries.at(1).equal_range(word);
+    auto uisspair = dictionaries.at(1).equal_range(upper);
 
     if ((zisspair.first == zisspair.second) && (visspair.first == visspair.second))
     {
@@ -433,17 +433,17 @@ void MainWindow::findDefinition(QString const & words) {
     currentTab->definitionResults.clear();
     for (auto itr = zisspair.first; itr != zisspair.second; ++itr) {
         auto key = itr->first;
-        auto thisEntry = *itr->second;
+        auto thisEntry = itr->second;
         currentTab->definitionResults.push_back(std::make_pair(key, thisEntry));
     }
     for (auto itr = visspair.first; itr != visspair.second; ++itr) {
         auto key = itr->first;
-        auto thisEntry = *itr->second;
+        auto thisEntry = itr->second;
         currentTab->definitionResults.push_back(std::make_pair(key, thisEntry));
     }
     for (auto itr = uisspair.first; itr != uisspair.second; ++itr) {
         auto key = itr->first;
-        auto thisEntry = *itr->second;
+        auto thisEntry = itr->second;
         currentTab->definitionResults.push_back(std::make_pair(key, thisEntry));
     }
 
@@ -475,16 +475,17 @@ void MainWindow::findDefinitionPrint(size_t index) {
 
 void MainWindow::findInflection(QString const & word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto results = ptrvecstrvecptr_t(new vecstrvecptr_t);
+    auto results = vecvecstr_t{};
     for (auto i = 0; i < 8; ++i) {
-        results->push_back(strvecptr_t(new strvec_t));
+        results.push_back(vecstr_t{});
+//        results->push_back(strvecptr_t(new vecstr_t));
     }
 
     for (size_t i = 0; i < 8; ++i) {
         findInflectionThread(results, word, i);
     }
 
-    auto resultSize = [&]() { int sz = 0; for (auto i : *results) { sz += i->size(); } return sz; }();
+    auto resultSize = [&]() { int sz = 0; for (auto i : results) { sz += i.size(); } return sz; }();
     if (resultSize == 0) {
         currentTab->result->setFontPointSize(20);
         currentTab->result->setText("Word not found");
@@ -492,8 +493,8 @@ void MainWindow::findInflection(QString const & word) {
     }
 
     QString toprint;
-    for (auto && i : *results) {
-        for (auto && j : *i) {
+    for (auto && i : results) {
+        for (auto && j : i) {
             j = addStyleToResults(j);
             toprint += j + "\n\n";
         }
@@ -503,11 +504,11 @@ void MainWindow::findInflection(QString const & word) {
     currentTab->result->setHtml(toprint);
 }
 
-void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, QString word, size_t index) {
-    auto thisDic = inflectionals->at(index);
-    auto thisResult = results->at(index);
-    auto itr = thisDic->find(word);
-    if (itr == thisDic->end()) { return; }
+void MainWindow::findInflectionThread(vecvecstr_t & results, QString word, size_t index) {
+    auto && thisDic = inflectionals[index];
+    auto && thisResult = results[index];
+    auto itr = thisDic.find(word);
+    if (itr == thisDic.end()) { return; }
     QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
@@ -524,7 +525,7 @@ void MainWindow::findInflectionThread(ptrvecstrvecptr_t results, QString word, s
             continue; }
         else {
             if (itr->first != key) { break; }
-            thisResult->push_back(line.c_str());
+            thisResult.push_back(line.c_str());
             itr = std::next(itr);
             ++currentPos;
             pos = itr->second;
@@ -545,12 +546,12 @@ void MainWindow::textualSearchPrint(size_t index) {
 
 void MainWindow::textualSearchThread(QString word, size_t index) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto thisDic = dictionaries->at(index);
-    for (auto && i : *thisDic) {
+    auto thisDic = dictionaries.at(index);
+    for (auto && i : thisDic) {
         QString key = i.first;
         QString value;
         bool found = false;
-        for (auto j : *i.second) {
+        for (auto j : i.second) {
             auto pos = j.indexOf(word);
             if (pos != -1) {
                 found = true;
@@ -617,10 +618,10 @@ void MainWindow::printAll(QString const & str) {
 
 void MainWindow::printAllThread(QString word, size_t index) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto & thisDic = originals->at(index);
+    auto & thisDic = originals.at(index);
     auto & thisResult = currentTab->resultsToPrint;
-    auto range = thisDic->equal_range(word);
-    auto count = thisDic->count(word);
+    auto range = thisDic.equal_range(word);
+    auto count = thisDic.count(word);
     if (count == 0) { return; }
     QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
@@ -631,7 +632,7 @@ void MainWindow::printAllThread(QString word, size_t index) {
     int currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
-        strvec_t thisEntry;
+        vecstr_t thisEntry;
         auto pos = itr->second;
 
         while (std::getline(issfile, line)) {
@@ -704,7 +705,7 @@ void MainWindow::onInputTextEdited(const QString &arg1)
         currentTab->definitionResults.clear();
         QStringList display;
         if (word.length() > 1) {
-            for (auto && entry : *wordindex) {
+            for (auto && entry : wordindex) {
                 auto pos = entry.indexOf(word);
                 if (pos == 0) {
                     display.push_back(entry);
@@ -1356,7 +1357,7 @@ QVector<QString> MainWindow::ParseVerb() {
 
     QVector<QString> result;
 
-    if (currentTab->inflStruct.empty()) return strvec_t{};
+    if (currentTab->inflStruct.empty()) return vecstr_t{};
 
     auto end = currentTab->inflStruct.cend();
     auto itr = currentTab->inflStruct.cbegin();

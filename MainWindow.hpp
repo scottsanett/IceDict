@@ -45,21 +45,13 @@
 #include "macros.hpp"
 
 using map_t = std::multimap<QString, int>;
-using mapptr_t = std::shared_ptr<map_t>;
-using mapptrvec_t = QVector<mapptr_t>;
-using mapptrvecptr_t = std::shared_ptr<mapptrvec_t>;
-using strset_t = std::set<QString>;
-using strsetptr_t = std::shared_ptr<strset_t>;
-using strptr_t = std::shared_ptr<QString>;
-using strvec_t = QVector<QString>;
-using strvecptr_t = std::shared_ptr<strvec_t>;
-using vecstrvecptr_t = QVector<strvecptr_t>;
-using ptrvecstrvecptr_t = std::shared_ptr<vecstrvecptr_t>;
-using strvecptrmap_t = std::multimap<QString, strvecptr_t>;
-using strvecptrmapptr_t = std::shared_ptr<strvecptrmap_t>;
-using strvecptrmapptrvec_t = QVector<strvecptrmapptr_t>;
-using strvecptrmapptrvecptr_t = std::shared_ptr<strvecptrmapptrvec_t>;
-using vecpair_t = QVector<std::pair<QString, strvec_t>>;
+using vecmap_t = QVector<map_t>;  // QVector<std::multimap<QString, int>>
+using setstr_t = std::set<QString>;
+using vecstr_t = QVector<QString>;
+using vecvecstr_t = QVector<vecstr_t>; // QVector<QVector<QString>>
+using mapvecstr_t = std::multimap<QString, vecstr_t>; // std::multimap<QString, QVector<QString>>
+using vecmapvecstr_t = QVector<mapvecstr_t>; // QVector<std::multimap<QString, QVector<QString>>>
+using vecpair_t = QVector<std::pair<QString, vecstr_t>>; // QVector<std::pair<QString, QVector<QString>>>
 
 namespace Ui {
 class MainWindow;
@@ -145,12 +137,12 @@ private:
 //    QList<std::shared_ptr<Pimpl>> tabs;
     std::map<QWidget*, std::shared_ptr<Pimpl>> tabIndices;
 
-    mapptrvecptr_t inflectionals;
-    mapptrvecptr_t definitions;
-    mapptrvecptr_t originals;
-    strvecptrmapptrvecptr_t dictionaries;
-    strsetptr_t forms;
-    strsetptr_t wordindex;
+    vecmap_t inflectionals;
+    vecmap_t definitions;
+    vecmap_t originals;
+    vecmapvecstr_t dictionaries;
+    setstr_t forms;
+    setstr_t wordindex;
 
 private slots:
     void search_norse_word();
@@ -274,10 +266,9 @@ private:
     /* importing functions */
     void importWordIndex();
     void importInflections();
-    void importInflectionsThread(mapptrvecptr_t mapvec, size_t i);
-    void importWordIndexThread(mapptrvecptr_t mapvec, QString const name, size_t i);
+    void importInflectionsThread(vecmap_t & mapvec, size_t i);
     void importOriginal();
-    void importOriginalThread(mapptrvecptr_t mapvec, size_t i);
+    void importOriginalThread(vecmap_t & mapvec, size_t i);
     void importDictionary();
     void importDictionaryThread(QString const name, size_t i);
 
@@ -287,14 +278,14 @@ private:
     void findInflection(QString const & word);
     void onlineDefinition(QString const & word);
     void onlineText(QString const & word);
-    void findInflectionThread(ptrvecstrvecptr_t dics, QString word, size_t index);
+    void findInflectionThread(vecvecstr_t & dics, QString word, size_t index);
     void textualSearch(QString const & word);
     void textualSearchThread(QString word, size_t index);
     void textualSearchPrint(size_t index);
     void printAll(QString const & word);
     void printAllThread(QString word, size_t index);
     void printAllPrint(size_t index);
-    void allFormsAutocompleteThread(ptrvecstrvecptr_t dics, QString word, size_t index);
+    void allFormsAutocompleteThread(vecvecstr_t dics, QString word, size_t index);
 };
 
 
