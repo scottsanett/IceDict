@@ -1,14 +1,16 @@
 #include "PageDownloader.hpp"
 
-PageDownloader::PageDownloader(QUrl fileUrl, QObject *parent) : QObject(parent)
-{
-    connect (&WebControl, SIGNAL(finished(QNetworkReply*)),
+PageDownloader::PageDownloader(QObject * parent): QObject(parent) {
+    QObject::connect(&WebControl, SIGNAL(finished(QNetworkReply*)),
              this, SLOT(pageDownloaded(QNetworkReply*)));
-    QNetworkRequest request(fileUrl);
-    WebControl.get(request);
 }
 
 PageDownloader::~PageDownloader() {}
+
+void PageDownloader::DownloadPage(QUrl fileUrl) {
+    QNetworkRequest request(fileUrl);
+    WebControl.get(request);
+}
 
 void PageDownloader::pageDownloaded(QNetworkReply *pReply) {
     DownloadedData = pReply->readAll();

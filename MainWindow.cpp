@@ -6,6 +6,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     Q_INIT_RESOURCE(resource);
 
+    pageControl = new PageDownloader(this);
+    QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
+
     inflectionals.fill(map_t{});
     originals.fill(map_t{});
     definitions.fill(map_t{});
@@ -42,12 +45,12 @@ MainWindow::~MainWindow() {
 
 void MainWindow::addTab_clicked() {
     auto currentTab = std::make_shared<Pimpl>();
-    currentTab->centralLayout = new QVBoxLayout;
-    currentTab->mainSplitter = new QSplitter;
+    currentTab->centralLayout = new QVBoxLayout();
+    currentTab->mainSplitter = new QSplitter();
     currentTab->mainSplitter->setHandleWidth(0);
     tabIndices.insert(std::make_pair(currentTab->mainSplitter, currentTab));
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
-    currentTab->inputLayout = new QSplitter;
+    currentTab->inputLayout = new QSplitter();
     currentTab->inputLayout->setHandleWidth(0);
 #ifdef __APPLE__
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
@@ -57,7 +60,7 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout->setOrientation(Qt::Vertical);
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
-    currentTab->input = new QLineEdit;
+    currentTab->input = new QLineEdit();
     currentTab->input->setPlaceholderText("Select a dictionary first...");
 
     currentTab->input->setMaximumHeight(25);
@@ -69,10 +72,10 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout->addWidget(currentTab->input);
     QObject::connect(currentTab->input, &QLineEdit::textEdited,
                      this, &MainWindow::onInputTextEdited);
-    QObject::connect(currentTab->input, &QLineEdit::editingFinished,
-                     this, &MainWindow::onInputEditingFinished);
+    QObject::connect(currentTab->input, &QLineEdit::returnPressed,
+                     this, &MainWindow::onInputReturnPressed);
 
-    currentTab->options = new QListWidget;
+    currentTab->options = new QListWidget(this);
     currentTab->options->setMinimumWidth(150);
     currentTab->options->setMaximumWidth(200);
 #ifdef __APPLE__
@@ -87,7 +90,7 @@ void MainWindow::addTab_clicked() {
     QObject::connect(currentTab->options, &QListWidget::itemClicked,
                      this, &MainWindow::onOptionsItemClicked);
 
-    currentTab->result = new QTextBrowser;
+    currentTab->result = new QTextBrowser();
     currentTab->result->setHtml(startScreen);
     currentTab->result->setFrameStyle(QFrame::NoFrame);
     currentTab->result->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -95,7 +98,6 @@ void MainWindow::addTab_clicked() {
     auto index = ui->resultsTab->addTab(currentTab->mainSplitter, "(empty)");
     QObject::connect(currentTab->result, &QTextBrowser::customContextMenuRequested,
                      this, &MainWindow::onResultContextMenuRequested);
-
     ui->resultsTab->setCurrentIndex(index);
 }
 
@@ -119,7 +121,7 @@ void MainWindow::activateInput() {
 void MainWindow::initializeResultFromDictionaries() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (!currentTab->resultsFromDictionaries)
-        currentTab->resultsFromDictionaries = new QListWidget;
+        currentTab->resultsFromDictionaries = new QListWidget(this);
 
     currentTab->resultsFromDictionaries->setMaximumWidth(200);
     currentTab->resultsFromDictionaries->setMaximumHeight(150);
@@ -128,6 +130,7 @@ void MainWindow::initializeResultFromDictionaries() {
 #else
     currentTab->resultsFromDictionaries->setFrameStyle(QFrame::VLine);
 #endif
+    currentTab->resultsFromDictionaries->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->resultsFromDictionaries);
     QObject::connect(
                 currentTab->resultsFromDictionaries, &QListWidget::itemClicked,
@@ -149,7 +152,7 @@ void MainWindow::clearResultFromDictionaries() {
 void MainWindow::initializeInflectionForms() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (!currentTab->inflectionForms)
-        currentTab->inflectionForms = new TreeWidget;
+        currentTab->inflectionForms = new TreeWidget(this);
     currentTab->inflectionForms->setHeaderLabel("Inflections");
     currentTab->inflectionForms->setMaximumWidth(300);
     currentTab->inflectionForms->setMinimumHeight(450);
@@ -363,8 +366,6 @@ void MainWindow::importDictionary() {
 void MainWindow::importDictionaryThread(QString const name, size_t i) {
     QString filename = ":/alphabet/" + name;
     QFile f(filename);
-
-
     f.open(QIODevice::ReadOnly);
     QString qfile = f.readAll();
     std::istringstream file(qfile.toStdString());
@@ -387,16 +388,8 @@ void MainWindow::importDictionaryThread(QString const name, size_t i) {
         }
         thisMap.insert(std::make_pair(key.c_str(), entry));
     }
-
-
     f.close();
 }
-
-/**
- * @brief MainWindow::findDefinition
- * @param words
- * find a way to separate the suggested words that the overlapping entries that two dictionaries provide
- */
 
 void MainWindow::findDefinition(QString const & words) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
@@ -475,11 +468,8 @@ void MainWindow::findDefinitionPrint(size_t index) {
 
 void MainWindow::findInflection(QString const & word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto results = vecvecstr_t{};
-    for (auto i = 0; i < 8; ++i) {
-        results.push_back(vecstr_t{});
-//        results->push_back(strvecptr_t(new vecstr_t));
-    }
+    std::array<vecstr_t, 8> results;
+    results.fill(vecstr_t{});
 
     for (size_t i = 0; i < 8; ++i) {
         findInflectionThread(results, word, i);
@@ -504,7 +494,7 @@ void MainWindow::findInflection(QString const & word) {
     currentTab->result->setHtml(toprint);
 }
 
-void MainWindow::findInflectionThread(vecvecstr_t & results, QString word, size_t index) {
+void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString word, size_t index) {
     auto && thisDic = inflectionals[index];
     auto && thisResult = results[index];
     auto itr = thisDic.find(word);
@@ -731,7 +721,7 @@ void MainWindow::onInputTextEdited(const QString &arg1)
 }
 
 
-void MainWindow::onInputEditingFinished()
+void MainWindow::onInputReturnPressed()
 {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     QString word = currentTab->input->text();
@@ -740,14 +730,12 @@ void MainWindow::onInputEditingFinished()
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
-        currentTab->inputted = word;
         onlineDefinition(word);
     }
     else if (currentTab->flags[1] == 1 && word.length() > 0) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
-        currentTab->inputted = word;
         onlineText(word);
     }
     else if (currentTab->flags[2] == 1 && word.length() > 0) {
@@ -797,9 +785,8 @@ void MainWindow::onOptionsItemClicked(QListWidgetItem *item)
         downloadPage(url);
     }
     else if (currentTab->flags[2] == 1) {
-        currentTab->input->setText(itemText);
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
-        onInputEditingFinished();
+        findDefinition(tag);
     }
     else if (currentTab->flags[3] == 1) {
         currentTab->input->setText(itemText);
@@ -838,12 +825,7 @@ void MainWindow::resultsFromDictionariesItemClicked(QListWidgetItem * item) {
 }
 
 void MainWindow::downloadPage(QString url) {
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->clear();
-
-    QUrl pageUrl(url);
-    pageControl = new PageDownloader(pageUrl, this);
-    QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
+    pageControl->DownloadPage(QUrl{url});
 }
 
 void MainWindow::loadPage() {
@@ -852,12 +834,21 @@ void MainWindow::loadPage() {
     QString str = QString::fromLatin1(qPage);
 
     currentTab->webpage = str;
-    currentTab->webpage = str;
 
-    if (parsePage()) {
+    auto display = parsePage();
+    if (display) {
         currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
         currentTab->result->setHtml(currentTab->webpage);
         currentTab->webpage.clear();
+    }
+    else {
+        for (auto && i : currentTab->onlineEntries) {
+            currentTab->options->addItem(i.first);
+        }
+        auto firstEntry = currentTab->onlineEntries.cbegin();
+        auto tag = firstEntry->first;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
+        downloadPage(firstEntry->second);
     }
 }
 
@@ -873,23 +864,45 @@ void MainWindow::onlineDefinition(const QString &word) {
     downloadPage(url);
 }
 
-/**
- * @brief MainWindow::parsePage
- * needs revision
- * @return
- */
 bool MainWindow::parsePage() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    if (currentTab->webpage.contains("produced no results.")) {
-        auto pos = currentTab->webpage.indexOf("<h3>While searching in Icelandic Online Dictionary and Readings</h3>");
-        if (pos != -1) currentTab->webpage = currentTab->webpage.mid(pos, currentTab->webpage.length() - pos);
-        pos = currentTab->webpage.contains("<div class=\"mainBackground\">");
-        if (pos != -1) currentTab->webpage = currentTab->webpage.mid(0, pos);
+//    qDebug() << currentTab->webpage;
+    if (currentTab->webpage.contains("produced no results."))  // no results
+    {
+        QString startMarker = "<h3>While searching in Icelandic Online Dictionary and Readings</h3>";
+        QString endMarker = ":</p>\n\n\t<div class=\"mainBackground\">\n\t\t";
+        auto startPos = currentTab->webpage.indexOf(startMarker);
+        auto endPos = currentTab->webpage.indexOf(endMarker);
+        currentTab->webpage = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length()) + ".";
         return true;
     }
-    else if (currentTab->webpage.contains("<div class=\"results\">")) {
+
+    else if (currentTab->webpage.contains("<strong>-&gt;</strong>")) // redirection appears
+    {
+        QString startMarker = "<strong>-&gt;</strong>";
+        QString endMarker = "</span>\n </div><!-- entry -->\n\t\t<hr />\n\t\t<span class=\"navlink\">";
+        auto startPos = currentTab->webpage.indexOf(startMarker);
+        auto endPos = currentTab->webpage.indexOf(endMarker);
+        auto snippet = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length());
+        snippet = snippet.trimmed();
+        auto tokens = snippet.split("<a href=\"", QString::SkipEmptyParts);
+        for (auto && token : tokens) {
+            QString mid_marker = "\">";
+            QString end_marker = "</a>";
+            auto mid_pos = token.indexOf(mid_marker);
+            auto end_pos = token.indexOf(end_marker);
+            auto entryLink = "http://digicoll.library.wisc.edu" + token.mid(0, mid_pos);
+            auto entryName = token.mid(mid_pos + mid_marker.length(), end_pos - mid_pos - mid_marker.length());
+            currentTab->onlineEntries.insert(std::make_pair(entryName, entryLink));
+        }
+        return false;
+    }
+
+    else if (currentTab->webpage.contains("<div class=\"results\">")) // found multiples results
+    {
         auto pos = currentTab->webpage.indexOf("<div class=\"results\">");
-        if (pos != -1) currentTab->webpage = currentTab->webpage.mid(pos, currentTab->webpage.length() - pos);
+        if (pos != -1)
+            currentTab->webpage = currentTab->webpage.mid(pos, currentTab->webpage.length() - pos);
         pos = currentTab->webpage.indexOf("</div> <!-- results -->");
         if (pos != -1) currentTab->webpage = currentTab->webpage.mid(0, pos);
         QVector<QString> toBeDeleted = {
@@ -929,19 +942,18 @@ bool MainWindow::parsePage() {
                 iss >> temp;
                 key += ' ' + temp;
             }
-            currentTab->onlineEntries.insert(std::make_pair(key.c_str(), link.c_str()));
+            QString key_str = key.c_str();
+            if (key_str.begin()->isDigit()) key_str = key_str.right(key_str.length() - 1);
+            currentTab->onlineEntries.insert(std::make_pair(key_str, link.c_str()));
         }
-
-        QStringList alternatives;
-        for (auto && i : currentTab->onlineEntries) {
-            alternatives.push_back(i.first);
-        }
-        currentTab->options->addItems(alternatives);
         return false;
     }
-    else {
+    else // found only one result
+    {
         auto pos = currentTab->webpage.indexOf("<div class=\"entry\">");
-        if (pos != -1) { currentTab->webpage = currentTab->webpage.mid(pos, currentTab->webpage.length() - pos); }
+        if (pos != -1) {
+            currentTab->webpage = currentTab->webpage.mid(pos, currentTab->webpage.length() - pos);
+        }
         pos = currentTab->webpage.indexOf("</div><!-- entry -->");
         if (pos != -1) { currentTab->webpage = currentTab->webpage.mid(0, pos); }
         pos = currentTab->webpage.indexOf("<span class=\"lemma\">");
@@ -1815,27 +1827,27 @@ void MainWindow::onResultContextMenuRequested(QPoint const & p) {
     resultContextMenu->move(windowX + widgetX + p.x(), global.y());
     resultContextMenu->addSeparator();
 
-    QAction * act1 = new QAction("Search Icelandic -> English");
+    QAction * act1 = new QAction("Search Icelandic -> English", this);
     QObject::connect(act1, &QAction::triggered,
                      this, &MainWindow::onContextMenuIceToEngTriggered);
 
-    QAction * act2 = new QAction("Search Text In Icelandic Dictionary");
+    QAction * act2 = new QAction("Search Text In Icelandic Dictionary", this);
     QObject::connect(act2, &QAction::triggered,
                      this, &MainWindow::onContextMenuEngToIceTriggered);
 
-    QAction * act3 = new QAction("Search Old Icelandic -> English");
+    QAction * act3 = new QAction("Search Old Icelandic -> English", this);
     QObject::connect(act3, &QAction::triggered,
                      this, &MainWindow::onContextMenuNorToEngTriggered);
 
-    QAction * act4 = new QAction("Search Text In Old Icelandic Dictionaries");
+    QAction * act4 = new QAction("Search Text In Old Icelandic Dictionaries", this);
     QObject::connect(act4, &QAction::triggered,
                      this, &MainWindow::onContextMenuEngToNorTriggered);
 
-    QAction * act5 = new QAction("Search Inflections Reversely");
+    QAction * act5 = new QAction("Search Inflections Reversely", this);
     QObject::connect(act5, &QAction::triggered,
                      this, &MainWindow::onContextMenuSearchInfReverseTriggered);
 
-    QAction * act6 = new QAction("Search Inflections");
+    QAction * act6 = new QAction("Search Inflections", this);
     QObject::connect(act6, &QAction::triggered,
                      this, &MainWindow::onContextMenuSearchInfTriggered);
 
@@ -1863,7 +1875,7 @@ void MainWindow::onContextMenuIceToEngTriggered() {
     currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     on_actionModern_Icelandic_triggered();
     currentTab->input->setText(text);
-    onInputEditingFinished();
+    onInputReturnPressed();
 }
 
 void MainWindow::onContextMenuEngToIceTriggered() {
@@ -1875,7 +1887,7 @@ void MainWindow::onContextMenuEngToIceTriggered() {
     currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     on_actionEnglish_Modern_Icelandic_triggered();
     currentTab->input->setText(text);
-    onInputEditingFinished();
+    onInputReturnPressed();
 }
 
 void MainWindow::onContextMenuNorToEngTriggered() {
@@ -1887,7 +1899,7 @@ void MainWindow::onContextMenuNorToEngTriggered() {
     currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     on_actionOld_Icelandic_English_triggered();
     currentTab->input->setText(text);
-    onInputEditingFinished();
+    onInputReturnPressed();
 }
 
 void MainWindow::onContextMenuEngToNorTriggered() {
@@ -1899,7 +1911,7 @@ void MainWindow::onContextMenuEngToNorTriggered() {
     currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     on_actionOld_Icelandic_Text_Search_triggered();
     currentTab->input->setText(text);
-    onInputEditingFinished();
+    onInputReturnPressed();
 }
 
 void MainWindow::onContextMenuSearchInfReverseTriggered() {
@@ -1911,7 +1923,7 @@ void MainWindow::onContextMenuSearchInfReverseTriggered() {
     currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     on_actionSearch_Inflections_triggered();
     currentTab->input->setText(text);
-    onInputEditingFinished();
+    onInputReturnPressed();
 }
 
 void MainWindow::onContextMenuSearchInfTriggered() {
@@ -1923,7 +1935,7 @@ void MainWindow::onContextMenuSearchInfTriggered() {
     currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     on_actionList_All_Forms_triggered();
     currentTab->input->setText(text);
-    onInputEditingFinished();
+    onInputReturnPressed();
 }
 
 void MainWindow::onContextMenuZoomInTriggered() {

@@ -74,23 +74,15 @@ public:
 
 private:
     struct Pimpl {
-#ifdef __APPLE__
-        size_t perpetuaFontSize = 40;
+        size_t perpetuaFontSize = 20;
         size_t segoeFontSize = 14;
-#else
-        size_t perpetuaFontSize = 25;
-        size_t segoeFontSize = 28;
-#endif
-
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
         QString webpage;
-        QString inputted;
-        std::map<QString, QString> onlineEntries;
         std::set<QVector<QString>> inflStruct;
+        std::map<QString, QString> onlineEntries;
         std::multimap<QString, QString, QStringCaseInsensitiveComparator> textualResults;
-        QVector<QString> inflSelectResult;
         std::multimap<QString, QVector<QString>, QStringCaseInsensitiveComparator> definitionResults;
-//        QVector<std::pair<QString, QVector<QString>>> definitionResults;
+        QVector<QString> inflSelectResult;
         QVector<std::pair<QString, QVector<QString>>> resultsToPrint;
 
         QVBoxLayout * centralLayout;
@@ -99,9 +91,17 @@ private:
         QLineEdit * input;
         QListWidget * options;
         QTextBrowser * result;
-        PageDownloader * pageControl;
         QListWidget * resultsFromDictionaries;
         TreeWidget * inflectionForms;
+
+        ~Pimpl() {
+            centralLayout->deleteLater();
+            mainSplitter->deleteLater();
+            inputLayout->deleteLater();
+            input->deleteLater();
+            options->deleteLater();
+            result->deleteLater();
+        }
     };
 
     /* pointers */
@@ -150,7 +150,6 @@ private:
     std::array<map_t, 2> definitions;
     std::array<mapvecstr_t, 2> dictionaries;
 
-    setstr_t forms;
     setstr_t wordindex;
 
 private slots:
@@ -168,7 +167,7 @@ private slots:
     /* slots concerning selection changes in the InflectionForms tree */
     void checkStateChanged(Qt::CheckState, QVector<QString> const);
     void onInputTextEdited(const QString &arg1);
-    void onInputEditingFinished();
+    void onInputReturnPressed();
     void onOptionsItemClicked(QListWidgetItem *item);
     void resultsFromDictionariesItemClicked(QListWidgetItem * item);
 
@@ -206,7 +205,6 @@ private slots:
 
 
     void on_actionZoom_In_triggered();
-
     void on_actionZoom_Out_triggered();
 
 private:
@@ -284,17 +282,16 @@ private:
     /* query functions */
     void findDefinition(QString const & word);
     void findDefinitionPrint(size_t index);
-    void findInflection(QString const & word);
     void onlineDefinition(QString const & word);
     void onlineText(QString const & word);
-    void findInflectionThread(vecvecstr_t & dics, QString word, size_t index);
+    void findInflection(QString const & word);
+    void findInflectionThread(std::array<vecstr_t, 8> & dics, QString word, size_t index);
     void textualSearch(QString const & word);
     void textualSearchThread(QString word, size_t index);
     void textualSearchPrint(size_t index);
     void printAll(QString const & word);
     void printAllThread(QString word, size_t index);
     void printAllPrint(size_t index);
-    void allFormsAutocompleteThread(vecvecstr_t dics, QString word, size_t index);
 };
 
 

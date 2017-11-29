@@ -11,13 +11,14 @@ class PageDownloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit PageDownloader(QUrl pageUrl, QObject *parent = 0);
+    PageDownloader(QObject * parent = 0);
+    void DownloadPage(QUrl pageUrl);
+//    explicit PageDownloader(QUrl pageUrl, QObject *parent = 0);
     virtual ~PageDownloader();
     QByteArray downloadedData() const;
 
 signals:
     void downloaded();
-public slots:
 
 private slots:
     void pageDownloaded(QNetworkReply * pReply);
