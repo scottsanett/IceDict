@@ -2067,6 +2067,7 @@ void MainWindow::on_actionUser_Manual_triggered()
         auto str = file.readAll();
         helpDoc->setHtml(str);
         dialog->show();
+        dialog->move(this->x() + (this->width() - dialog->width()) / 2, this->y());
     }
 }
 
