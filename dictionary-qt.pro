@@ -7,6 +7,7 @@
 QT       += core gui\
            network\
            widgets\
+           webenginewidgets
 
 # greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
@@ -42,7 +43,8 @@ HEADERS  += \
     MainWindow.hpp \
     PageDownloader.hpp \
     inflection.hpp \
-    macros.hpp
+    macros.hpp \
+    TreeWidget.hpp
 
 FORMS += \
     mainwindow.ui

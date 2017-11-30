@@ -581,7 +581,7 @@ void MainWindow::textualSearchThread(QString word, size_t index) {
 
 void MainWindow::textualSearch(QString const & word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->clear();
+//    currentTab->input->clear();
 
     textualSearchThread(word, 0);
     textualSearchThread(word, 1);
@@ -811,7 +811,7 @@ void MainWindow::onOptionsItemClicked(QListWidgetItem *item)
         findDefinition(tag);
     }
     else if (currentTab->flags[3] == 1) {
-        currentTab->input->setText(itemText);
+//        currentTab->input->setText(itemText);
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         if (currentTab->textualResults.size() == 0) {
             textualSearch(tag);
@@ -1258,11 +1258,13 @@ void MainWindow::fillVerbs(QString const & str) {
     if (!currentTab->inflectionForms) return;
 
     auto none = constructItem("Non-Impersonal", currentTab->inflectionForms);
-    fillStructures<false, TYPE_VOICE>(none, str);
-    fillStructures<false, TYPE_MOOD>(none, str);
-    fillStructures<false, TYPE_TENSE>(none, str);
-    fillStructures<false, TYPE_PERSON>(none, str);
-    fillStructures<false, TYPE_NUMBER>(none, str);
+    if (none) {
+        fillStructures<false, TYPE_VOICE>(none, str);
+        fillStructures<false, TYPE_MOOD>(none, str);
+        fillStructures<false, TYPE_TENSE>(none, str);
+        fillStructures<false, TYPE_PERSON>(none, str);
+        fillStructures<false, TYPE_NUMBER>(none, str);
+    }
 
     bool findImpersonal = InflManager.find(str, Infl::Short, Infl::Impersonal);
     if (findImpersonal) {
@@ -2058,4 +2060,37 @@ void MainWindow::on_actionZoom_In_triggered()
 void MainWindow::on_actionZoom_Out_triggered()
 {
     onContextMenuZoomOutTriggered();
+}
+
+void MainWindow::on_actionUser_Manual_triggered()
+{
+    auto dialog = new QDialog(this);
+    dialog->setModal(true);
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), dialog, SLOT(close()));
+    dialog->setLayout(new QVBoxLayout(dialog));
+    dialog->layout()->setMargin(0);
+    auto helpDoc = new QWebEngineView();
+    dialog->layout()->addWidget(helpDoc);
+    QFile file(":/documentation/doc.html");
+    if (file.open(QFile::ReadOnly)) {
+        auto str = file.readAll();
+        helpDoc->setHtml(str);
+        dialog->show();
+    }
+}
+
+void MainWindow::on_actionAbout_IceDict_triggered()
+{
+    auto messagebox = new QMessageBox(this);
+    messagebox->setTextFormat(Qt::RichText);
+    auto pixmap = QPixmap(":/alphabet/icon.png");
+    pixmap = pixmap.scaledToHeight(100, Qt::SmoothTransformation);
+    messagebox->setIconPixmap(pixmap);
+    messagebox->setText("<p align=center><h2>IceDict</h2></p><p align=center style=\"font-weight: normal\">Version 1.0</p><p align=center style=\"font-weight: normal; font-size:11px\">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>");
+    messagebox->exec();
+}
+
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    QMessageBox::aboutQt(this, "About Qt");
 }

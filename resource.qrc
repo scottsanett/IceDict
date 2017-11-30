@@ -33,5 +33,21 @@
         <file>alphabet/perpetua.ttf</file>
         <file>alphabet/perpetuab.ttf</file>
         <file>alphabet/segoeui.ttf</file>
+        <file>documentation/images/screenshot1.jpg</file>
+        <file>documentation/images/screenshot2.jpg</file>
+        <file>documentation/images/screenshot3.jpg</file>
+        <file>documentation/images/screenshot4.jpg</file>
+        <file>documentation/images/screenshot5.jpg</file>
+        <file>documentation/images/screenshot6.jpg</file>
+        <file>documentation/images/screenshot7.jpg</file>
+        <file>documentation/images/screenshot8.jpg</file>
+        <file>documentation/images/screenshot9.jpg</file>
+        <file>documentation/images/screenshot10.jpg</file>
+        <file>documentation/images/screenshot11.jpg</file>
+        <file>documentation/images/screenshot12.jpg</file>
+        <file>documentation/images/screenshot13.jpg</file>
+        <file>documentation/images/screenshot14.jpg</file>
+        <file>documentation/doc.html</file>
+        <file>alphabet/icon.png</file>
     </qresource>
 </RCC>

@@ -11,6 +11,7 @@
 #include "QPushButton"
 #include "QLineEdit"
 #include "QLabel"
+#include "QDialog"
 #include "QHBoxLayout"
 #include "QGridLayout"
 #include "QTextBrowser"
@@ -23,10 +24,12 @@
 #include "QIcon"
 #include "QToolButton"
 #include "QShortcut"
+#include "QMessageBox"
 #include "QSplitter"
+#include "QWebEngineView"
+
 #include <cstdlib>
 #include <thread>
-
 #include <map>
 #include <set>
 #include <vector>
@@ -108,7 +111,6 @@ private:
     /* pointers */
     Ui::MainWindow * ui;
     PageDownloader * pageControl;
-//    QMenu * resultContextMenu;
     Inflection InflManager;
 
     /* POD members */
@@ -208,6 +210,12 @@ private slots:
 
     void on_actionZoom_In_triggered();
     void on_actionZoom_Out_triggered();
+
+    void on_actionUser_Manual_triggered();
+
+    void on_actionAbout_IceDict_triggered();
+
+    void on_actionAbout_Qt_triggered();
 
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);

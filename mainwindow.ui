@@ -110,6 +110,9 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionUser_Manual"/>
+    <addaction name="separator"/>
+    <addaction name="actionAcknowldgetments"/>
    </widget>
    <widget class="QMenu" name="menuDictionaries">
     <property name="title">
@@ -129,6 +132,14 @@
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
    </widget>
+   <widget class="QMenu" name="menuIceDict">
+    <property name="title">
+     <string>IceDict</string>
+    </property>
+    <addaction name="actionAbout_IceDict"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
+   <addaction name="menuIceDict"/>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuDictionaries"/>
@@ -173,6 +184,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
    </property>
   </action>
   <action name="actionModern_Icelandic">
@@ -231,72 +245,6 @@
     <string>Ctrl+7</string>
    </property>
   </action>
-  <action name="actionActive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Active</string>
-   </property>
-  </action>
-  <action name="actionMiddle">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Middle</string>
-   </property>
-  </action>
-  <action name="actionAll">
-   <property name="text">
-    <string>All</string>
-   </property>
-  </action>
-  <action name="actionAll_2">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>All</string>
-   </property>
-  </action>
-  <action name="actionImpersonal">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Impersonal</string>
-   </property>
-  </action>
-  <action name="actionIndicative">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Indicative</string>
-   </property>
-  </action>
-  <action name="actionSubjunctive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Subjunctive</string>
-   </property>
-  </action>
-  <action name="actionImperative">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Imperative</string>
-   </property>
-  </action>
-  <action name="actionAll_3">
-   <property name="text">
-    <string>All</string>
-   </property>
-  </action>
   <action name="actionZoom_In">
    <property name="text">
     <string>Zoom In</string>
@@ -311,6 +259,26 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionUser_Manual">
+   <property name="text">
+    <string>IceDict Help</string>
+   </property>
+  </action>
+  <action name="actionAcknowldgetments">
+   <property name="text">
+    <string>Acknowledgements</string>
+   </property>
+  </action>
+  <action name="actionAbout_IceDict">
+   <property name="text">
+    <string>About IceDict</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
    </property>
   </action>
  </widget>
