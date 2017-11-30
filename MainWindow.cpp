@@ -21,8 +21,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->setupUi(this);
     this->setWindowTitle("IceDict");
-    QIcon icon(":/alphabet/icon.ico");
-    this->setWindowIcon(icon);
     ui->resultsTab->setDocumentMode(true);
     ui->resultsTab->setTabsClosable(true);
     ui->resultsTab->tabBar()->setMovable(true);
@@ -2067,7 +2065,7 @@ void MainWindow::on_actionUser_Manual_triggered()
         auto str = file.readAll();
         helpDoc->setHtml(str);
         dialog->show();
-        dialog->move(this->x() + (this->width() - dialog->width()) / 2, this->y());
+        dialog->move(this->x() + (this->width() - dialog->width()) / 2, this->y() + (this->height() - dialog->height()) / 2);
     }
 }
 
@@ -2076,11 +2074,11 @@ void MainWindow::on_actionAbout_IceDict_triggered()
     auto aboutMessage =
             R"foo(
             <p align=center><h2>IceDict</h2></p>
-            <p align=center style="font-weight: normal\">Version 1.0</p>
-            <p align=center style=\"font-weight: normal; font-size:11px\">Copyright Â© 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>)foo";
+            <p align=center style="font-weight: normal">Version 1.0</p>
+            <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
-    auto pixmap = QPixmap(":/alphabet/icon.png");
+    auto pixmap = QPixmap(":/alphabet/IceDict.png");
     pixmap = pixmap.scaledToHeight(100, Qt::SmoothTransformation);
     messagebox->setIconPixmap(pixmap);
     messagebox->setText(aboutMessage);
@@ -2097,14 +2095,14 @@ void MainWindow::on_actionAcknowledgements_triggered()
     auto acknowledgementMessage =
             R"foo(
             <p align=center><h1 id="toc_0">Acknowledgements</h1></p>
-            <p style="font-weight:normal">IceDict utilizes the following copyrighted material, the use of which is hereby acknowledged.</p>
+            <p style="font-weight:normal">IceDict utilizes the following copyrighted materials, the use of which is hereby acknowledged.</p>
             <h3 id="toc_1">Online Dictionary:</h3>
-            <p align="justify" style="font-weight:normal"><a href="http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?id=IcelOnline.IEOrd">Íslensk-ensk orðabók</a></p>
+            <p style="font-weight:normal"><a href="http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?id=IcelOnline.IEOrd">Íslensk-ensk orðabók</a></p>
             <h3 id="toc_2">Offline Dictionaries:</h3>
-            <p align="justify" style="font-weight:normal"><a href="http://norse.ulver.com/dct/zoega/">A Concise Dictionary of Old Icelandic</a></p>
-            <p align="justify" style="font-weight:normal"><a href="http://norse.ulver.com/dct/cleasby/">An Icelandic-English Dictionary Based on the MS. Collections of the Late Richard Cleasby Enlarged and Completed by Gudbrand Vigfusson, M.A.</a></p>
+            <p style="font-weight:normal"><a href="http://norse.ulver.com/dct/zoega/">A Concise Dictionary of Old Icelandic</a></p>
+            <p style="font-weight:normal"><a href="http://norse.ulver.com/dct/cleasby/">An Icelandic-English Dictionary Based on the MS. Collections of the Late Richard Cleasby Enlarged and Completed by Gudbrand Vigfusson, M.A.</a></p>
             <h3 id="toc_3">Inflectional Data:</h3>
-            <p align="justify" style="font-weight:normal"><a href="http://bin.arnastofnun.is/forsida/">Beygingarlýsing í­slensks nútí­mamáls Stofnun Árna Magnússonar á­ í­slenskum fræðum</a></p>)foo";
+            <p style="font-weight:normal"><a href="http://bin.arnastofnun.is/forsida/">Beygingarlýsing í­slensks nútí­mamáls Stofnun Árna Magnússonar á­ í­slenskum fræðum</a></p>)foo";
     auto messageBox = new QMessageBox(this);
     messageBox->setWindowTitle("Acknowledgements");
     messageBox->setTextFormat(Qt::RichText);

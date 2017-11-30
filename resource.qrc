@@ -1,8 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>alphabet/cover.jpg</file>
-        <file>alphabet/icon.ico</file>
-        <file>alphabet/icon.icns</file>
         <file>alphabet/zoega</file>
         <file>alphabet/vifgusson</file>
         <file>alphabet/wordindex</file>
@@ -48,6 +46,7 @@
         <file>documentation/images/screenshot13.jpg</file>
         <file>documentation/images/screenshot14.jpg</file>
         <file>documentation/doc.html</file>
-        <file>alphabet/icon.png</file>
+        <file>alphabet/IceDict.png</file>
+        <file>IceDict.ico</file>
     </qresource>
 </RCC>
