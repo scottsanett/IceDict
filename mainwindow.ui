@@ -112,7 +112,7 @@
     </property>
     <addaction name="actionUser_Manual"/>
     <addaction name="separator"/>
-    <addaction name="actionAcknowldgetments"/>
+    <addaction name="actionAcknowledgements"/>
    </widget>
    <widget class="QMenu" name="menuDictionaries">
     <property name="title">
@@ -237,14 +237,6 @@
     <string>Ctrl+6</string>
    </property>
   </action>
-  <action name="actionList_One_Specific_Form">
-   <property name="text">
-    <string>List One Specific Form</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+7</string>
-   </property>
-  </action>
   <action name="actionZoom_In">
    <property name="text">
     <string>Zoom In</string>
@@ -266,7 +258,7 @@
     <string>IceDict Help</string>
    </property>
   </action>
-  <action name="actionAcknowldgetments">
+  <action name="actionAcknowledgements">
    <property name="text">
     <string>Acknowledgements</string>
    </property>

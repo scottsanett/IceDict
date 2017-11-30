@@ -11,11 +11,9 @@ bool Inflection::find(QString const & str, enum Infl::Policy p, enum Infl::Forms
     bool result = false;
     if (p == Infl::Full) {
         result = str.contains(InflName.at(f));
-//        result = str.find(InflName.at(f)) == std::string::npos;
     }
     else if (p == Infl::Short) {
         result = str.contains(InflStruct.at(f));
-//        result = str.find(InflStruct.at(f)) == std::string::npos;
     }
     return result;
 }

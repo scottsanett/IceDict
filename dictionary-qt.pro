@@ -22,7 +22,7 @@ QMAKE_CXXFLAGS += -std=c++17
 DEFINES += QT_DEPRECATED_WARNINGS
 RESOURCES = resource.qrc
 ICON = alphabet/icon.icns
-CONFIG += resources_big\
+CONFIG += resources_big
 win32:RC_ICONS += alphabet/icon.ico
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -31,7 +31,6 @@ win32:RC_ICONS += alphabet/icon.ico
 
 
 SOURCES += main.cpp\
-    TreeWidget.cpp \
     TreeWidgetItem.cpp \
     MainWindow.cpp \
     PageDownloader.cpp \
@@ -43,8 +42,7 @@ HEADERS  += \
     MainWindow.hpp \
     PageDownloader.hpp \
     inflection.hpp \
-    macros.hpp \
-    TreeWidget.hpp
+    macros.hpp
 
 FORMS += \
     mainwindow.ui

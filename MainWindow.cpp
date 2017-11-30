@@ -30,8 +30,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setExpanding(true);
     QObject::connect(ui->resultsTab->tabBar(), &QTabBar::tabCloseRequested,
                      this, &MainWindow::onTabCloseButtonClicked);
-//    ui->centralLayout->setMargin(0);
-//    ui->centralLayout->setContentsMargins(0, 0, 0, 0);
     ui->statusBar->hide();
     connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
@@ -1888,12 +1886,6 @@ void MainWindow::onResultContextMenuRequested(QPoint const & p) {
     resultContextMenu->addAction(act4);
     resultContextMenu->addAction(act5);
     resultContextMenu->addAction(act6);
-
-    /*
-    resultContextMenu->addSeparator();
-    resultContextMenu->addAction(zoomIn);
-    resultContextMenu->addAction(zoomOut);
-    */
     resultContextMenu->show();
 }
 
@@ -2064,9 +2056,8 @@ void MainWindow::on_actionZoom_Out_triggered()
 
 void MainWindow::on_actionUser_Manual_triggered()
 {
-    auto dialog = new QDialog(this);
-    dialog->setModal(true);
-    new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), dialog, SLOT(close()));
+    auto dialog = new QWidget(this);
+    dialog->setWindowFlag(Qt::Tool);
     dialog->setLayout(new QVBoxLayout(dialog));
     dialog->layout()->setMargin(0);
     auto helpDoc = new QWebEngineView();
@@ -2081,16 +2072,41 @@ void MainWindow::on_actionUser_Manual_triggered()
 
 void MainWindow::on_actionAbout_IceDict_triggered()
 {
+    auto aboutMessage =
+            R"foo(
+            <p align=center><h2>IceDict</h2></p>
+            <p align=center style="font-weight: normal\">Version 1.0</p>
+            <p align=center style=\"font-weight: normal; font-size:11px\">Copyright Â© 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
     auto pixmap = QPixmap(":/alphabet/icon.png");
     pixmap = pixmap.scaledToHeight(100, Qt::SmoothTransformation);
     messagebox->setIconPixmap(pixmap);
-    messagebox->setText("<p align=center><h2>IceDict</h2></p><p align=center style=\"font-weight: normal\">Version 1.0</p><p align=center style=\"font-weight: normal; font-size:11px\">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>");
+    messagebox->setText(aboutMessage);
     messagebox->exec();
 }
 
 void MainWindow::on_actionAbout_Qt_triggered()
 {
     QMessageBox::aboutQt(this, "About Qt");
+}
+
+void MainWindow::on_actionAcknowledgements_triggered()
+{
+    auto acknowledgementMessage =
+            R"foo(
+            <p align=center><h1 id="toc_0">Acknowledgements</h1></p>
+            <p style="font-weight:normal">IceDict utilizes the following copyrighted material, the use of which is hereby acknowledged.</p>
+            <h3 id="toc_1">Online Dictionary:</h3>
+            <p align="justify" style="font-weight:normal"><a href="http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?id=IcelOnline.IEOrd">Íslensk-ensk orðabók</a></p>
+            <h3 id="toc_2">Offline Dictionaries:</h3>
+            <p align="justify" style="font-weight:normal"><a href="http://norse.ulver.com/dct/zoega/">A Concise Dictionary of Old Icelandic</a></p>
+            <p align="justify" style="font-weight:normal"><a href="http://norse.ulver.com/dct/cleasby/">An Icelandic-English Dictionary Based on the MS. Collections of the Late Richard Cleasby Enlarged and Completed by Gudbrand Vigfusson, M.A.</a></p>
+            <h3 id="toc_3">Inflectional Data:</h3>
+            <p align="justify" style="font-weight:normal"><a href="http://bin.arnastofnun.is/forsida/">Beygingarlýsing í­slensks nútí­mamáls Stofnun Árna Magnússonar á­ í­slenskum fræðum</a></p>)foo";
+    auto messageBox = new QMessageBox(this);
+    messageBox->setWindowTitle("Acknowledgements");
+    messageBox->setTextFormat(Qt::RichText);
+    messageBox->setText(acknowledgementMessage);
+    messageBox->exec();
 }

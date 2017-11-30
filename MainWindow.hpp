@@ -6,14 +6,11 @@
 #include <QWidget>
 #include <QObject>
 #include <QFile>
-#include "QWidget"
-#include "QMainWindow"
 #include "QPushButton"
 #include "QLineEdit"
 #include "QLabel"
 #include "QDialog"
 #include "QHBoxLayout"
-#include "QGridLayout"
 #include "QTextBrowser"
 #include "QResource"
 #include "QTextStream"
@@ -114,13 +111,12 @@ private:
     Inflection InflManager;
 
     /* POD members */
-    int tabIndex;
-    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20px;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ </span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
     const char * writeUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
     const char * writeUrl2 = "&submit=Search";
-    const char * textUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=dentry"
-                            "&q1=";
+    const char * textUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=dentry&q1=";
     const char * textUrl2 = "&submit=Search";
+
+    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\" font-size:20px;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ </span></p><p align=\"center\"><br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
 
     enum class POS { Noun, Verb, Adjective, Adverb, Pronoun, Numerical};
     enum POS currentPOS;
@@ -216,6 +212,8 @@ private slots:
     void on_actionAbout_IceDict_triggered();
 
     void on_actionAbout_Qt_triggered();
+
+    void on_actionAcknowledgements_triggered();
 
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
