@@ -299,9 +299,17 @@ void MainWindow::importWordIndex() {
 }
 
 void MainWindow::importInflections() {
-    for (size_t i = 1; i <= 8; ++i) {
-        importInflectionsThread(inflectionals, i);
-    }
+    std::thread t1(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 1);
+    std::thread t2(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 2);
+    std::thread t3(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 3);
+    std::thread t4(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 4);
+    t1.join(); t2.join(); t3.join(); t4.join();
+
+    std::thread t5(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 5);
+    std::thread t6(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 6);
+    std::thread t7(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 7);
+    std::thread t8(&MainWindow::importInflectionsThread, this, std::ref(inflectionals), 8);
+    t5.join(); t6.join(); t7.join(); t8.join();
 }
 
 
@@ -325,9 +333,23 @@ void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i
 }
 
 void MainWindow::importOriginal() {
+    std::thread t1(&MainWindow::importOriginalThread, this, std::ref(originals), 1);
+    std::thread t2(&MainWindow::importOriginalThread, this, std::ref(originals), 2);
+    std::thread t3(&MainWindow::importOriginalThread, this, std::ref(originals), 3);
+    std::thread t4(&MainWindow::importOriginalThread, this, std::ref(originals), 4);
+    t1.join(); t2.join(); t3.join(); t4.join();
+
+    std::thread t5(&MainWindow::importOriginalThread, this, std::ref(originals), 5);
+    std::thread t6(&MainWindow::importOriginalThread, this, std::ref(originals), 6);
+    std::thread t7(&MainWindow::importOriginalThread, this, std::ref(originals), 7);
+    std::thread t8(&MainWindow::importOriginalThread, this, std::ref(originals), 8);
+    t5.join(); t6.join(); t7.join(); t8.join();
+
+    /*
     for (size_t i = 1; i <= 8; ++i) {
         importOriginalThread(originals, i);
     }
+    */
 }
 
 void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
@@ -358,8 +380,9 @@ void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
 }
 
 void MainWindow::importDictionary() {
-    importDictionaryThread("zoega", 0);
-    importDictionaryThread("vifgusson", 1);
+    std::thread t1(&MainWindow::importDictionaryThread, this, "zoega", 0);
+    std::thread t2(&MainWindow::importDictionaryThread, this, "vifgusson", 1);
+    t1.join(); t2.join();
 }
 
 void MainWindow::importDictionaryThread(QString const name, size_t i) {

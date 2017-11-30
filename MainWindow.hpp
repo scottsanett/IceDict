@@ -25,6 +25,7 @@
 #include "QShortcut"
 #include "QSplitter"
 #include <cstdlib>
+#include <thread>
 
 #include <map>
 #include <set>
