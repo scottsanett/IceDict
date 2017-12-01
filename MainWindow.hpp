@@ -184,7 +184,8 @@ private slots:
     void search_icelandic_text();
 
     void loadPage();
-    void loadError();
+    void connectionError();
+    void timeoutError();
     void addTab_clicked();
     void closeTab(int);
 

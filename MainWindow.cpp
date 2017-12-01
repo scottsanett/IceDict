@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     pageControl = new PageDownloader(this);
     QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
-    QObject::connect(pageControl, SIGNAL(connectionError()), this, SLOT(loadError()));
+    QObject::connect(pageControl, SIGNAL(connectionError()), this, SLOT(connectionError()));
+    QObject::connect(pageControl, SIGNAL(timeoutError()), this, SLOT(timeoutError()));
 
     inflectionals.fill(map_t{});
     originals.fill(map_t{});
@@ -943,9 +944,14 @@ void MainWindow::loadPage() {
     }
 }
 
-void MainWindow::loadError() {
+void MainWindow::connectionError() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->result->setHtml("<br/><span style=\"font-family: Perpetua; font-size: 20px; font-weight: bold\">Connection error.<br/>Please check your network connection</span>");
+    currentTab->result->setHtml("<br/><br/><br/><br/><br/><span style=\"font-family: Perpetua; font-size: 20px; font-weight: bold;\"><p align='center'>Connection Error</p><p align='center' style='font-weight: normal'>Please check your network connection.</p></span>");
+}
+
+void MainWindow::timeoutError() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    currentTab->result->setHtml("<br/><br/><br/><br/><b/><span style=\"font-family: Perpetua; font-size: 20px; font-weight: bold;\"><p align='center'>Connection Timeout</p><p align='center' style='font-weight: normal'>Please check your network connection.</p></span>");
 }
 
 void MainWindow::onlineText(QString word) {

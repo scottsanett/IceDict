@@ -32,6 +32,7 @@ void PageDownloader::DownloadPage(QUrl fileUrl) {
     else {
         disconnect(pReply, SIGNAL(finished()), &loop, SLOT(quit()));
         pReply->abort();
+        emit timeoutError();
     }
 
 }

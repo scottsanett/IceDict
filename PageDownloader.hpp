@@ -21,6 +21,7 @@ public:
 signals:
     void downloaded();
     void connectionError();
+    void timeoutError();
 
 private slots:
     void pageDownloaded(QNetworkReply * pReply);
