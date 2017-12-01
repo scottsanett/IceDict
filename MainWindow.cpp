@@ -340,12 +340,6 @@ void MainWindow::importOriginal() {
     std::thread t7(&MainWindow::importOriginalThread, this, std::ref(originals), 7);
     std::thread t8(&MainWindow::importOriginalThread, this, std::ref(originals), 8);
     t5.join(); t6.join(); t7.join(); t8.join();
-
-    /*
-    for (size_t i = 1; i <= 8; ++i) {
-        importOriginalThread(originals, i);
-    }
-    */
 }
 
 void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
@@ -493,7 +487,10 @@ void MainWindow::findInflection(QString word) {
     if ([](QString str){ for (auto && i : str) { if (i.isLower()) return false; } return true; }(word)) {
         word = word.toLower();
     }
-
+    while (word.contains("z")) {
+        auto index = word.indexOf("z");
+        word.replace(index, 1, "s");
+    }
     auto oeIndex = word.indexOf("œ");
     if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
     auto oslashIndex = word.indexOf("ø");
@@ -532,10 +529,46 @@ void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString
         }
         else if (word.endsWith("r") &&
                  word.at(word.length() - 2) != "u" &&
+                 word.at(word.length() - 2) != "ú" &&
                  word.at(word.length() - 2) != "a" &&
-                 word.at(word.length() - 2) != "i"
+                 word.at(word.length() - 2) != "á" &&
+                 word.at(word.length() - 2) != "e" &&
+                 word.at(word.length() - 2) != "é" &&
+                 word.at(word.length() - 2) != "o" &&
+                 word.at(word.length() - 2) != "ó" &&
+                 word.at(word.length() - 2) != "y" &&
+                 word.at(word.length() - 2) != "ý" &&
+                 word.at(word.length() - 2) != "i" &&
+                 word.at(word.length() - 2) != "í"
                  ) {
             word.insert(word.length() - 1, "u");
+        }
+        else if (word.endsWith("it")) {
+            word.replace(word.length() - 2, 2, "ið");
+        }
+        else if (word.endsWith("at")) {
+            word.replace(word.length() - 2, 2, "að");
+        }
+        else if (word.endsWith("ðisk")) {
+            word.replace(word.length() - 4, 4, "tist");
+        }
+        else if (word.endsWith("ðir")) {
+            word.replace(word.length() - 4, 4, "tir");
+        }
+        else if (word.endsWith("ði")) {
+            word.replace(word.length() - 4, 4, "ti");
+        }
+        else if (word.endsWith("isk")) {
+            word.replace(word.length() - 3, 3, "ist");
+        }
+        else if (word.endsWith("ask")) {
+            word.replace(word.length() - 3, 3, "ast");
+        }
+        else if (word == "emk") {
+            word = "er";
+        }
+        else if (word.endsWith("mk")) {
+            word = word.left(word.length() - 1);
         }
         itr = thisDic.find(word);
         if (itr == thisDic.end()) return;
@@ -631,6 +664,10 @@ void MainWindow::printAll(QString word) {
     if ([](QString str){ for (auto && i : str) { if (i.isLower()) return false; } return true; }(word)) {
         word = word.toLower();
     }
+    while (word.contains("z")) {
+        auto index = word.indexOf("z");
+        word.replace(index, 1, "s");
+    }
     auto oeIndex = word.indexOf("œ");
     if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
     auto oslashIndex = word.indexOf("ø");
@@ -668,8 +705,17 @@ void MainWindow::printAllThread(QString word, size_t index) {
         }
         else if (word.endsWith("r") &&
                  word.at(word.length() - 2) != "u" &&
+                 word.at(word.length() - 2) != "ú" &&
                  word.at(word.length() - 2) != "a" &&
-                 word.at(word.length() - 2) != "i"
+                 word.at(word.length() - 2) != "a" &&
+                 word.at(word.length() - 2) != "e" &&
+                 word.at(word.length() - 2) != "é" &&
+                 word.at(word.length() - 2) != "o" &&
+                 word.at(word.length() - 2) != "ó" &&
+                 word.at(word.length() - 2) != "y" &&
+                 word.at(word.length() - 2) != "ý" &&
+                 word.at(word.length() - 2) != "i" &&
+                 word.at(word.length() - 2) != "í"
                  ) {
             word.insert(word.length() - 1, "u");
         }
@@ -925,8 +971,17 @@ void MainWindow::onlineText(QString word) {
     }
     else if (word.endsWith("r") &&
              word.at(word.length() - 2) != "u" &&
+             word.at(word.length() - 2) != "ú" &&
              word.at(word.length() - 2) != "a" &&
-             word.at(word.length() - 2) != "i"
+             word.at(word.length() - 2) != "á" &&
+             word.at(word.length() - 2) != "e" &&
+             word.at(word.length() - 2) != "é" &&
+             word.at(word.length() - 2) != "o" &&
+             word.at(word.length() - 2) != "ó" &&
+             word.at(word.length() - 2) != "y" &&
+             word.at(word.length() - 2) != "ý" &&
+             word.at(word.length() - 2) != "i" &&
+             word.at(word.length() - 2) != "í"
              ) {
         word.insert(word.length() - 1, "u");
     }
@@ -947,10 +1002,23 @@ void MainWindow::onlineDefinition(QString word) {
     }
     else if (word.endsWith("r") &&
              word.at(word.length() - 2) != "u" &&
+             word.at(word.length() - 2) != "ú" &&
              word.at(word.length() - 2) != "a" &&
-             word.at(word.length() - 2) != "i"
+             word.at(word.length() - 2) != "á" &&
+             word.at(word.length() - 2) != "e" &&
+             word.at(word.length() - 2) != "é" &&
+             word.at(word.length() - 2) != "o" &&
+             word.at(word.length() - 2) != "ó" &&
+             word.at(word.length() - 2) != "y" &&
+             word.at(word.length() - 2) != "ý" &&
+             word.at(word.length() - 2) != "i" &&
+             word.at(word.length() - 2) != "í"
              ) {
         word.insert(word.length() - 1, "u");
+    }
+    while (word.contains("z")) {
+        auto index = word.indexOf("z");
+        word.replace(index, 1, "s");
     }
 
     QString newWord = wordToWrite(word);
@@ -963,6 +1031,53 @@ bool MainWindow::parsePage() {
 //    qDebug() << currentTab->webpage;
     if (currentTab->webpage.contains("produced no results."))  // no results
     {
+        if (currentTab->flags.at(1) == 1) {
+            QString startMarker = "simple search for <em>";
+            QString endMarker = "</em> produced no results";
+            auto startPos = currentTab->webpage.indexOf(startMarker);
+            auto endPos = currentTab->webpage.indexOf(endMarker);
+            auto word = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length());
+            auto backup = word;
+            while (word.contains("z")) {
+                auto index = word.indexOf("z");
+                word.replace(index, 1, "s");
+            }
+            if (word.endsWith("it")) {
+                word.replace(word.length() - 2, 2, "ið");
+            }
+            else if (word.endsWith("at")) {
+                word.replace(word.length() - 2, 2, "að");
+            }
+            else if (word.endsWith("ðisk")) {
+                word.replace(word.length() - 4, 4, "tist");
+            }
+            else if (word.endsWith("ðir")) {
+                word.replace(word.length() - 3, 3, "tir");
+            }
+            else if (word.endsWith("ði")) {
+                word.replace(word.length() - 2, 2, "ti");
+            }
+            else if (word.endsWith("isk")) {
+                word.replace(word.length() - 3, 3, "ist");
+            }
+            else if (word.endsWith("ask")) {
+                word.replace(word.length() - 3, 3, "ast");
+            }
+            else if (word == "emk") {
+                word = "er";
+            }
+            else if (word.endsWith("mk")) {
+                word = word.left(word.length() - 1);
+            }
+            else {
+                currentTab->webpage = "Your simple search for <em>" + backup + "</em> produced no results.</p>\n\n<p>Modify your search and try again:</p>\n\n\t";
+                return true;
+            }
+            qDebug() << word;
+            currentTab->webpage = "No result has been found.\n\nRedirecting to " + word + "...";
+            onlineText(word);
+            return true;
+        }
         QString startMarker = "<h3>While searching in Icelandic Online Dictionary and Readings</h3>";
         QString endMarker = ":</p>\n\n\t<div class=\"mainBackground\">\n\t\t";
         auto startPos = currentTab->webpage.indexOf(startMarker);
@@ -1099,6 +1214,9 @@ void MainWindow::on_actionClose_Tab_triggered()
     if (ui->resultsTab->count() > 1) {
         auto activeTabIndex = ui->resultsTab->currentIndex();
         closeTab(activeTabIndex);
+    }
+    else {
+        this->close();
     }
 }
 
@@ -2150,7 +2268,7 @@ void MainWindow::on_actionAbout_IceDict_triggered()
     auto aboutMessage =
             R"foo(
             <p align=center><h2>IceDict</h2></p>
-            <p align=center style="font-weight: normal">Version 1.0</p>
+            <p align=center style="font-weight: normal">Version 1.1</p>
             <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
