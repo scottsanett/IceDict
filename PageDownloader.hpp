@@ -6,19 +6,21 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QByteArray>
+#include <QEventLoop>
+#include <QTimer>
 
 class PageDownloader : public QObject
 {
     Q_OBJECT
 public:
     PageDownloader(QObject * parent = 0);
-    void DownloadPage(QUrl pageUrl);
-//    explicit PageDownloader(QUrl pageUrl, QObject *parent = 0);
     virtual ~PageDownloader();
+    void DownloadPage(QUrl pageUrl);
     QByteArray downloadedData() const;
 
 signals:
     void downloaded();
+    void connectionError();
 
 private slots:
     void pageDownloaded(QNetworkReply * pReply);

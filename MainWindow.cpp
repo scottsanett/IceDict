@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     pageControl = new PageDownloader(this);
     QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
+    QObject::connect(pageControl, SIGNAL(connectionError()), this, SLOT(loadError()));
 
     inflectionals.fill(map_t{});
     originals.fill(map_t{});
@@ -266,8 +267,6 @@ void MainWindow::search_all_inflections()
     currentTab->input->setPlaceholderText("Insert word here...");
 }
 
-
-
 QString MainWindow::wordToWrite(QString arg) {
     auto str = arg;
     for (auto && i : writeRules) {
@@ -279,8 +278,71 @@ QString MainWindow::wordToWrite(QString arg) {
     return str;
 }
 
-/* import the index for all words in the two dictionaries */
+QString MainWindow::oldToModern(QString word, Infl::Transforms flag) {
+    if (flag & Infl::Vowels) {
+        auto oeIndex = word.indexOf("œ");
+        if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
+        auto oslashIndex = word.indexOf("ø");
+        if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
+    }
 
+    if (flag & Infl::Consonants) {
+        if (word.endsWith("rr")) {
+            word = word.left(word.length() - 1);
+        }
+        else if (word.endsWith("r") && !isVowel(word.at(word.length() - 2))) {
+            word.insert(word.length() - 1, "u");
+        }
+        while (word.contains("z")) {
+            auto index = word.indexOf("z");
+            word.replace(index, 1, "s");
+        }
+    }
+
+    if (flag & Infl::Inflections) {
+        if (word.endsWith("it")) {
+            word.replace(word.length() - 2, 2, "ið");
+        }
+        else if (word.endsWith("at")) {
+            word.replace(word.length() - 2, 2, "að");
+        }
+        else if (word.endsWith("ðisk")) {
+            word.replace(word.length() - 4, 4, "tist");
+        }
+        else if (word.endsWith("ðir")) {
+            word.replace(word.length() - 4, 4, "tir");
+        }
+        else if (word.endsWith("ði")) {
+            word.replace(word.length() - 4, 4, "ti");
+        }
+        else if (word.endsWith("isk")) {
+            word.replace(word.length() - 3, 3, "ist");
+        }
+        else if (word.endsWith("ask")) {
+            word.replace(word.length() - 3, 3, "ast");
+        }
+        else if (word == "emk") {
+            word = "er";
+        }
+        else if (word.endsWith("mk")) {
+            word = word.left(word.length() - 1);
+        }
+        else if (word == "ek" || word == "eg") {
+            word = "ég";
+        }
+        else if (word.endsWith("a")) {
+            word.replace(word.length() - 1, 1, "i");
+        }
+    }
+    return word;
+}
+
+
+bool MainWindow::isVowel(QChar ch) {
+    return (std::find(vowels.cbegin(), vowels.cend(), ch) != vowels.cend());
+}
+
+/* import the index for all words in the two dictionaries */
 void MainWindow::importWordIndex() {
     QFile wd(":/alphabet/wordindex");
 
@@ -487,17 +549,16 @@ void MainWindow::findInflection(QString word) {
     if ([](QString str){ for (auto && i : str) { if (i.isLower()) return false; } return true; }(word)) {
         word = word.toLower();
     }
-    while (word.contains("z")) {
-        auto index = word.indexOf("z");
-        word.replace(index, 1, "s");
-    }
-    auto oeIndex = word.indexOf("œ");
-    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
-    auto oslashIndex = word.indexOf("ø");
-    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
+
+    word = oldToModern(word, Infl::Vowels | Infl::Consonants);
+    auto wordInfl = oldToModern(word, Infl::Inflections);
 
     for (size_t i = 0; i < 8; ++i) {
         findInflectionThread(results, word, i);
+    }
+
+    for (size_t i = 0; i < 8; ++i) {
+        findInflectionThread(results, wordInfl, i);
     }
 
     auto resultSize = [&]() { int sz = 0; for (auto i : results) { sz += i.size(); } return sz; }();
@@ -523,56 +584,7 @@ void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString
     auto && thisDic = inflectionals[index];
     auto && thisResult = results[index];
     auto itr = thisDic.find(word);
-    if (itr == thisDic.end()) {
-        if (word.endsWith("rr")) {
-            word = word.left(word.length() - 1);
-        }
-        else if (word.endsWith("r") &&
-                 word.at(word.length() - 2) != "u" &&
-                 word.at(word.length() - 2) != "ú" &&
-                 word.at(word.length() - 2) != "a" &&
-                 word.at(word.length() - 2) != "á" &&
-                 word.at(word.length() - 2) != "e" &&
-                 word.at(word.length() - 2) != "é" &&
-                 word.at(word.length() - 2) != "o" &&
-                 word.at(word.length() - 2) != "ó" &&
-                 word.at(word.length() - 2) != "y" &&
-                 word.at(word.length() - 2) != "ý" &&
-                 word.at(word.length() - 2) != "i" &&
-                 word.at(word.length() - 2) != "í"
-                 ) {
-            word.insert(word.length() - 1, "u");
-        }
-        else if (word.endsWith("it")) {
-            word.replace(word.length() - 2, 2, "ið");
-        }
-        else if (word.endsWith("at")) {
-            word.replace(word.length() - 2, 2, "að");
-        }
-        else if (word.endsWith("ðisk")) {
-            word.replace(word.length() - 4, 4, "tist");
-        }
-        else if (word.endsWith("ðir")) {
-            word.replace(word.length() - 4, 4, "tir");
-        }
-        else if (word.endsWith("ði")) {
-            word.replace(word.length() - 4, 4, "ti");
-        }
-        else if (word.endsWith("isk")) {
-            word.replace(word.length() - 3, 3, "ist");
-        }
-        else if (word.endsWith("ask")) {
-            word.replace(word.length() - 3, 3, "ast");
-        }
-        else if (word == "emk") {
-            word = "er";
-        }
-        else if (word.endsWith("mk")) {
-            word = word.left(word.length() - 1);
-        }
-        itr = thisDic.find(word);
-        if (itr == thisDic.end()) return;
-    }
+    if (itr == thisDic.end()) { return; }
     QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
@@ -664,15 +676,7 @@ void MainWindow::printAll(QString word) {
     if ([](QString str){ for (auto && i : str) { if (i.isLower()) return false; } return true; }(word)) {
         word = word.toLower();
     }
-    while (word.contains("z")) {
-        auto index = word.indexOf("z");
-        word.replace(index, 1, "s");
-    }
-    auto oeIndex = word.indexOf("œ");
-    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
-    auto oslashIndex = word.indexOf("ø");
-    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
-
+    word = oldToModern(word, Infl::Vowels | Infl::Consonants);
     word = word + ';';
 
     auto & results = currentTab->resultsToPrint;
@@ -699,30 +703,7 @@ void MainWindow::printAllThread(QString word, size_t index) {
     auto & thisResult = currentTab->resultsToPrint;
     auto range = thisDic.equal_range(word);
     auto count = std::distance(range.first, range.second);
-    if (count == 0) {
-        if (word.endsWith("rr")) {
-            word = word.left(word.length() - 1);
-        }
-        else if (word.endsWith("r") &&
-                 word.at(word.length() - 2) != "u" &&
-                 word.at(word.length() - 2) != "ú" &&
-                 word.at(word.length() - 2) != "a" &&
-                 word.at(word.length() - 2) != "a" &&
-                 word.at(word.length() - 2) != "e" &&
-                 word.at(word.length() - 2) != "é" &&
-                 word.at(word.length() - 2) != "o" &&
-                 word.at(word.length() - 2) != "ó" &&
-                 word.at(word.length() - 2) != "y" &&
-                 word.at(word.length() - 2) != "ý" &&
-                 word.at(word.length() - 2) != "i" &&
-                 word.at(word.length() - 2) != "í"
-                 ) {
-            word.insert(word.length() - 1, "u");
-        }
-        range = thisDic.equal_range(word);
-        count = std::distance(range.first, range.second);
-        if (count == 0) return;
-    }
+    if (count == 0)  return;
     QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
@@ -838,12 +819,14 @@ void MainWindow::onInputReturnPressed()
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
+        currentTab->textInQuery.clear();
         onlineDefinition(word);
     }
     else if (currentTab->flags[1] == 1 && word.length() > 0) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
+        currentTab->textInQuery.clear();
         onlineText(word);
     }
     else if (currentTab->flags[2] == 1 && word.length() > 0) {
@@ -960,31 +943,16 @@ void MainWindow::loadPage() {
     }
 }
 
+void MainWindow::loadError() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    currentTab->result->setHtml("<br/><span style=\"font-family: Perpetua; font-size: 20px; font-weight: bold\">Connection error.<br/>Please check your network connection</span>");
+}
+
 void MainWindow::onlineText(QString word) {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     word = word.toLower();
-    auto oeIndex = word.indexOf("œ");
-    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
-    auto oslashIndex = word.indexOf("ø");
-    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
-    if (word.endsWith("rr")) {
-        word = word.left(word.length() - 1);
-    }
-    else if (word.endsWith("r") &&
-             word.at(word.length() - 2) != "u" &&
-             word.at(word.length() - 2) != "ú" &&
-             word.at(word.length() - 2) != "a" &&
-             word.at(word.length() - 2) != "á" &&
-             word.at(word.length() - 2) != "e" &&
-             word.at(word.length() - 2) != "é" &&
-             word.at(word.length() - 2) != "o" &&
-             word.at(word.length() - 2) != "ó" &&
-             word.at(word.length() - 2) != "y" &&
-             word.at(word.length() - 2) != "ý" &&
-             word.at(word.length() - 2) != "i" &&
-             word.at(word.length() - 2) != "í"
-             ) {
-        word.insert(word.length() - 1, "u");
-    }
+    word = oldToModern(word, Infl::Vowels);
+    currentTab->textInQuery = word;
 
     QString newWord = wordToWrite(word);
     QString url = textUrl1 + newWord + textUrl2;
@@ -992,34 +960,10 @@ void MainWindow::onlineText(QString word) {
 }
 
 void MainWindow::onlineDefinition(QString word) {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     word = word.toLower();
-    auto oeIndex = word.indexOf("œ");
-    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
-    auto oslashIndex = word.indexOf("ø");
-    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
-    if (word.endsWith("rr")) {
-        word = word.left(word.length() - 1);
-    }
-    else if (word.endsWith("r") &&
-             word.at(word.length() - 2) != "u" &&
-             word.at(word.length() - 2) != "ú" &&
-             word.at(word.length() - 2) != "a" &&
-             word.at(word.length() - 2) != "á" &&
-             word.at(word.length() - 2) != "e" &&
-             word.at(word.length() - 2) != "é" &&
-             word.at(word.length() - 2) != "o" &&
-             word.at(word.length() - 2) != "ó" &&
-             word.at(word.length() - 2) != "y" &&
-             word.at(word.length() - 2) != "ý" &&
-             word.at(word.length() - 2) != "i" &&
-             word.at(word.length() - 2) != "í"
-             ) {
-        word.insert(word.length() - 1, "u");
-    }
-    while (word.contains("z")) {
-        auto index = word.indexOf("z");
-        word.replace(index, 1, "s");
-    }
+    word = oldToModern(word, Infl::Vowels | Infl::Consonants);
+    currentTab->textInQuery = word;
 
     QString newWord = wordToWrite(word);
     QString url = writeUrl1 + newWord + writeUrl2;
@@ -1028,7 +972,15 @@ void MainWindow::onlineDefinition(QString word) {
 
 bool MainWindow::parsePage() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-//    qDebug() << currentTab->webpage;
+    QString kwStartMarker = "Icelandic Online: Dictionary Entry for ";
+    QString kwEndMarker = "</title>\n<link rel=\"stylesheet\"";
+    auto kwStartIndex = currentTab->webpage.indexOf(kwStartMarker);
+    auto kwEndIndex = currentTab->webpage.indexOf(kwEndMarker);
+    auto kwRaw = currentTab->webpage.mid(kwStartIndex + kwStartMarker.length(), kwEndIndex - kwStartIndex - kwStartMarker.length());
+    QString keyword;
+    for (auto ch : kwRaw) {
+        if (ch.isLetter()) keyword += ch;
+    }
     if (currentTab->webpage.contains("produced no results."))  // no results
     {
         if (currentTab->flags.at(1) == 1) {
@@ -1038,42 +990,11 @@ bool MainWindow::parsePage() {
             auto endPos = currentTab->webpage.indexOf(endMarker);
             auto word = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length());
             auto backup = word;
-            while (word.contains("z")) {
-                auto index = word.indexOf("z");
-                word.replace(index, 1, "s");
-            }
-            if (word.endsWith("it")) {
-                word.replace(word.length() - 2, 2, "ið");
-            }
-            else if (word.endsWith("at")) {
-                word.replace(word.length() - 2, 2, "að");
-            }
-            else if (word.endsWith("ðisk")) {
-                word.replace(word.length() - 4, 4, "tist");
-            }
-            else if (word.endsWith("ðir")) {
-                word.replace(word.length() - 3, 3, "tir");
-            }
-            else if (word.endsWith("ði")) {
-                word.replace(word.length() - 2, 2, "ti");
-            }
-            else if (word.endsWith("isk")) {
-                word.replace(word.length() - 3, 3, "ist");
-            }
-            else if (word.endsWith("ask")) {
-                word.replace(word.length() - 3, 3, "ast");
-            }
-            else if (word == "emk") {
-                word = "er";
-            }
-            else if (word.endsWith("mk")) {
-                word = word.left(word.length() - 1);
-            }
-            else {
+            word = oldToModern(word, Infl::Consonants | Infl::Inflections);
+            if (word == backup) {
                 currentTab->webpage = "Your simple search for <em>" + backup + "</em> produced no results.</p>\n\n<p>Modify your search and try again:</p>\n\n\t";
                 return true;
             }
-            qDebug() << word;
             currentTab->webpage = "No result has been found.\n\nRedirecting to " + word + "...";
             onlineText(word);
             return true;
@@ -1168,13 +1089,13 @@ bool MainWindow::parsePage() {
         pos = currentTab->webpage.indexOf("<span class=\"lemma\">");
         if (pos != -1) {
             QString tag = "<span class=\"lemma\">";
-            currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-weight:600; font-size:24px;\" class=\"lemma\">");
+            currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-weight: bold; font-size:24px;\" class=\"lemma\">");
         }
         while (currentTab->webpage.contains("<span class=\"orth\">")) {
             QString tag = "<span class=\"orth\">";
             auto pos = currentTab->webpage.indexOf(tag);
             if (pos != -1) {
-                currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-weight:600;\" class=\"orth\">");
+                currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-weight: bold;\" class=\"orth\">");
             }
         }
         while (currentTab->webpage.contains("<span class=\"trans\">")) {
@@ -1183,6 +1104,19 @@ bool MainWindow::parsePage() {
             if (pos != -1) {
                 currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-style:italic;\" class=\"trans\">");
             }
+        }
+
+        if (keyword != currentTab->textInQuery) {
+            auto tokens = currentTab->webpage.split(currentTab->textInQuery);
+            QString result;
+            for (auto i = 0; i < tokens.size(); ++i) {
+                if (tokens.at(i).length() == 0) continue;
+                if (i < tokens.size() - 1) {
+                    result += tokens.at(i) + "<b><span style=\"color:#ff0000;\">" + currentTab->textInQuery + "</span></b>";
+                }
+                else result += tokens.at(i);
+            }
+            currentTab->webpage = result;
         }
         return true;
     }

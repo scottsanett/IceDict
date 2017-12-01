@@ -65,6 +65,22 @@ namespace Ui {
 class MainWindow;
 }
 
+namespace Infl {
+    enum Transforms {
+        Vowels = 1 << 0,
+        Consonants = 1 << 1,
+        Inflections = 1 << 2
+    };
+
+    inline Transforms operator& (Transforms a, Transforms b) {
+        return static_cast<Transforms>(static_cast<int>(a) & static_cast<int>(b));
+    }
+
+    inline Transforms operator| (Transforms a, Transforms b) {
+        return static_cast<Transforms>(static_cast<int>(a) | static_cast<int>(b));
+    }
+}
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -75,6 +91,7 @@ public:
 
 private:
     struct Pimpl {
+        QString textInQuery;
         size_t perpetuaFontSize = 20;
         size_t segoeFontSize = 14;
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
@@ -137,15 +154,18 @@ private:
     } PartOfSpeech;
 
     /* Abstract data types */
-    std::map<QString, QString> writeRules = {
-        std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
+    std::array<QString, 15> vowels = {
+        {"a", "á", "e", "é", "i", "í", "o", "ó", "u", "ú", "y", "ý", "ö", "æ"}
+    };
+
+    std::array<std::pair<QString, QString>, 20> writeRules = {
+        {std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
         std::make_pair("ú", "%FA"), std::make_pair("ý", "%FD"), std::make_pair("Á", "%C1"), std::make_pair("É", "%C9"),
         std::make_pair("Í", "%CD"), std::make_pair("Ó", "%D3"), std::make_pair("Ú", "%DA"), std::make_pair("Ý", "%DD"),
         std::make_pair("æ", "%E6"), std::make_pair("ö", "%F6"), std::make_pair("Æ", "%C6"), std::make_pair("Ö", "%D6"),
-        std::make_pair("þ", "%FE"), std::make_pair("ð", "%F0"), std::make_pair("Þ", "%DE"), std::make_pair("Ð", "%D0"),
+        std::make_pair("þ", "%FE"), std::make_pair("ð", "%F0"), std::make_pair("Þ", "%DE"), std::make_pair("Ð", "%D0")}
     };
 
-//    QList<std::shared_ptr<Pimpl>> tabs;
     std::map<QWidget*, std::shared_ptr<Pimpl>> tabIndices;
 
     std::array<map_t, 8> inflectionals;
@@ -164,6 +184,7 @@ private slots:
     void search_icelandic_text();
 
     void loadPage();
+    void loadError();
     void addTab_clicked();
     void closeTab(int);
 
@@ -225,6 +246,9 @@ private:
 
     QString addStyleToResults(QString str);
     QString wordToWrite(QString);
+    QString oldToModern(QString, Infl::Transforms);
+    QString removeNonAlpha(QString);
+    bool isVowel(QChar ch);
 
     /* functions concerning user interface */
     void activateInput();

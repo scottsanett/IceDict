@@ -1,15 +1,39 @@
 #include "PageDownloader.hpp"
 
-PageDownloader::PageDownloader(QObject * parent): QObject(parent) {
-    QObject::connect(&WebControl, SIGNAL(finished(QNetworkReply*)),
-             this, SLOT(pageDownloaded(QNetworkReply*)));
-}
+PageDownloader::PageDownloader(QObject * parent): QObject(parent) {}
 
 PageDownloader::~PageDownloader() {}
 
 void PageDownloader::DownloadPage(QUrl fileUrl) {
     QNetworkRequest request(fileUrl);
-    WebControl.get(request);
+    auto pReply = WebControl.get(request);
+    QTimer timer;
+    timer.setSingleShot(true);
+    QEventLoop loop;
+    connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+    connect(pReply, SIGNAL(finished()), &loop, SLOT(quit()));
+    timer.start(5000);
+    loop.exec();
+
+    if (timer.isActive()) {
+        timer.stop();
+        if (pReply->error() > 0) {
+            emit connectionError();
+        }
+        else {
+            auto value = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            if (value >= 200 && value < 300) {
+                DownloadedData = pReply->readAll();
+                pReply->deleteLater();
+                emit downloaded();
+            }
+        }
+    }
+    else {
+        disconnect(pReply, SIGNAL(finished()), &loop, SLOT(quit()));
+        pReply->abort();
+    }
+
 }
 
 void PageDownloader::pageDownloaded(QNetworkReply *pReply) {
