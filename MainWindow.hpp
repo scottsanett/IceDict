@@ -117,9 +117,9 @@ private:
     const char * textUrl2 = "&submit=Search";
 
 #ifdef _WIN64
-    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px; font-weight:bold\">Welcome to IceDict</span></p><p align=\"center\"<br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
+    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"<br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
 #else
-    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px; font-weight:bold\">Welcome to IceDict</span></p><p align=\"center\"><span style=\"font-family: Segoe UI Symbol; font-size:20px;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
+    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\"font-family: Segoe UI Symbol; font-size:20px;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
 #endif
 
     enum class POS { Noun, Verb, Adjective, Adverb, Pronoun, Numerical};
@@ -291,16 +291,16 @@ private:
     void importDictionaryThread(QString const name, size_t i);
 
     /* query functions */
-    void findDefinition(QString const & word);
+    void findDefinition(QString word);
     void findDefinitionPrint(size_t index);
-    void onlineDefinition(QString const & word);
-    void onlineText(QString const & word);
-    void findInflection(QString const & word);
+    void onlineDefinition(QString word);
+    void onlineText(QString word);
+    void findInflection(QString word);
     void findInflectionThread(std::array<vecstr_t, 8> & dics, QString word, size_t index);
     void textualSearch(QString const & word);
     void textualSearchThread(QString word, size_t index);
     void textualSearchPrint(size_t index);
-    void printAll(QString const & word);
+    void printAll(QString word);
     void printAllThread(QString word, size_t index);
     void printAllPrint(size_t index);
 };

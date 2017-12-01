@@ -48,5 +48,6 @@
         <file>documentation/doc.html</file>
         <file>alphabet/IceDict.png</file>
         <file>IceDict.ico</file>
+        <file>IceDict.icns</file>
     </qresource>
 </RCC>

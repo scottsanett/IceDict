@@ -409,11 +409,12 @@ void MainWindow::importDictionaryThread(QString const name, size_t i) {
     f.close();
 }
 
-void MainWindow::findDefinition(QString const & words) {
+void MainWindow::findDefinition(QString word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto original = word;
 
-    QString word = "<b>" + words + "</b>";
-    auto upper = QString(words).toUpper();
+    auto upper = QString(original).toUpper();
+    word = "<b>" + original + "</b>";
     upper = "<b>" + upper + "</b>";
 
     auto IsAllUpper = [](QString const & str){
@@ -449,7 +450,7 @@ void MainWindow::findDefinition(QString const & words) {
         currentTab->definitionResults.insert(std::make_pair(key, thisEntry));
     }
 
-    if (!IsAllUpper(words)) {
+    if (!IsAllUpper(original)) {
         for (auto itr = uisspair.first; itr != uisspair.second; ++itr) {
             auto key = itr->first;
             auto thisEntry = itr->second;
@@ -484,10 +485,19 @@ void MainWindow::findDefinitionPrint(size_t index) {
     currentTab->result->setHtml(display);
 }
 
-void MainWindow::findInflection(QString const & word) {
+void MainWindow::findInflection(QString word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     std::array<vecstr_t, 8> results;
     results.fill(vecstr_t{});
+
+    if ([](QString str){ for (auto && i : str) { if (i.isLower()) return false; } return true; }(word)) {
+        word = word.toLower();
+    }
+
+    auto oeIndex = word.indexOf("œ");
+    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
+    auto oslashIndex = word.indexOf("ø");
+    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
 
     for (size_t i = 0; i < 8; ++i) {
         findInflectionThread(results, word, i);
@@ -516,7 +526,20 @@ void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString
     auto && thisDic = inflectionals[index];
     auto && thisResult = results[index];
     auto itr = thisDic.find(word);
-    if (itr == thisDic.end()) { return; }
+    if (itr == thisDic.end()) {
+        if (word.endsWith("rr")) {
+            word = word.left(word.length() - 1);
+        }
+        else if (word.endsWith("r") &&
+                 word.at(word.length() - 2) != "u" &&
+                 word.at(word.length() - 2) != "a" &&
+                 word.at(word.length() - 2) != "i"
+                 ) {
+            word.insert(word.length() - 1, "u");
+        }
+        itr = thisDic.find(word);
+        if (itr == thisDic.end()) return;
+    }
     QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
@@ -547,7 +570,6 @@ void MainWindow::textualSearchPrint(size_t index) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     auto thisEntry = currentTab->textualResults.cbegin();
     for (auto i = 0; i < index; ++i) thisEntry = std::next(thisEntry);
-//    auto thisEntry = currentTab->textualResults.at(index);
     QString key = thisEntry->first;
     QString display = thisEntry->second;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20px;\">" + display + "</span></p>";
@@ -577,7 +599,6 @@ void MainWindow::textualSearchThread(QString word, size_t index) {
 
 void MainWindow::textualSearch(QString const & word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-//    currentTab->input->clear();
 
     textualSearchThread(word, 0);
     textualSearchThread(word, 1);
@@ -602,12 +623,21 @@ void MainWindow::textualSearch(QString const & word) {
 }
 
 
-void MainWindow::printAll(QString const & str) {
+void MainWindow::printAll(QString word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->input->clear();
     currentTab->options->clear();
 
-    auto word = str + ';';
+    if ([](QString str){ for (auto && i : str) { if (i.isLower()) return false; } return true; }(word)) {
+        word = word.toLower();
+    }
+    auto oeIndex = word.indexOf("œ");
+    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
+    auto oslashIndex = word.indexOf("ø");
+    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
+
+    word = word + ';';
+
     auto & results = currentTab->resultsToPrint;
     for (size_t i = 0; i < 8; ++i) {
         printAllThread(word, i);
@@ -631,8 +661,22 @@ void MainWindow::printAllThread(QString word, size_t index) {
     auto & thisDic = originals.at(index);
     auto & thisResult = currentTab->resultsToPrint;
     auto range = thisDic.equal_range(word);
-    auto count = thisDic.count(word);
-    if (count == 0) { return; }
+    auto count = std::distance(range.first, range.second);
+    if (count == 0) {
+        if (word.endsWith("rr")) {
+            word = word.left(word.length() - 1);
+        }
+        else if (word.endsWith("r") &&
+                 word.at(word.length() - 2) != "u" &&
+                 word.at(word.length() - 2) != "a" &&
+                 word.at(word.length() - 2) != "i"
+                 ) {
+            word.insert(word.length() - 1, "u");
+        }
+        range = thisDic.equal_range(word);
+        count = std::distance(range.first, range.second);
+        if (count == 0) return;
+    }
     QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
@@ -870,13 +914,45 @@ void MainWindow::loadPage() {
     }
 }
 
-void MainWindow::onlineText(const QString & word) {
+void MainWindow::onlineText(QString word) {
+    word = word.toLower();
+    auto oeIndex = word.indexOf("œ");
+    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
+    auto oslashIndex = word.indexOf("ø");
+    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
+    if (word.endsWith("rr")) {
+        word = word.left(word.length() - 1);
+    }
+    else if (word.endsWith("r") &&
+             word.at(word.length() - 2) != "u" &&
+             word.at(word.length() - 2) != "a" &&
+             word.at(word.length() - 2) != "i"
+             ) {
+        word.insert(word.length() - 1, "u");
+    }
+
     QString newWord = wordToWrite(word);
     QString url = textUrl1 + newWord + textUrl2;
     downloadPage(url);
 }
 
-void MainWindow::onlineDefinition(const QString &word) {
+void MainWindow::onlineDefinition(QString word) {
+    word = word.toLower();
+    auto oeIndex = word.indexOf("œ");
+    if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
+    auto oslashIndex = word.indexOf("ø");
+    if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
+    if (word.endsWith("rr")) {
+        word = word.left(word.length() - 1);
+    }
+    else if (word.endsWith("r") &&
+             word.at(word.length() - 2) != "u" &&
+             word.at(word.length() - 2) != "a" &&
+             word.at(word.length() - 2) != "i"
+             ) {
+        word.insert(word.length() - 1, "u");
+    }
+
     QString newWord = wordToWrite(word);
     QString url = writeUrl1 + newWord + writeUrl2;
     downloadPage(url);
@@ -2079,7 +2155,7 @@ void MainWindow::on_actionAbout_IceDict_triggered()
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
     auto pixmap = QPixmap(":/alphabet/IceDict.png");
-    pixmap = pixmap.scaledToHeight(100, Qt::SmoothTransformation);
+    pixmap = pixmap.scaledToHeight(128, Qt::SmoothTransformation);
     messagebox->setIconPixmap(pixmap);
     messagebox->setText(aboutMessage);
     messagebox->exec();
