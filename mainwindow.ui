@@ -43,6 +43,12 @@
      <layout class="QVBoxLayout" name="centralLayout">
       <item>
        <widget class="QTabWidget" name="resultsTab">
+        <property name="minimumSize">
+         <size>
+          <width>600</width>
+          <height>400</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <family>Segoe UI</family>
@@ -74,13 +80,6 @@
      </layout>
     </item>
    </layout>
-  </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="font">
-    <font>
-     <family>Segoe UI</family>
-    </font>
-   </property>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -131,6 +130,10 @@
     </property>
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind_in_Page"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_Status_Bar"/>
    </widget>
    <widget class="QMenu" name="menuIceDict">
     <property name="title">
@@ -164,7 +167,7 @@
   </action>
   <action name="actionFullscreen">
    <property name="text">
-    <string>Fullscreen</string>
+    <string>Enter Full Screen</string>
    </property>
    <property name="shortcut">
     <string>Meta+Ctrl+F</string>
@@ -223,7 +226,7 @@
   </action>
   <action name="actionSearch_Inflections">
    <property name="text">
-    <string>Search Inflections</string>
+    <string>Search Inflections (Reversely)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
@@ -231,7 +234,7 @@
   </action>
   <action name="actionList_All_Forms">
    <property name="text">
-    <string>List All Forms</string>
+    <string>Search Inflections</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+6</string>
@@ -242,7 +245,7 @@
     <string>Zoom In</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+=</string>
+    <string>Ctrl++</string>
    </property>
   </action>
   <action name="actionZoom_Out">
@@ -271,6 +274,22 @@
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionFind_in_Page">
+   <property name="text">
+    <string>Find in Page</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+F</string>
+   </property>
+  </action>
+  <action name="actionShow_Status_Bar">
+   <property name="text">
+    <string>Show Status Bar</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+/</string>
    </property>
   </action>
  </widget>

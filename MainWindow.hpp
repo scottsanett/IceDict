@@ -20,6 +20,13 @@
 #include "QString"
 #include "QIcon"
 #include "QToolButton"
+#include <QCheckBox>
+#include <QSlider>
+#include <QSpacerItem>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QTextBlock>
+#include <QTextCursor>
 #include "QShortcut"
 #include "QMessageBox"
 #include "QSplitter"
@@ -39,6 +46,8 @@
 #include <type_traits>
 #include <cctype>
 
+#include "FindPane.hpp"
+#include "StatusBar.hpp"
 #include "PageDownloader.hpp"
 #include "TreeWidget.hpp"
 #include "TreeWidgetItem.hpp"
@@ -106,9 +115,15 @@ private:
         QVBoxLayout * centralLayout;
         QSplitter * mainSplitter;
         QSplitter * inputLayout;
+        QSplitter * resultLayout;
+        QVBoxLayout * inputPaneLayout;
+        QGroupBox * inputPane;
+        QComboBox * comboBox;
         QLineEdit * input;
         QListWidget * options;
         QTextBrowser * result;
+        FindPane * findPane;
+
         QListWidget * resultsFromDictionaries;
         TreeWidget * inflectionForms;
 
@@ -116,15 +131,19 @@ private:
             centralLayout->deleteLater();
             mainSplitter->deleteLater();
             inputLayout->deleteLater();
+            resultLayout->deleteLater();
             input->deleteLater();
+            comboBox->deleteLater();
             options->deleteLater();
             result->deleteLater();
         }
     };
 
+
     /* pointers */
     Ui::MainWindow * ui;
     PageDownloader * pageControl;
+    StatusBar * statusBar;
     Inflection InflManager;
 
     /* POD members */
@@ -175,6 +194,9 @@ private:
 
     setstr_t wordindex;
 
+    QList<QTextEdit::ExtraSelection> findInPageSelections;
+    QList<QTextEdit::ExtraSelection>::size_type findInPageSelectionIndex;
+
 private slots:
     void search_norse_word();
     void search_norse_text();
@@ -183,11 +205,15 @@ private slots:
     void search_icelandic_word();
     void search_icelandic_text();
 
+    void activateInput();
     void loadPage();
     void connectionError();
     void timeoutError();
     void addTab_clicked();
     void closeTab(int);
+    void searchPanelReturnPressed(QString, QTextDocument::FindFlags);
+    void searchPaneNextButtonPressed();
+    void searchPanePrevButtonPressed();
 
     /* slots concerning selection changes in the InflectionForms tree */
     void checkStateChanged(Qt::CheckState, QVector<QString> const);
@@ -228,6 +254,8 @@ private slots:
     void onContextMenuZoomInTriggered();
     void onContextMenuZoomOutTriggered();
 
+    void onComboBoxIndexChanged(int index);
+
     void onTabCloseButtonClicked(int index);
 
     void on_actionZoom_In_triggered();
@@ -241,6 +269,10 @@ private slots:
 
     void on_actionAcknowledgements_triggered();
 
+    void on_actionFind_in_Page_triggered();
+
+    void on_actionShow_Status_Bar_triggered();
+
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
     TreeWidgetItem * constructItem(QString, TreeWidgetItem * parent);
@@ -252,7 +284,6 @@ private:
     bool isVowel(QChar ch);
 
     /* functions concerning user interface */
-    void activateInput();
     void initializeResultFromDictionaries();
     void clearResultFromDictionaries();
     void initializeInflectionForms();

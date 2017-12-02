@@ -15,6 +15,7 @@ QT       += core gui\
 TARGET = IceDict
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++17
+VERSION = 1.5
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -34,7 +35,9 @@ SOURCES += main.cpp\
     TreeWidgetItem.cpp \
     MainWindow.cpp \
     PageDownloader.cpp \
-    inflection.cpp
+    inflection.cpp \
+    FindPane.cpp \
+    StatusBar.cpp
 
 HEADERS  += \
     TreeWidget.hpp \
@@ -42,7 +45,9 @@ HEADERS  += \
     MainWindow.hpp \
     PageDownloader.hpp \
     inflection.hpp \
-    macros.hpp
+    macros.hpp \
+    FindPane.hpp \
+    StatusBar.hpp
 
 FORMS += \
     mainwindow.ui

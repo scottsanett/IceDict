@@ -10,7 +10,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
     QObject::connect(pageControl, SIGNAL(connectionError()), this, SLOT(connectionError()));
     QObject::connect(pageControl, SIGNAL(timeoutError()), this, SLOT(timeoutError()));
-
     inflectionals.fill(map_t{});
     originals.fill(map_t{});
     definitions.fill(map_t{});
@@ -30,7 +29,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setExpanding(true);
     QObject::connect(ui->resultsTab->tabBar(), &QTabBar::tabCloseRequested,
                      this, &MainWindow::onTabCloseButtonClicked);
-    ui->statusBar->hide();
+    statusBar = new StatusBar(this);
+    this->setStatusBar(statusBar);
+    statusBar->hide();
     connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
     QShortcut* searchShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this);
@@ -53,6 +54,7 @@ void MainWindow::addTab_clicked() {
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
     currentTab->inputLayout = new QSplitter();
     currentTab->inputLayout->setHandleWidth(0);
+    currentTab->inputLayout->setContentsMargins(0, 0, 0, 0);
 #ifdef __APPLE__
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
 #else
@@ -61,24 +63,46 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout->setOrientation(Qt::Vertical);
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
+    currentTab->inputPaneLayout = new QVBoxLayout;
+    currentTab->inputPaneLayout->setContentsMargins(0, 0, 0, 5);
+    currentTab->inputPane = new QGroupBox();
+    currentTab->inputPane->setBackgroundRole(QPalette::Window);
+    currentTab->inputPane->setFixedHeight(70);
+    currentTab->inputPane->setMinimumWidth(170);
+    currentTab->inputPane->setMaximumWidth(220);
+    currentTab->inputLayout->addWidget(currentTab->inputPane);
+    currentTab->inputPane->setLayout(currentTab->inputPaneLayout);
+
+    currentTab->comboBox = new QComboBox();
+    currentTab->comboBox->setFixedHeight(35);
+    currentTab->comboBox->setFrame(false);
+    currentTab->comboBox->setStyleSheet("font-family: Segoe UI; font-size: 12px;");
+    currentTab->comboBox->addItem("Modern Icelandic -> English");
+    currentTab->comboBox->addItem("Search Text in Modern Icelandic Dictionary");
+    currentTab->comboBox->addItem("Old Icelandic -> English");
+    currentTab->comboBox->addItem("Search Text in Old Icelandic Dictionaries");
+    currentTab->comboBox->addItem("Search Inflections Reversely");
+    currentTab->comboBox->addItem("Search Inflections");
+    currentTab->comboBox->setCurrentIndex(-1);
+    connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(onComboBoxIndexChanged(int)));
+    currentTab->inputPaneLayout->addWidget(currentTab->comboBox);
+
     currentTab->input = new QLineEdit();
     currentTab->input->setPlaceholderText("Select a dictionary first...");
-
-    currentTab->input->setMaximumHeight(25);
-    currentTab->input->setMinimumWidth(150);
-    currentTab->input->setMaximumWidth(200);
-    currentTab->input->setFrame(false);
+    currentTab->input->setFixedHeight(25);
+//    currentTab->input->setFrame(false);
     currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->input->setEnabled(false);
-    currentTab->inputLayout->addWidget(currentTab->input);
+    currentTab->inputPaneLayout->addWidget(currentTab->input);
     QObject::connect(currentTab->input, &QLineEdit::textEdited,
                      this, &MainWindow::onInputTextEdited);
     QObject::connect(currentTab->input, &QLineEdit::returnPressed,
                      this, &MainWindow::onInputReturnPressed);
 
     currentTab->options = new QListWidget(this);
-    currentTab->options->setMinimumWidth(150);
-    currentTab->options->setMaximumWidth(200);
+    currentTab->options->setMinimumWidth(170);
+    currentTab->options->setMaximumWidth(220);
 #ifdef __APPLE__
     currentTab->options->setFrameStyle(QFrame::NoFrame);
 #else
@@ -91,11 +115,17 @@ void MainWindow::addTab_clicked() {
     QObject::connect(currentTab->options, &QListWidget::itemClicked,
                      this, &MainWindow::onOptionsItemClicked);
 
+    currentTab->resultLayout = new QSplitter;
+    currentTab->resultLayout->setOrientation(Qt::Vertical);
+    currentTab->resultLayout->setFrameStyle(QFrame::NoFrame);
+    currentTab->resultLayout->setHandleWidth(0);
+    currentTab->mainSplitter->addWidget(currentTab->resultLayout);
     currentTab->result = new QTextBrowser();
     currentTab->result->setHtml(startScreen);
     currentTab->result->setFrameStyle(QFrame::NoFrame);
     currentTab->result->setContextMenuPolicy(Qt::CustomContextMenu);
-    currentTab->mainSplitter->addWidget(currentTab->result);
+    currentTab->resultLayout->addWidget(currentTab->result);
+
     auto index = ui->resultsTab->currentIndex();
     ui->resultsTab->insertTab(++index, currentTab->mainSplitter, ("empty"));
     QObject::connect(currentTab->result, &QTextBrowser::customContextMenuRequested,
@@ -109,10 +139,54 @@ void MainWindow::closeTab(int index) {
         tabIndices.erase(currentSplitter);
 }
 
+void MainWindow::searchPanelReturnPressed(QString str, QTextDocument::FindFlags flags) {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto document = currentTab->result->document();
+    auto text_format = QTextCharFormat();
+    auto palette = currentTab->result->palette();
+    text_format.setBackground(QBrush(Qt::yellow));
+
+    findInPageSelections.clear();
+    findInPageSelectionIndex = 0;
+    QTextCursor cursor;
+
+    while (true) {
+        cursor = document->find(str, cursor, flags);
+        if (cursor.isNull()) break;
+        QTextEdit::ExtraSelection sel;
+        sel.cursor = cursor;
+        sel.format = text_format;
+        findInPageSelections.append(sel);
+    }
+
+    currentTab->result->setExtraSelections(findInPageSelections);
+}
+
+void MainWindow::searchPaneNextButtonPressed() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    if (findInPageSelectionIndex < findInPageSelections.size()) {
+        if (++findInPageSelectionIndex == findInPageSelections.size()) {
+            findInPageSelectionIndex = findInPageSelections.size() - 1;
+        }
+        auto sel = findInPageSelections.at(findInPageSelectionIndex);
+        currentTab->result->setTextCursor(sel.cursor);
+    }
+}
+
+void MainWindow::searchPanePrevButtonPressed() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    if (findInPageSelectionIndex >= 0) {
+        if (--findInPageSelectionIndex < 0) findInPageSelectionIndex = 0;
+        auto sel = findInPageSelections.at(findInPageSelectionIndex);
+        currentTab->result->setTextCursor(sel.cursor);
+    }
+}
+
 void MainWindow::activateInput() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->input->activateWindow();
     currentTab->input->setFocus();
+    currentTab->input->selectAll();
 }
 
 void MainWindow::initializeResultFromDictionaries() {
@@ -214,6 +288,7 @@ void MainWindow::search_icelandic_word()
     currentTab->options->clear();
     currentTab->result->clear();
     currentTab->input->setPlaceholderText("Insert word here...");
+    statusBar->showMessage("search definitions for modern Icelandic word (online)");
 }
 
 
@@ -226,6 +301,7 @@ void MainWindow::search_icelandic_text()
     currentTab->options->clear();
     currentTab->result->clear();
     currentTab->input->setPlaceholderText("Insert text here...");
+    statusBar->showMessage("search text in modern Icelandic dictionary (online)");
 }
 
 void MainWindow::search_norse_word()
@@ -236,6 +312,7 @@ void MainWindow::search_norse_word()
     currentTab->input->clear();
     currentTab->result->clear();
     currentTab->options->clear();
+    statusBar->showMessage("search definitions for old Icelandic word");
 }
 
 void MainWindow::search_norse_text()
@@ -246,6 +323,7 @@ void MainWindow::search_norse_text()
     currentTab->options->clear();
     currentTab->result->clear();
     currentTab->input->setPlaceholderText("Insert text here...");
+    statusBar->showMessage("search text in old Icelandic dictionaries");
 }
 
 void MainWindow::search_original()
@@ -256,6 +334,7 @@ void MainWindow::search_original()
     currentTab->options->clear();
     currentTab->result->clear();
     currentTab->input->setPlaceholderText("Insert word here...");
+    statusBar->showMessage("find all entries that can be inflected to the word just entered");
 }
 
 void MainWindow::search_all_inflections()
@@ -266,6 +345,7 @@ void MainWindow::search_all_inflections()
     currentTab->options->clear();
     currentTab->result->clear();
     currentTab->input->setPlaceholderText("Insert word here...");
+    statusBar->showMessage("search all inflections of a word");
 }
 
 QString MainWindow::wordToWrite(QString arg) {
@@ -285,6 +365,27 @@ QString MainWindow::oldToModern(QString word, Infl::Transforms flag) {
         if (oeIndex != -1) word.replace(oeIndex, 1, "æ");
         auto oslashIndex = word.indexOf("ø");
         if (oslashIndex != -1) word.replace(oslashIndex, 1, "ö");
+        if (word.endsWith("ékk")) {
+            word.replace(word.length() - 3, 1, "e");
+        }
+        while (word.indexOf("áng") != -1) {
+            word.replace(word.indexOf("áng"), 1, "a");
+        }
+        while (word.indexOf("éng") != -1) {
+            word.replace(word.indexOf("éng"), 1, "e");
+        }
+        while (word.indexOf("íng") != -1) {
+            word.replace(word.indexOf("íng"), 1, "i");
+        }
+        while (word.indexOf("óng") != -1) {
+            word.replace(word.indexOf("óng"), 1, "o");
+        }
+        while (word.indexOf("úng") != -1) {
+            word.replace(word.indexOf("úng"), 1, "u");
+        }
+        while (word.indexOf("ýng") != -1) {
+            word.replace(word.indexOf("ýng"), 1, "y");
+        }
     }
 
     if (flag & Infl::Consonants) {
@@ -302,25 +403,25 @@ QString MainWindow::oldToModern(QString word, Infl::Transforms flag) {
 
     if (flag & Infl::Inflections) {
         if (word.endsWith("it")) {
-            word.replace(word.length() - 2, 2, "ið");
+            word.replace(word.length() - 1, 1, "ð");
         }
         else if (word.endsWith("at")) {
-            word.replace(word.length() - 2, 2, "að");
+            word.replace(word.length() - 1, 1, "ð");
         }
         else if (word.endsWith("ðisk")) {
-            word.replace(word.length() - 4, 4, "tist");
+            word.replace(word.length() - 4, 1, "t");
         }
         else if (word.endsWith("ðir")) {
-            word.replace(word.length() - 4, 4, "tir");
+            word.replace(word.length() - 4, 1, "t");
         }
         else if (word.endsWith("ði")) {
-            word.replace(word.length() - 4, 4, "ti");
+            word.replace(word.length() - 4, 1, "t");
         }
         else if (word.endsWith("isk")) {
-            word.replace(word.length() - 3, 3, "ist");
+            word.replace(word.length() - 1, 1, "t");
         }
         else if (word.endsWith("ask")) {
-            word.replace(word.length() - 3, 3, "ast");
+            word.replace(word.length() - 1, 1, "t");
         }
         else if (word == "emk") {
             word = "er";
@@ -934,6 +1035,7 @@ void MainWindow::loadPage() {
         currentTab->webpage.clear();
     }
     else {
+        currentTab->options->clear();
         for (auto && i : currentTab->onlineEntries) {
             currentTab->options->addItem(i.first);
         }
@@ -1029,6 +1131,7 @@ bool MainWindow::parsePage() {
             auto end_pos = token.indexOf(end_marker);
             auto entryLink = "http://digicoll.library.wisc.edu" + token.mid(0, mid_pos);
             auto entryName = token.mid(mid_pos + mid_marker.length(), end_pos - mid_pos - mid_marker.length());
+            currentTab->onlineEntries.erase(currentTab->onlineEntries.find(kwRaw));
             currentTab->onlineEntries.insert(std::make_pair(entryName, entryLink));
         }
         return false;
@@ -1160,6 +1263,21 @@ void MainWindow::on_actionClose_Tab_triggered()
     }
 }
 
+void MainWindow::onComboBoxIndexChanged(int index) {
+//    qDebug() << index;
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    currentTab->input->setEnabled(true);
+    currentTab->options->setEnabled(true);
+    switch (index) {
+    case (0): { search_icelandic_word(); break; }
+    case (1): { search_icelandic_text(); break; }
+    case (2): { search_norse_word(); break; }
+    case (3): { search_norse_text(); break; }
+    case (4): { search_original(); break; }
+    case (5): { search_all_inflections(); break; }
+    default: {}
+    }
+}
 
 void MainWindow::onTabCloseButtonClicked(int index) {
     if (ui->resultsTab->count() > 1) {
@@ -1175,12 +1293,8 @@ void MainWindow::on_actionModern_Icelandic_triggered()
     ui->actionZoom_In->setEnabled(false);
     ui->actionZoom_Out->setEnabled(false);
 
-    ui->statusBar->showMessage("Search definitions for Modern Icelandic word (online)");
-
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->setEnabled(true);
-    currentTab->options->setEnabled(true);
-    search_icelandic_word();
+    currentTab->comboBox->setCurrentIndex(0);
 }
 
 
@@ -1191,12 +1305,9 @@ void MainWindow::on_actionEnglish_Modern_Icelandic_triggered()
 
     ui->actionZoom_In->setEnabled(false);
     ui->actionZoom_Out->setEnabled(false);
-    ui->statusBar->showMessage("Search text in Modern Icelandic dictionary (online)");
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->setEnabled(true);
-    currentTab->options->setEnabled(true);
-    search_icelandic_text();
+    currentTab->comboBox->setCurrentIndex(1);
 }
 
 void MainWindow::on_actionOld_Icelandic_English_triggered()
@@ -1206,9 +1317,7 @@ void MainWindow::on_actionOld_Icelandic_English_triggered()
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->setEnabled(true);
-    currentTab->options->setEnabled(true);
-    search_norse_word();
+    currentTab->comboBox->setCurrentIndex(2);
 }
 
 
@@ -1219,11 +1328,7 @@ void MainWindow::on_actionOld_Icelandic_Text_Search_triggered()
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->setEnabled(true);
-    currentTab->options->setEnabled(true);
-    search_norse_text();
-
-    ui->statusBar->showMessage("Search text in Old Icelandic dictionaries");
+    currentTab->comboBox->setCurrentIndex(3);
 }
 
 void MainWindow::on_actionSearch_Inflections_triggered()
@@ -1233,11 +1338,7 @@ void MainWindow::on_actionSearch_Inflections_triggered()
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->setEnabled(true);
-    currentTab->options->setEnabled(true);
-    search_original();
-
-    ui->statusBar->showMessage("Search all inflection names of a word form");
+    currentTab->comboBox->setCurrentIndex(4);
 }
 
 void MainWindow::on_actionList_All_Forms_triggered()
@@ -1247,11 +1348,7 @@ void MainWindow::on_actionList_All_Forms_triggered()
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->input->setEnabled(true);
-    currentTab->options->setEnabled(true);
-    search_all_inflections();
-
-    ui->statusBar->showMessage("List all inflections of a word");
+    currentTab->comboBox->setCurrentIndex(5);
 }
 
 
@@ -1982,7 +2079,7 @@ void MainWindow::onResultContextMenuRequested(QPoint const & p) {
     auto global = QWidget::mapToGlobal(p);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     auto windowX = MainWindow::x();
-    auto widgetX = currentTab->result->x();
+    auto widgetX = currentTab->resultLayout->x();
 
     auto resultContextMenu = currentTab->result->createStandardContextMenu();
     resultContextMenu->move(windowX + widgetX + p.x(), global.y());
@@ -2208,7 +2305,7 @@ void MainWindow::on_actionAbout_IceDict_triggered()
     auto aboutMessage =
             R"foo(
             <p align=center><h2>IceDict</h2></p>
-            <p align=center style="font-weight: normal">Version 1.1</p>
+            <p align=center style="font-weight: normal">Version 1.5</p>
             <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
@@ -2242,4 +2339,38 @@ void MainWindow::on_actionAcknowledgements_triggered()
     messageBox->setTextFormat(Qt::RichText);
     messageBox->setText(acknowledgementMessage);
     messageBox->exec();
+}
+
+void MainWindow::on_actionFind_in_Page_triggered()
+{
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    if (!currentTab->findPane) {
+        currentTab->findPane = new FindPane(this);
+        QObject::connect(currentTab->findPane, &FindPane::returnPressedSignal,
+                         this, &MainWindow::searchPanelReturnPressed);
+        QObject::connect(currentTab->findPane, &FindPane::prevButtonPressedSignal,
+                         this, &MainWindow::searchPanePrevButtonPressed);
+        QObject::connect(currentTab->findPane, &FindPane::nextButtonPressedSignal,
+                         this, &MainWindow::searchPaneNextButtonPressed);
+        currentTab->resultLayout->addWidget(currentTab->findPane->frame());
+        currentTab->findPane->setFocus();
+    }
+    else if (currentTab->findPane->frame()->isHidden()) {
+        currentTab->findPane->show();
+    }
+    else {
+        currentTab->findPane->close();
+    }
+}
+
+void MainWindow::on_actionShow_Status_Bar_triggered()
+{
+    if (statusBar->isHidden()) {
+        statusBar->setHidden(false);
+        ui->actionShow_Status_Bar->setText("Hide Status Bar");
+    }
+    else {
+        statusBar->setHidden(true);
+        ui->actionShow_Status_Bar->setText("Show Status Bar");
+    }
 }
