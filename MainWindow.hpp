@@ -273,6 +273,8 @@ private slots:
 
     void on_actionShow_Status_Bar_triggered();
 
+    void on_actionFind_triggered();
+
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
     TreeWidgetItem * constructItem(QString, TreeWidgetItem * parent);

@@ -15,12 +15,20 @@ FindPane::FindPane(QWidget *parent) : QWidget(parent)
     searchPanel->setStyleSheet("font-family: Segoe UI; font-size: 12px");
     searchLayout->addWidget(searchPanel);
 
+#ifdef __APPLE__
     prevButton = new QPushButton("←", parent);
+#else
+    prevButton = new QPushButton("<", parent);
+#endif
     prevButton->setFlat(true);
     prevButton->setFixedWidth(20);
     connect(prevButton, &QPushButton::pressed, this, &FindPane::prevButtonPressedSignal);
     searchLayout->addWidget(prevButton);
+#ifdef __APPLE__
     nextButton = new QPushButton("→", parent);
+#else
+    nextButton = new QPushButton(">", parent);
+#endif
     nextButton->setFlat(true);
     nextButton->setFixedWidth(20);
     connect(nextButton, &QPushButton::pressed, this, &FindPane::nextButtonPressedSignal);
@@ -31,7 +39,11 @@ FindPane::FindPane(QWidget *parent) : QWidget(parent)
     matchWholeWords = new QCheckBox("Match Whole Words", parent);
     connect(matchWholeWords, &QCheckBox::stateChanged, this, &FindPane::matchWholeWordsChanged);
     searchLayout->addWidget(matchWholeWords);
+#ifdef __APPLE__
     closeButton = new QPushButton("✕", parent);
+#else
+    closeButton = new QPushButton("x", parent);
+#endif
     closeButton->setFlat(true);
     closeButton->setFixedWidth(20);
     searchLayout->addWidget(closeButton);

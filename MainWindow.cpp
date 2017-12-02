@@ -27,6 +27,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setMovable(true);
     ui->resultsTab->tabBar()->setAutoHide(true);
     ui->resultsTab->tabBar()->setExpanding(true);
+
+#ifdef __APPLE__
+    ui->resultsTab->setFont(QFont("Segoe UI", 12));
+#else
+    ui->resultsTab->setFont(QFont("Segoe UI", 10));
+#endif
+
     QObject::connect(ui->resultsTab->tabBar(), &QTabBar::tabCloseRequested,
                      this, &MainWindow::onTabCloseButtonClicked);
     statusBar = new StatusBar(this);
@@ -34,11 +41,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     statusBar->hide();
     connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
-    QShortcut* searchShortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F), this);
-    QObject::connect(
-                searchShortcut, &QShortcut::activated,
-                this, &MainWindow::activateInput
-                );
 }
 
 MainWindow::~MainWindow() {
@@ -55,43 +57,53 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout = new QSplitter();
     currentTab->inputLayout->setHandleWidth(0);
     currentTab->inputLayout->setContentsMargins(0, 0, 0, 0);
-#ifdef __APPLE__
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
-#else
-    currentTab->inputLayout->setFrameStyle(QFrame::VLine);
-#endif
     currentTab->inputLayout->setOrientation(Qt::Vertical);
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
     currentTab->inputPaneLayout = new QVBoxLayout;
-    currentTab->inputPaneLayout->setContentsMargins(0, 0, 0, 5);
     currentTab->inputPane = new QGroupBox();
-    currentTab->inputPane->setBackgroundRole(QPalette::Window);
+#ifdef __APPLE__
+    currentTab->inputPane->setFlat(true);
     currentTab->inputPane->setFixedHeight(70);
-    currentTab->inputPane->setMinimumWidth(170);
-    currentTab->inputPane->setMaximumWidth(220);
+    currentTab->inputPaneLayout->setContentsMargins(0, 10, 0, 0);
+#else
+    currentTab->inputPaneLayout->setContentsMargins(0, 0, 0, 0);
+    currentTab->inputPane->setFixedHeight(50);
+#endif
+    currentTab->inputPane->setMinimumWidth(150);
+    currentTab->inputPane->setMaximumWidth(200);
     currentTab->inputLayout->addWidget(currentTab->inputPane);
     currentTab->inputPane->setLayout(currentTab->inputPaneLayout);
 
     currentTab->comboBox = new QComboBox();
-    currentTab->comboBox->setFixedHeight(35);
     currentTab->comboBox->setFrame(false);
-    currentTab->comboBox->setStyleSheet("font-family: Segoe UI; font-size: 12px;");
-    currentTab->comboBox->addItem("Modern Icelandic -> English");
-    currentTab->comboBox->addItem("Search Text in Modern Icelandic Dictionary");
-    currentTab->comboBox->addItem("Old Icelandic -> English");
-    currentTab->comboBox->addItem("Search Text in Old Icelandic Dictionaries");
-    currentTab->comboBox->addItem("Search Inflections Reversely");
-    currentTab->comboBox->addItem("Search Inflections");
+#ifdef __APPLE__
+    currentTab->comboBox->addItem("Icelandic → English");
+    currentTab->comboBox->addItem("Icelandic Textual");
+    currentTab->comboBox->addItem("Norse → English");
+    currentTab->comboBox->addItem("Norse Textual");
+    currentTab->comboBox->addItem("Find Originals");
+    currentTab->comboBox->addItem("All Inflections");
+#else
+    currentTab->comboBox->addItem("Icelandic -> English");
+    currentTab->comboBox->addItem("Icelandic Textual");
+    currentTab->comboBox->addItem("Norse -> English");
+    currentTab->comboBox->addItem("Norse Textual");
+    currentTab->comboBox->addItem("Find Originals");
+    currentTab->comboBox->addItem("All Inflections");
+    currentTab->comboBox->setFrame(false);
+#endif
     currentTab->comboBox->setCurrentIndex(-1);
     connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onComboBoxIndexChanged(int)));
     currentTab->inputPaneLayout->addWidget(currentTab->comboBox);
 
     currentTab->input = new QLineEdit();
+#ifndef __APPLE__
+    currentTab->input->setFrame(false);
+#endif
     currentTab->input->setPlaceholderText("Select a dictionary first...");
-    currentTab->input->setFixedHeight(25);
-//    currentTab->input->setFrame(false);
     currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->input->setEnabled(false);
     currentTab->inputPaneLayout->addWidget(currentTab->input);
@@ -101,12 +113,12 @@ void MainWindow::addTab_clicked() {
                      this, &MainWindow::onInputReturnPressed);
 
     currentTab->options = new QListWidget(this);
-    currentTab->options->setMinimumWidth(170);
-    currentTab->options->setMaximumWidth(220);
+    currentTab->options->setMinimumWidth(150);
+    currentTab->options->setMaximumWidth(200);
 #ifdef __APPLE__
     currentTab->options->setFrameStyle(QFrame::NoFrame);
 #else
-    currentTab->options->setFrameStyle(QFrame::VLine);
+    currentTab->options->setFrameStyle(QFrame::HLine);
 #endif
     currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 13px");
 
@@ -163,6 +175,7 @@ void MainWindow::searchPanelReturnPressed(QString str, QTextDocument::FindFlags 
 }
 
 void MainWindow::searchPaneNextButtonPressed() {
+    if (findInPageSelections.empty()) return;
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (findInPageSelectionIndex < findInPageSelections.size()) {
         if (++findInPageSelectionIndex == findInPageSelections.size()) {
@@ -174,6 +187,7 @@ void MainWindow::searchPaneNextButtonPressed() {
 }
 
 void MainWindow::searchPanePrevButtonPressed() {
+    if (findInPageSelections.empty()) return;
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (findInPageSelectionIndex >= 0) {
         if (--findInPageSelectionIndex < 0) findInPageSelectionIndex = 0;
@@ -620,7 +634,7 @@ void MainWindow::findDefinition(QString word) {
     for (auto && i : currentTab->definitionResults) {
         QString key = i.first;
         key = key.mid(3, key.length() - 7);
-        alternatives.push_back(key);
+        alternatives.push_back(key.toLower());
     }
 
     currentTab->resultsFromDictionaries->clear();
@@ -762,6 +776,7 @@ void MainWindow::textualSearch(QString const & word) {
         QString key = i.first;
         if (key.length() > 7) {
             key = key.mid(3, key.length() - 7);
+            key = key.toLower();
             alternatives.push_back(key);
         }
     }
@@ -1240,9 +1255,11 @@ void MainWindow::on_actionFullscreen_triggered()
 {
     if (windowState() != Qt::WindowFullScreen) {
         QWidget::setWindowState(Qt::WindowFullScreen);
+        ui->actionFullscreen->setText("Exit Full Screen");
     }
     else {
         QWidget::setWindowState(Qt::WindowNoState);
+        ui->actionFullscreen->setText("Enter Full Screen");
     }
 }
 
@@ -2085,27 +2102,34 @@ void MainWindow::onResultContextMenuRequested(QPoint const & p) {
     resultContextMenu->move(windowX + widgetX + p.x(), global.y());
     resultContextMenu->addSeparator();
 
-    QAction * act1 = new QAction("Search Icelandic -> English", this);
+#ifdef __APPLE__
+    QAction * act1 = new QAction("Icelandic → English", this);
+#else
+    QAction * act1 = new QAction("Icelandic -> English", this);
+#endif
     QObject::connect(act1, &QAction::triggered,
                      this, &MainWindow::onContextMenuIceToEngTriggered);
 
-    QAction * act2 = new QAction("Search Text In Icelandic Dictionary", this);
+    QAction * act2 = new QAction("Icelandic Textual", this);
     QObject::connect(act2, &QAction::triggered,
                      this, &MainWindow::onContextMenuEngToIceTriggered);
-
-    QAction * act3 = new QAction("Search Old Icelandic -> English", this);
+#ifdef __APPLE__
+    QAction * act3 = new QAction("Norse → English", this);
+#else
+    QAction * act3 = new QAction("Norse -> English", this);
+#endif
     QObject::connect(act3, &QAction::triggered,
                      this, &MainWindow::onContextMenuNorToEngTriggered);
 
-    QAction * act4 = new QAction("Search Text In Old Icelandic Dictionaries", this);
+    QAction * act4 = new QAction("Norse Textual", this);
     QObject::connect(act4, &QAction::triggered,
                      this, &MainWindow::onContextMenuEngToNorTriggered);
 
-    QAction * act5 = new QAction("Search Inflections Reversely", this);
+    QAction * act5 = new QAction("Find Originals", this);
     QObject::connect(act5, &QAction::triggered,
                      this, &MainWindow::onContextMenuSearchInfReverseTriggered);
 
-    QAction * act6 = new QAction("Search Inflections", this);
+    QAction * act6 = new QAction("All Inflections", this);
     QObject::connect(act6, &QAction::triggered,
                      this, &MainWindow::onContextMenuSearchInfTriggered);
 
@@ -2305,7 +2329,7 @@ void MainWindow::on_actionAbout_IceDict_triggered()
     auto aboutMessage =
             R"foo(
             <p align=center><h2>IceDict</h2></p>
-            <p align=center style="font-weight: normal">Version 1.5</p>
+            <p align=center style="font-weight: normal">Version 1.6</p>
             <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
@@ -2330,7 +2354,7 @@ void MainWindow::on_actionAcknowledgements_triggered()
             <h3 id="toc_1">Online Dictionary:</h3>
             <p style="font-weight:normal"><a href="http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?id=IcelOnline.IEOrd">Íslensk-ensk orðabók</a></p>
             <h3 id="toc_2">Offline Dictionaries:</h3>
-            <p style="font-weight:normal"><a href="http://norse.ulver.com/dct/zoega/">A Concise Dictionary of Old Icelandic</a></p>
+            <p style="font-weight:normal"><a href="http://norse.ulver.com/dct/zoega/">A Concise Dictionary of Norse</a></p>
             <p style="font-weight:normal"><a href="http://norse.ulver.com/dct/cleasby/">An Icelandic-English Dictionary Based on the MS. Collections of the Late Richard Cleasby Enlarged and Completed by Gudbrand Vigfusson, M.A.</a></p>
             <h3 id="toc_3">Inflectional Data:</h3>
             <p style="font-weight:normal"><a href="http://bin.arnastofnun.is/forsida/">Beygingarlýsing í­slensks nútí­mamáls Stofnun Árna Magnússonar á­ í­slenskum fræðum</a></p>)foo";
@@ -2373,4 +2397,9 @@ void MainWindow::on_actionShow_Status_Bar_triggered()
         statusBar->setHidden(true);
         ui->actionShow_Status_Bar->setText("Show Status Bar");
     }
+}
+
+void MainWindow::on_actionFind_triggered()
+{
+    activateInput();
 }

@@ -10,12 +10,6 @@
     <height>650</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <family>Segoe UI</family>
-    <pointsize>11</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -52,9 +46,7 @@
         <property name="font">
          <font>
           <family>Segoe UI</family>
-          <pointsize>10</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="focusPolicy">
@@ -131,6 +123,7 @@
     <addaction name="actionZoom_In"/>
     <addaction name="actionZoom_Out"/>
     <addaction name="separator"/>
+    <addaction name="actionFind"/>
     <addaction name="actionFind_in_Page"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Status_Bar"/>
@@ -290,6 +283,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+/</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>
