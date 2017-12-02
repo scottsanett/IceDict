@@ -1032,35 +1032,6 @@ void MainWindow::resultsFromDictionariesItemClicked(QListWidgetItem * item) {
     }
 }
 
-void MainWindow::downloadPage(QString url) {
-    pageControl->DownloadPage(QUrl{url});
-}
-
-void MainWindow::loadPage() {
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    QByteArray qPage = (pageControl->downloadedData());
-    QString str = QString::fromLatin1(qPage);
-
-    currentTab->webpage = str;
-
-    auto display = parsePage();
-    if (display) {
-        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
-        currentTab->result->setHtml(currentTab->webpage);
-        currentTab->webpage.clear();
-    }
-    else {
-        currentTab->options->clear();
-        for (auto && i : currentTab->onlineEntries) {
-            currentTab->options->addItem(i.first);
-        }
-        auto firstEntry = currentTab->onlineEntries.cbegin();
-        auto tag = firstEntry->first;
-        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
-        downloadPage(firstEntry->second);
-    }
-}
-
 void MainWindow::connectionError() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->result->setHtml("<br/><br/><br/><br/><br/><span style=\"font-family: Perpetua; font-size: 20px; font-weight: bold;\"><p align='center'>Connection Error</p><p align='center' style='font-weight: normal'>Please check your network connection.</p></span>");
@@ -1091,6 +1062,43 @@ void MainWindow::onlineDefinition(QString word) {
     QString newWord = wordToWrite(word);
     QString url = writeUrl1 + newWord + writeUrl2;
     downloadPage(url);
+}
+
+QString MainWindow::removeNonAlpha(QString str) {
+    QString result;
+    for (auto ch : str) {
+        if (ch.isLetter()) result += ch;
+    }
+    return result;
+}
+
+void MainWindow::downloadPage(QString url) {
+    pageControl->DownloadPage(QUrl{url});
+}
+
+void MainWindow::loadPage() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    QByteArray qPage = (pageControl->downloadedData());
+    QString str = QString::fromLatin1(qPage);
+
+    currentTab->webpage = str;
+
+    auto display = parsePage();
+    if (display) {
+        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
+        currentTab->result->setHtml(currentTab->webpage);
+        currentTab->webpage.clear();
+    }
+    else {
+        currentTab->options->clear();
+        for (auto && i : currentTab->onlineEntries) {
+            currentTab->options->addItem(i.first);
+        }
+        auto firstEntry = currentTab->onlineEntries.cbegin();
+        auto tag = firstEntry->first;
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
+        downloadPage(firstEntry->second);
+    }
 }
 
 bool MainWindow::parsePage() {
@@ -1146,6 +1154,7 @@ bool MainWindow::parsePage() {
             auto end_pos = token.indexOf(end_marker);
             auto entryLink = "http://digicoll.library.wisc.edu" + token.mid(0, mid_pos);
             auto entryName = token.mid(mid_pos + mid_marker.length(), end_pos - mid_pos - mid_marker.length());
+            auto itr = currentTab->onlineEntries.find(kwRaw);
             currentTab->onlineEntries.erase(currentTab->onlineEntries.find(kwRaw));
             currentTab->onlineEntries.insert(std::make_pair(entryName, entryLink));
         }
@@ -1281,7 +1290,6 @@ void MainWindow::on_actionClose_Tab_triggered()
 }
 
 void MainWindow::onComboBoxIndexChanged(int index) {
-//    qDebug() << index;
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->input->setEnabled(true);
     currentTab->options->setEnabled(true);
@@ -2092,14 +2100,11 @@ QVector<QString> MainWindow::ParseAdverb() {
     return result;
 }
 
-void MainWindow::onResultContextMenuRequested(QPoint const & p) {
-    auto global = QWidget::mapToGlobal(p);
+void MainWindow::onResultContextMenuRequested(QPoint const &) {
+    auto cursorPos = QCursor::pos();
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto windowX = MainWindow::x();
-    auto widgetX = currentTab->resultLayout->x();
-
     auto resultContextMenu = currentTab->result->createStandardContextMenu();
-    resultContextMenu->move(windowX + widgetX + p.x(), global.y());
+    resultContextMenu->move(cursorPos.x(), cursorPos.y());
     resultContextMenu->addSeparator();
 
 #ifdef __APPLE__

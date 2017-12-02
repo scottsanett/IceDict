@@ -106,7 +106,7 @@ private:
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
         QString webpage;
         std::set<QVector<QString>> inflStruct;
-        std::map<QString, QString> onlineEntries;
+        std::multimap<QString, QString> onlineEntries;
         std::multimap<QString, QString, QStringCaseInsensitiveComparator> textualResults;
         std::multimap<QString, QVector<QString>, QStringCaseInsensitiveComparator> definitionResults;
         QVector<QString> inflSelectResult;
