@@ -403,6 +403,10 @@ QString MainWindow::oldToModern(QString word, Infl::Transforms flag) {
     }
 
     if (flag & Infl::Consonants) {
+        while (word.contains("pt")) {
+            auto index = word.indexOf("pt");
+            word.replace(index, 1, "f");
+        }
         if (word.endsWith("rr")) {
             word = word.left(word.length() - 1);
         }
@@ -937,6 +941,7 @@ void MainWindow::onInputReturnPressed()
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
         currentTab->textInQuery.clear();
+//        currentTab->wordAfterRedirection.clear();
         onlineDefinition(word);
     }
     else if (currentTab->flags[1] == 1 && word.length() > 0) {
@@ -944,6 +949,7 @@ void MainWindow::onInputReturnPressed()
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
         currentTab->textInQuery.clear();
+//        currentTab->wordAfterRedirection.clear();
         onlineText(word);
     }
     else if (currentTab->flags[2] == 1 && word.length() > 0) {
@@ -1084,12 +1090,12 @@ void MainWindow::loadPage() {
     currentTab->webpage = str;
 
     auto display = parsePage();
-    if (display) {
+    if (display == Infl::Results::No || display == Infl::Results::One) {
         currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
         currentTab->result->setHtml(currentTab->webpage);
         currentTab->webpage.clear();
     }
-    else {
+    else if (display == Infl::Results::Many || display == Infl::Results::Redirected) {
         currentTab->options->clear();
         for (auto && i : currentTab->onlineEntries) {
             currentTab->options->addItem(i.first);
@@ -1099,10 +1105,18 @@ void MainWindow::loadPage() {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         downloadPage(firstEntry->second);
     }
+    else if (display == Infl::Results::Possible) {
+        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
+        currentTab->result->setHtml(currentTab->webpage);
+        currentTab->webpage.clear();
+        onlineText(currentTab->wordAfterRedirection);
+        currentTab->wordAfterRedirection.clear();
+    }
 }
 
-bool MainWindow::parsePage() {
+Infl::Results MainWindow::parsePage() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+//    qDebug() << currentTab->webpage;
     QString kwStartMarker = "Icelandic Online: Dictionary Entry for ";
     QString kwEndMarker = "</title>\n<link rel=\"stylesheet\"";
     auto kwStartIndex = currentTab->webpage.indexOf(kwStartMarker);
@@ -1124,18 +1138,20 @@ bool MainWindow::parsePage() {
             word = oldToModern(word, Infl::Consonants | Infl::Inflections);
             if (word == backup) {
                 currentTab->webpage = "Your simple search for <em>" + backup + "</em> produced no results.</p>\n\n<p>Modify your search and try again:</p>\n\n\t";
-                return true;
+                return Infl::Results::No;
+//                return true;
             }
             currentTab->webpage = "No result has been found.\n\nRedirecting to " + word + "...";
-            onlineText(word);
-            return true;
+            currentTab->wordAfterRedirection = word;
+            return Infl::Results::Possible;
+//            return false;
         }
         QString startMarker = "<h3>While searching in Icelandic Online Dictionary and Readings</h3>";
         QString endMarker = ":</p>\n\n\t<div class=\"mainBackground\">\n\t\t";
         auto startPos = currentTab->webpage.indexOf(startMarker);
         auto endPos = currentTab->webpage.indexOf(endMarker);
         currentTab->webpage = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length()) + ".";
-        return true;
+        return Infl::Results::No;
     }
 
     else if (currentTab->webpage.contains("<strong>-&gt;</strong>")) // redirection appears
@@ -1158,7 +1174,7 @@ bool MainWindow::parsePage() {
             currentTab->onlineEntries.erase(currentTab->onlineEntries.find(kwRaw));
             currentTab->onlineEntries.insert(std::make_pair(entryName, entryLink));
         }
-        return false;
+        return Infl::Results::Redirected;
     }
 
     else if (currentTab->webpage.contains("<div class=\"results\">")) // found multiples results
@@ -1209,17 +1225,16 @@ bool MainWindow::parsePage() {
             if (key_str.begin()->isDigit()) key_str = key_str.right(key_str.length() - 1);
             currentTab->onlineEntries.insert(std::make_pair(key_str, link.c_str()));
         }
-        return false;
+        return Infl::Results::Many;
     }
     else // found only one result
     {
-        auto pos = currentTab->webpage.indexOf("<div class=\"entry\">");
-        if (pos != -1) {
-            currentTab->webpage = currentTab->webpage.mid(pos, currentTab->webpage.length() - pos);
-        }
-        pos = currentTab->webpage.indexOf("</div><!-- entry -->");
-        if (pos != -1) { currentTab->webpage = currentTab->webpage.mid(0, pos); }
-        pos = currentTab->webpage.indexOf("<span class=\"lemma\">");
+        QString startMarker = "<div class=\"entry\">";
+        QString endMarker = "</div><!-- entry -->";
+        auto startPos = currentTab->webpage.indexOf(startMarker);
+        auto endPos = currentTab->webpage.indexOf(endMarker);
+        currentTab->webpage = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length());
+        auto pos = currentTab->webpage.indexOf("<span class=\"lemma\">");
         if (pos != -1) {
             QString tag = "<span class=\"lemma\">";
             currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-weight: bold; font-size:24px;\" class=\"lemma\">");
@@ -1251,7 +1266,7 @@ bool MainWindow::parsePage() {
             }
             currentTab->webpage = result;
         }
-        return true;
+        return Infl::Results::One;
     }
 }
 

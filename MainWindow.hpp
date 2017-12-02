@@ -88,6 +88,8 @@ namespace Infl {
     inline Transforms operator| (Transforms a, Transforms b) {
         return static_cast<Transforms>(static_cast<int>(a) | static_cast<int>(b));
     }
+
+    enum class Results { No, One, Many, Redirected, Possible };
 }
 
 class MainWindow : public QMainWindow
@@ -101,6 +103,7 @@ public:
 private:
     struct Pimpl {
         QString textInQuery;
+        QString wordAfterRedirection;
         size_t perpetuaFontSize = 20;
         size_t segoeFontSize = 14;
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
@@ -160,6 +163,7 @@ private:
 
     enum class POS { Noun, Verb, Adjective, Adverb, Pronoun, Numerical};
     enum POS currentPOS;
+
 
     struct PartOfSpeech {
         const char * MasNoun = "<td>kk</td>";
@@ -337,7 +341,7 @@ private:
 
     /* functions concerning online query */
     void downloadPage(QString url);
-    bool parsePage();
+    Infl::Results parsePage();
 
     /* importing functions */
     void importWordIndex();
