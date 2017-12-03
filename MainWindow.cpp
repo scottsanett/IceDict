@@ -137,8 +137,15 @@ void MainWindow::addTab_clicked() {
 
 void MainWindow::closeTab(int index) {
     auto currentSplitter = ui->resultsTab->widget(index);
-    if (tabIndices.find(currentSplitter) != tabIndices.end())
+    if (tabIndices.find(currentSplitter) != tabIndices.end()) {
+        if (closedTabs.size() == 10) {
+            closedTabs.pop_front();
+        }
+        closedTabs.push_back(std::make_tuple(index, ui->resultsTab->tabText(index), tabIndices.at(currentSplitter)));
+//        closedTabs.push_back(std::make_pair(index, tabIndices.at(currentSplitter)));
         tabIndices.erase(currentSplitter);
+        ui->resultsTab->removeTab(index);
+    }
 }
 
 void MainWindow::searchPanelReturnPressed(QString str, QTextDocument::FindFlags flags) {
@@ -967,33 +974,29 @@ void MainWindow::onInputReturnPressed()
 void MainWindow::onOptionsItemClicked(QListWidgetItem *item)
 {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto itemIndex = currentTab->options->currentRow();
     auto itemText = item->text();
     auto tag = itemText;
 
     if (currentTab->flags[0] == 1) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         QString url;
-        auto itr = currentTab->onlineEntries.find(tag);
-        if (itr != currentTab->onlineEntries.end()) {
-            url = itr->second;
-        }
-        downloadPage(url);
+        auto itr = currentTab->onlineEntries.cbegin();
+        for (auto i = 0; i < itemIndex; ++i) itr = std::next(itr);
+        downloadPage(itr->second);
     }
     else if (currentTab->flags[1] == 1) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         QString url;
-        auto itr = currentTab->onlineEntries.find(tag);
-        if (itr != currentTab->onlineEntries.end()) {
-            url = itr->second;
-        }
-        downloadPage(url);
+        auto itr = currentTab->onlineEntries.cbegin();
+        for (auto i = 0; i < itemIndex; ++i) itr = std::next(itr);
+        downloadPage(itr->second);
     }
     else if (currentTab->flags[2] == 1) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         findDefinition(tag);
     }
     else if (currentTab->flags[3] == 1) {
-//        currentTab->input->setText(itemText);
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         if (currentTab->textualResults.size() == 0) {
             textualSearch(tag);
@@ -1883,60 +1886,6 @@ QVector<QString> MainWindow::ParseVerb() {
         }
     }
 
-/*
-    itr = currentTab->inflStruct.cbegin();
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::PresentParticiple)) itr = std::next(itr);
-    QVector<Infl::Forms> presPartContainer;
-
-    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::PresentParticiple)) {
-        presPartContainer.push_back(InflManager.enumOfForms(itr->at(0)));
-        itr = std::next(itr);
-    }
-
-    for (auto && entry : currentTab->inflSelectResult) {
-        for (auto && a : presPartContainer) {
-            auto satisfied = InflManager.find(entry, Infl::Short, Infl::PresentParticiple) &&
-                             InflManager.find(entry, Infl::Short, a);
-            if (satisfied) result.push_back(entry);
-        }
-    }
-
-    itr = currentTab->inflStruct.cbegin();
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::PastParticiple)) itr = std::next(itr);
-    std::array<QVector<Infl::Forms>, 4> participleContainter;
-    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::PastParticiple)) {
-        if (itr->at(1) == InflManager.categoryOf(Infl::Definiteness)) {
-            participleContainter.at(0).push_back(InflManager.enumOfForms(itr->at(2)));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Gender)) {
-            participleContainter.at(1).push_back(InflManager.enumOfForms(itr->at(2)));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Case)) {
-            participleContainter.at(2).push_back(InflManager.enumOfForms(itr->at(2)));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
-            participleContainter.at(3).push_back(InflManager.enumOfForms(itr->at(2)));
-        }
-        itr = std::next(itr);
-    }
-
-    for (auto && entry : currentTab->inflSelectResult) {
-        for (auto && a : participleContainter.at(0)) {
-            for (auto && b : participleContainter.at(1)) {
-                for (auto && c : participleContainter.at(2)) {
-                    for (auto && d : participleContainter.at(3)) {
-                        auto satisfied = InflManager.find(entry, Infl::Short, Infl::Participle) &&
-                                    InflManager.find(entry, Infl::Short, a) &&
-                                    InflManager.find(entry, Infl::Short, b) &&
-                                    InflManager.find(entry, Infl::Short, c) &&
-                                    InflManager.find(entry, Infl::Short, d);
-                        if (satisfied) result.push_back(entry);
-                    }
-                }
-            }
-        }
-    }
-*/
     return result;
 }
 
@@ -2451,6 +2400,7 @@ void MainWindow::on_actionAcknowledgements_triggered()
 void MainWindow::on_actionFind_in_Page_triggered()
 {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    if (std::find(currentTab->flags.cbegin(), currentTab->flags.cend(), 1) == currentTab->flags.cend()) return;
     if (!currentTab->findPane) {
         currentTab->findPane = new FindPane(this);
         QObject::connect(currentTab->findPane, &FindPane::returnPressedSignal,
@@ -2485,4 +2435,38 @@ void MainWindow::on_actionShow_Status_Bar_triggered()
 void MainWindow::on_actionFind_triggered()
 {
     activateInput();
+}
+
+void MainWindow::on_actionShow_Next_Tab_triggered()
+{
+    auto index = ui->resultsTab->currentIndex();
+    if (index == ui->resultsTab->count() - 1) {
+        index = 0;
+    }
+    else ++index;
+    ui->resultsTab->setCurrentIndex(index);
+}
+
+void MainWindow::on_actionShow_Previous_Tab_triggered()
+{
+    auto index = ui->resultsTab->currentIndex();
+    if (index == 0) {
+        index = ui->resultsTab->count() - 1;
+    }
+    else --index;
+    ui->resultsTab->setCurrentIndex(index);
+}
+
+void MainWindow::on_actionUndo_Close_Tab_triggered()
+{
+    if (!closedTabs.empty()) {
+        auto tabToRestore = closedTabs.back();
+        auto index = std::get<0>(tabToRestore);
+        auto title = std::get<1>(tabToRestore);
+        auto pimpl = std::get<2>(tabToRestore);
+        ui->resultsTab->insertTab(index, pimpl->mainSplitter, title);
+        ui->resultsTab->setCurrentIndex(index);
+        tabIndices.insert(std::make_pair(pimpl->mainSplitter, pimpl));
+        closedTabs.pop_back();
+    }
 }

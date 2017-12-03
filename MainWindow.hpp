@@ -37,6 +37,8 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <tuple>
+#include <deque>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -193,6 +195,7 @@ private:
     };
 
     std::map<QWidget*, std::shared_ptr<Pimpl>> tabIndices;
+    std::deque<std::tuple<int, QString, std::shared_ptr<Pimpl>>> closedTabs;
 
     std::array<map_t, 8> inflectionals;
     std::array<map_t, 8> originals;
@@ -281,6 +284,12 @@ private slots:
     void on_actionShow_Status_Bar_triggered();
 
     void on_actionFind_triggered();
+
+    void on_actionShow_Next_Tab_triggered();
+
+    void on_actionShow_Previous_Tab_triggered();
+
+    void on_actionUndo_Close_Tab_triggered();
 
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);

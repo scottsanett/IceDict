@@ -96,6 +96,9 @@
     </property>
     <addaction name="actionMinimize"/>
     <addaction name="actionFullscreen"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_Previous_Tab"/>
+    <addaction name="actionShow_Next_Tab"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -107,7 +110,7 @@
    </widget>
    <widget class="QMenu" name="menuDictionaries">
     <property name="title">
-     <string>Dictionaries</string>
+     <string>Search</string>
     </property>
     <addaction name="actionModern_Icelandic"/>
     <addaction name="actionEnglish_Modern_Icelandic"/>
@@ -135,8 +138,16 @@
     <addaction name="actionAbout_IceDict"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo_Close_Tab"/>
+    <addaction name="separator"/>
+   </widget>
    <addaction name="menuIceDict"/>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuDictionaries"/>
    <addaction name="menuWindow"/>
@@ -187,7 +198,7 @@
   </action>
   <action name="actionModern_Icelandic">
    <property name="text">
-    <string>Modern Icelandic -&gt; English (online)</string>
+    <string>Icelandic to English (online)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+1</string>
@@ -195,7 +206,7 @@
   </action>
   <action name="actionEnglish_Modern_Icelandic">
    <property name="text">
-    <string>Search Text in Modern Icelandic Dictionary (online)</string>
+    <string>Search Text in Icelandic Dictionary (online)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+2</string>
@@ -203,7 +214,7 @@
   </action>
   <action name="actionOld_Icelandic_English">
    <property name="text">
-    <string>Old Icelandic -&gt; English</string>
+    <string>Old Norse to English</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+3</string>
@@ -211,7 +222,7 @@
   </action>
   <action name="actionOld_Icelandic_Text_Search">
    <property name="text">
-    <string>Search Text in Old Icelandic Dictionaries</string>
+    <string>Search Text in Old Norse Dictionaries</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+4</string>
@@ -219,7 +230,7 @@
   </action>
   <action name="actionSearch_Inflections">
    <property name="text">
-    <string>Search Inflections (Reversely)</string>
+    <string>Find Original Headwords</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
@@ -227,7 +238,7 @@
   </action>
   <action name="actionList_All_Forms">
    <property name="text">
-    <string>Search Inflections</string>
+    <string>List All Inflectional Forms</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+6</string>
@@ -291,6 +302,38 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionShow_Next_Tab">
+   <property name="text">
+    <string>Show Next Tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Meta+Tab</string>
+   </property>
+  </action>
+  <action name="actionShow_Previous_Tab">
+   <property name="text">
+    <string>Show Previous Tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Meta+Shift+Tab</string>
+   </property>
+  </action>
+  <action name="actionSelect_All">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionUndo_Close_Tab">
+   <property name="text">
+    <string>Undo Close Tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
    </property>
   </action>
  </widget>
