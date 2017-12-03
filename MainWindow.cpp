@@ -62,22 +62,16 @@ void MainWindow::addTab_clicked() {
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
     currentTab->inputPaneLayout = new QVBoxLayout;
-    currentTab->inputPane = new QGroupBox();
-#ifdef __APPLE__
-    currentTab->inputPane->setFlat(true);
-    currentTab->inputPane->setFixedHeight(70);
-    currentTab->inputPaneLayout->setContentsMargins(0, 10, 0, 0);
-#else
-    currentTab->inputPaneLayout->setContentsMargins(0, 0, 0, 0);
-    currentTab->inputPane->setFixedHeight(50);
-#endif
-    currentTab->inputPane->setMinimumWidth(150);
-    currentTab->inputPane->setMaximumWidth(200);
-    currentTab->inputLayout->addWidget(currentTab->inputPane);
-    currentTab->inputPane->setLayout(currentTab->inputPaneLayout);
+    currentTab->inputPaneLayout->setMargin(0);
+    currentTab->inputPaneLayout->setSpacing(0);
+    currentTab->inputPaneLayoutWidget = new QWidget;
+    currentTab->inputPaneLayoutWidget->setLayout(currentTab->inputPaneLayout);
+    currentTab->inputPaneLayoutWidget->setMinimumWidth(150);
+    currentTab->inputPaneLayoutWidget->setMaximumWidth(200);
+    currentTab->inputPaneLayoutWidget->setFixedHeight(55);
+    currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
 
     currentTab->comboBox = new QComboBox();
-    currentTab->comboBox->setFrame(false);
 #ifdef __APPLE__
     currentTab->comboBox->addItem("Icelandic → English");
     currentTab->comboBox->addItem("Icelandic Textual");
@@ -92,7 +86,6 @@ void MainWindow::addTab_clicked() {
     currentTab->comboBox->addItem("Norse Textual");
     currentTab->comboBox->addItem("Find Originals");
     currentTab->comboBox->addItem("All Inflections");
-    currentTab->comboBox->setFrame(false);
 #endif
     currentTab->comboBox->setCurrentIndex(-1);
     connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
@@ -100,13 +93,10 @@ void MainWindow::addTab_clicked() {
     currentTab->inputPaneLayout->addWidget(currentTab->comboBox);
 
     currentTab->input = new QLineEdit();
-#ifndef __APPLE__
-    currentTab->input->setFrame(false);
-#endif
     currentTab->input->setPlaceholderText("Select a dictionary first...");
     currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->input->setEnabled(false);
-    currentTab->inputPaneLayout->addWidget(currentTab->input);
+    currentTab->inputPaneLayout->addWidget(currentTab->input, 1, 0);
     QObject::connect(currentTab->input, &QLineEdit::textEdited,
                      this, &MainWindow::onInputTextEdited);
     QObject::connect(currentTab->input, &QLineEdit::returnPressed,

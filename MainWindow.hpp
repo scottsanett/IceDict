@@ -120,7 +120,8 @@ private:
         QSplitter * inputLayout;
         QSplitter * resultLayout;
         QVBoxLayout * inputPaneLayout;
-        QGroupBox * inputPane;
+        QWidget * inputPaneLayoutWidget;
+//        QGroupBox * inputPane;
         QComboBox * comboBox;
         QLineEdit * input;
         QListWidget * options;
@@ -135,8 +136,10 @@ private:
             mainSplitter->deleteLater();
             inputLayout->deleteLater();
             resultLayout->deleteLater();
-            input->deleteLater();
+            inputPaneLayout->deleteLater();
+            inputPaneLayoutWidget->deleteLater();
             comboBox->deleteLater();
+            input->deleteLater();
             options->deleteLater();
             result->deleteLater();
         }
