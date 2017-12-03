@@ -1551,6 +1551,26 @@ void MainWindow::fillVerbs(QString const & str) {
         fillStructures<false, TYPE_VOICE>(supine, str);
     }
 
+    bool findParticiple = InflManager.find(str, Infl::Short, Infl::Participle);
+    if (findParticiple) {
+        auto participle = constructItem(InflManager.nameOf(Infl::Participle), currentTab->inflectionForms);
+
+        bool findPresParticiple = InflManager.find(str, Infl::Short, Infl::PresentParticiple);
+        if (findPresParticiple) {
+            constructItem(InflManager.nameOf(Infl::PresentParticiple), participle);
+        }
+
+        bool findPastParticiple = InflManager.find(str, Infl::Short, Infl::PastParticiple);
+        if (findPastParticiple) {
+            auto pastParticiple = constructItem(InflManager.nameOf(Infl::PastParticiple), participle);
+            fillStructures<false, TYPE_DEFINITENESS>(pastParticiple, str);
+            fillStructures<false, TYPE_GENDER>(pastParticiple, str);
+            fillStructures<false, TYPE_CASE>(pastParticiple, str);
+            fillStructures<false, TYPE_NUMBER>(pastParticiple, str);
+        }
+    }
+
+    /*
     bool findPresParticiple = InflManager.find(str, Infl::Short, Infl::PresentParticiple);
     if (findPresParticiple) {
         auto participle = constructItem(InflManager.nameOf(Infl::PresentParticiple), currentTab->inflectionForms);
@@ -1564,6 +1584,7 @@ void MainWindow::fillVerbs(QString const & str) {
         fillStructures<false, TYPE_CASE>(participle, str);
         fillStructures<false, TYPE_NUMBER>(participle, str);
     }
+    */
 }
 
 void MainWindow::fillNouns(QString const & str) {
@@ -1812,6 +1833,58 @@ QVector<QString> MainWindow::ParseVerb() {
     }
 
     itr = currentTab->inflStruct.cbegin();
+    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Participle)) itr = std::next(itr);
+    QVector<Infl::Forms> presPartContainer;
+    std::array<QVector<Infl::Forms>, 4> pastPartContainer;
+    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Participle)) {
+        if (itr->at(1) == InflManager.nameOf(Infl::PresentParticiple)) {
+            presPartContainer.push_back(InflManager.enumOfForms(itr->at(1)));
+            itr = std::next(itr);
+        }
+        else if (itr->at(1) == InflManager.nameOf(Infl::PastParticiple)) {
+            if (itr->at(2) == InflManager.categoryOf(Infl::Definiteness)) {
+                pastPartContainer.at(0).push_back(InflManager.enumOfForms(itr->at(3)));
+            }
+            else if (itr->at(2) == InflManager.categoryOf(Infl::Gender)) {
+                pastPartContainer.at(1).push_back(InflManager.enumOfForms(itr->at(3)));
+            }
+            else if (itr->at(2) == InflManager.categoryOf(Infl::Case)) {
+                pastPartContainer.at(2).push_back(InflManager.enumOfForms(itr->at(3)));
+            }
+            else if (itr->at(2) == InflManager.categoryOf(Infl::Number)) {
+                pastPartContainer.at(3).push_back(InflManager.enumOfForms(itr->at(3)));
+            }
+            itr = std::next(itr);
+        }
+    }
+
+    for (auto && entry : currentTab->inflSelectResult) {
+        for (auto && a : presPartContainer) {
+            auto satisfied = InflManager.find(entry, Infl::Short, Infl::PresentParticiple) &&
+                             InflManager.find(entry, Infl::Short, a);
+            if (satisfied) result.push_back(entry);
+        }
+    }
+
+    for (auto && entry : currentTab->inflSelectResult) {
+        for (auto && a : pastPartContainer.at(0)) {
+            for (auto && b : pastPartContainer.at(1)) {
+                for (auto && c : pastPartContainer.at(2)) {
+                    for (auto && d : pastPartContainer.at(3)) {
+                        auto satisfied = InflManager.find(entry, Infl::Short, Infl::Participle) &&
+                                    InflManager.find(entry, Infl::Short, a) &&
+                                    InflManager.find(entry, Infl::Short, b) &&
+                                    InflManager.find(entry, Infl::Short, c) &&
+                                    InflManager.find(entry, Infl::Short, d);
+                        if (satisfied) result.push_back(entry);
+                    }
+                }
+            }
+        }
+    }
+
+/*
+    itr = currentTab->inflStruct.cbegin();
     while (itr != end && itr->at(0) != InflManager.nameOf(Infl::PresentParticiple)) itr = std::next(itr);
     QVector<Infl::Forms> presPartContainer;
 
@@ -1863,7 +1936,7 @@ QVector<QString> MainWindow::ParseVerb() {
             }
         }
     }
-
+*/
     return result;
 }
 
