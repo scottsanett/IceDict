@@ -32,7 +32,7 @@ private:
 
 public:
     QFrame *  frame() { return searchLayoutWidget; }
-    void setFocus();
+    void setFocusInput();
     void show() { searchLayoutWidget->show(); }
     void close() { closeButtonPressed(); }
 private slots:

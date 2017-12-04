@@ -22,6 +22,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->setupUi(this);
     this->setWindowTitle("IceDict");
+    ui->actionClose_Tab->setText("Close Window");
+    ui->actionUndo_Close_Tab->setEnabled(false);
+    ui->actionBack->setEnabled(false);
+    ui->actionForward->setEnabled(false);
+    ui->actionFind_in_Page->setEnabled(false);
     ui->resultsTab->setDocumentMode(true);
     ui->resultsTab->setTabsClosable(true);
     ui->resultsTab->tabBar()->setMovable(true);
@@ -138,6 +143,9 @@ void MainWindow::addTab_clicked() {
     QObject::connect(currentTab->result, &QTextBrowser::customContextMenuRequested,
                      this, &MainWindow::onResultContextMenuRequested);
     ui->resultsTab->setCurrentIndex(index);
+    if (ui->resultsTab->count() > 1) {
+        ui->actionClose_Tab->setText("Close Tab");
+    }
 }
 
 void MainWindow::closeTab(int index) {
@@ -150,6 +158,7 @@ void MainWindow::closeTab(int index) {
         tabIndices.erase(currentSplitter);
         ui->resultsTab->removeTab(index);
     }
+    ui->actionUndo_Close_Tab->setEnabled(true);
 }
 
 void MainWindow::searchPanelReturnPressed(QString str, QTextDocument::FindFlags flags) {
@@ -1301,6 +1310,9 @@ void MainWindow::onTabCloseButtonClicked(int index) {
     if (ui->resultsTab->count() > 1) {
         closeTab(index);
     }
+    else {
+        ui->actionClose_Tab->setText("Close Window");
+    }
 }
 
 void MainWindow::on_actionModern_Icelandic_triggered()
@@ -1309,6 +1321,7 @@ void MainWindow::on_actionModern_Icelandic_triggered()
 
     ui->actionZoom_In->setEnabled(false);
     ui->actionZoom_Out->setEnabled(false);
+    ui->actionFind_in_Page->setEnabled(true);
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(0);
@@ -1321,6 +1334,7 @@ void MainWindow::on_actionEnglish_Modern_Icelandic_triggered()
 
     ui->actionZoom_In->setEnabled(false);
     ui->actionZoom_Out->setEnabled(false);
+    ui->actionFind_in_Page->setEnabled(true);
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(1);
@@ -1331,6 +1345,8 @@ void MainWindow::on_actionOld_Icelandic_English_triggered()
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
+    ui->actionFind_in_Page->setEnabled(true);
+
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(2);
 }
@@ -1341,6 +1357,7 @@ void MainWindow::on_actionOld_Icelandic_Text_Search_triggered()
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
+    ui->actionFind_in_Page->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(3);
 }
@@ -1350,6 +1367,7 @@ void MainWindow::on_actionSearch_Inflections_triggered()
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
+    ui->actionFind_in_Page->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(4);
 }
@@ -1359,6 +1377,7 @@ void MainWindow::on_actionList_All_Forms_triggered()
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
+    ui->actionFind_in_Page->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(5);
 }
@@ -2321,7 +2340,7 @@ void MainWindow::on_actionAbout_IceDict_triggered()
     auto aboutMessage =
             R"foo(
             <p align=center><h2>IceDict</h2></p>
-            <p align=center style="font-weight: normal">Version 1.6</p>
+            <p align=center style="font-weight: normal">Version 1.8</p>
             <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU GPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
@@ -2371,9 +2390,12 @@ void MainWindow::on_actionFind_in_Page_triggered()
                          this, &MainWindow::searchPaneNextButtonPressed);
         currentTab->resultLayout->addWidget(currentTab->findPane->frame());
         currentTab->findPane->setFocus();
+        currentTab->findPane->setFocusInput();
     }
     else if (currentTab->findPane->frame()->isHidden()) {
         currentTab->findPane->show();
+        currentTab->findPane->setFocus();
+        currentTab->findPane->setFocusInput();
     }
     else {
         currentTab->findPane->close();
@@ -2428,6 +2450,7 @@ void MainWindow::on_actionUndo_Close_Tab_triggered()
         ui->resultsTab->setCurrentIndex(index);
         tabIndices.insert(std::make_pair(pimpl->mainSplitter, pimpl));
         closedTabs.pop_back();
+        if (closedTabs.empty()) ui->actionUndo_Close_Tab->setDisabled(true);
     }
 }
 
@@ -2435,18 +2458,24 @@ void MainWindow::on_actionBack_triggered()
 {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
 
-    if (--tabResultHistoryIndex.at(currentTab->mainSplitter) == -1)
+    if (--tabResultHistoryIndex.at(currentTab->mainSplitter) == -1) {
+        ui->actionBack->setEnabled(false);
         tabResultHistoryIndex.at(currentTab->mainSplitter) = 0;
+    }
 
     currentTab->result->setHtml(tabResultHistory.at(currentTab->mainSplitter).at(tabResultHistoryIndex.at(currentTab->mainSplitter)));
+    ui->actionForward->setEnabled(true);
 }
 
 void MainWindow::on_actionForward_triggered()
 {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
 
-    if (++tabResultHistoryIndex.at(currentTab->mainSplitter) == tabResultHistory.at(currentTab->mainSplitter).size())
+    if (++tabResultHistoryIndex.at(currentTab->mainSplitter) == tabResultHistory.at(currentTab->mainSplitter).size()) {
+        ui->actionForward->setEnabled(false);
         tabResultHistoryIndex.at(currentTab->mainSplitter) = tabResultHistory.at(currentTab->mainSplitter).size() - 1;
+    }
 
     currentTab->result->setHtml(tabResultHistory.at(currentTab->mainSplitter).at(tabResultHistoryIndex.at(currentTab->mainSplitter)));
+    ui->actionBack->setEnabled(true);
 }

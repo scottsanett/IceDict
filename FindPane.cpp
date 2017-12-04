@@ -52,7 +52,7 @@ FindPane::FindPane(QWidget *parent) : QWidget(parent)
     QObject::connect(searchPanel, &QLineEdit::returnPressed, this, &FindPane::returnPressed);
 }
 
-void FindPane::setFocus() {
+void FindPane::setFocusInput() {
     searchPanel->setFocus();
     searchPanel->selectAll();
 }
