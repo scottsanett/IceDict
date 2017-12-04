@@ -281,6 +281,7 @@ void MainWindow::search_icelandic_word()
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->flags = {{1, 0, 0, 0, 0, 0}};
     currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
     currentTab->onlineEntries.clear();
     currentTab->options->clear();
     currentTab->result->clear();
@@ -294,6 +295,7 @@ void MainWindow::search_icelandic_text()
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->flags = {{0, 1, 0, 0, 0, 0}};
     currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
     currentTab->onlineEntries.clear();
     currentTab->options->clear();
     currentTab->result->clear();
@@ -329,6 +331,7 @@ void MainWindow::search_original()
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->flags = {{0, 0, 0, 0, 1, 0}};
     currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
     currentTab->options->clear();
     currentTab->result->clear();
     currentTab->input->setPlaceholderText("Insert word here...");
@@ -340,6 +343,7 @@ void MainWindow::search_all_inflections()
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->flags = {{0, 0, 0, 0, 0, 1}};
     currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
     currentTab->options->clear();
     currentTab->result->clear();
     currentTab->input->setPlaceholderText("Insert word here...");
@@ -457,7 +461,11 @@ void MainWindow::importWordIndex() {
     norseWordCompleter = new QCompleter(wordIndexList, this);
     norseWordCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     norseWordCompleter->setMaxVisibleItems(30);
+#ifdef __APPLE__
     norseWordCompleter->popup()->setFont(QFont("Segoe UI", 13));
+#else
+    norseWordCompleter->popup()->setFont(QFont("Segoe UI", 10));
+#endif
 }
 
 void MainWindow::importInflections() {

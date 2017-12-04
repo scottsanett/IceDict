@@ -12,6 +12,7 @@ FindPane::FindPane(QWidget *parent) : QWidget(parent)
     label = new QLabel("Find:", parent);
     searchLayout->addWidget(label);
     searchPanel = new QLineEdit(parent);
+    searchPanel->setClearButtonEnabled(true);
     searchPanel->setStyleSheet("font-family: Segoe UI; font-size: 12px");
     searchLayout->addWidget(searchPanel);
 
