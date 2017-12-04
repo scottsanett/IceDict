@@ -91,7 +91,7 @@ namespace Infl {
         return static_cast<Transforms>(static_cast<int>(a) | static_cast<int>(b));
     }
 
-    enum class Results { No, One, Many, Redirected, Possible };
+    enum class Results { No, One, Many, Maybe};
 }
 
 class MainWindow : public QMainWindow
@@ -123,7 +123,6 @@ private:
         QSplitter * resultLayout;
         QVBoxLayout * inputPaneLayout;
         QWidget * inputPaneLayoutWidget;
-//        QGroupBox * inputPane;
         QComboBox * comboBox;
         QLineEdit * input;
         QListWidget * options;
@@ -132,6 +131,7 @@ private:
 
         QListWidget * resultsFromDictionaries;
         TreeWidget * inflectionForms;
+        QPushButton * proceedButton;
 
         ~Pimpl() {
             centralLayout->deleteLater();
@@ -195,6 +195,8 @@ private:
     };
 
     std::map<QWidget*, std::shared_ptr<Pimpl>> tabIndices;
+    std::map<QWidget*, std::deque<QString>> tabResultHistory;
+    std::map<QWidget*, int> tabResultHistoryIndex;
     std::deque<std::tuple<int, QString, std::shared_ptr<Pimpl>>> closedTabs;
 
     std::array<map_t, 8> inflectionals;
@@ -227,31 +229,25 @@ private slots:
 
     /* slots concerning selection changes in the InflectionForms tree */
     void checkStateChanged(Qt::CheckState, QVector<QString> const);
+    void proceedButtonPressed();
     void onInputTextEdited(const QString &arg1);
     void onInputReturnPressed();
     void onOptionsItemClicked(QListWidgetItem *item);
     void resultsFromDictionariesItemClicked(QListWidgetItem * item);
 
     void onResultContextMenuRequested(QPoint const & p);
+    void onResultUrlClicked(QUrl);
+    void onResultTextChanged(QString);
 
     void on_actionMinimize_triggered();
-
     void on_actionFullscreen_triggered();
-
     void on_actionNew_Tab_triggered();
-
     void on_actionClose_Tab_triggered();
-
     void on_actionModern_Icelandic_triggered();
-
     void on_actionEnglish_Modern_Icelandic_triggered();
-
     void on_actionOld_Icelandic_English_triggered();
-
     void on_actionOld_Icelandic_Text_Search_triggered();
-
     void on_actionSearch_Inflections_triggered();
-
     void on_actionList_All_Forms_triggered();
 
     void onContextMenuIceToEngTriggered();
@@ -290,6 +286,10 @@ private slots:
     void on_actionShow_Previous_Tab_triggered();
 
     void on_actionUndo_Close_Tab_triggered();
+
+    void on_actionBack_triggered();
+
+    void on_actionForward_triggered();
 
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
@@ -348,8 +348,6 @@ private:
     bool findPast(QString const &);
     bool findFstPrs(QString const &);
     bool findSndPrs(QString const &);
-
-    QVector<QString> regexResult(QString const &, QString const &);
 
     /* functions concerning online query */
     void downloadPage(QString url);

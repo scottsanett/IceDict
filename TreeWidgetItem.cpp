@@ -80,7 +80,6 @@ void TreeWidgetItem::setData(int column, int role, const QVariant& value) {
             if (checkState(0) != Qt::PartiallyChecked && backup != Qt::PartiallyChecked) {
                 emit checkStateChanged(checkState(0), result);
             }
-
         }
     }
 }

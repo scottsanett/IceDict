@@ -53,6 +53,8 @@ void MainWindow::addTab_clicked() {
     currentTab->mainSplitter = new QSplitter();
     currentTab->mainSplitter->setHandleWidth(0);
     tabIndices.insert(std::make_pair(currentTab->mainSplitter, currentTab));
+    tabResultHistory.insert(std::make_pair(currentTab->mainSplitter, std::deque<QString>{}));
+    tabResultHistoryIndex.insert(std::make_pair(currentTab->mainSplitter, -1));
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
     currentTab->inputLayout = new QSplitter();
     currentTab->inputLayout->setHandleWidth(0);
@@ -126,6 +128,8 @@ void MainWindow::addTab_clicked() {
     currentTab->result->setHtml(startScreen);
     currentTab->result->setFrameStyle(QFrame::NoFrame);
     currentTab->result->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(currentTab->result, &QTextBrowser::anchorClicked,
+                     this, &MainWindow::onResultUrlClicked);
     currentTab->resultLayout->addWidget(currentTab->result);
 
     auto index = ui->resultsTab->currentIndex();
@@ -142,7 +146,6 @@ void MainWindow::closeTab(int index) {
             closedTabs.pop_front();
         }
         closedTabs.push_back(std::make_tuple(index, ui->resultsTab->tabText(index), tabIndices.at(currentSplitter)));
-//        closedTabs.push_back(std::make_pair(index, tabIndices.at(currentSplitter)));
         tabIndices.erase(currentSplitter);
         ui->resultsTab->removeTab(index);
     }
@@ -245,6 +248,15 @@ void MainWindow::initializeInflectionForms() {
 #endif
     currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
+
+    if (!currentTab->proceedButton) {
+        currentTab->proceedButton = new QPushButton("Proceed", this);
+        QObject::connect(currentTab->proceedButton, &QPushButton::pressed,
+                         this, &MainWindow::proceedButtonPressed);
+        auto height = currentTab->proceedButton->height();
+        currentTab->proceedButton->setFixedHeight(height);
+    }
+    currentTab->inputLayout->addWidget(currentTab->proceedButton);
 }
 
 void MainWindow::clearInflectionForms() {
@@ -253,6 +265,10 @@ void MainWindow::clearInflectionForms() {
         currentTab->inflectionForms->clear();
         delete currentTab->inflectionForms;
         currentTab->inflectionForms = nullptr;
+    }
+    if (currentTab->proceedButton) {
+        delete currentTab->proceedButton;
+        currentTab->proceedButton = nullptr;
     }
 }
 
@@ -656,6 +672,7 @@ void MainWindow::findDefinitionPrint(size_t index) {
     QString display = key + ' ' + value;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20px;\">" + display + "</span></p>";
     currentTab->result->setHtml(display);
+    onResultTextChanged(display);
 }
 
 void MainWindow::findInflection(QString word) {
@@ -695,6 +712,7 @@ void MainWindow::findInflection(QString word) {
 
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     currentTab->result->setHtml(toprint);
+    onResultTextChanged(toprint);
 }
 
 void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString word, size_t index) {
@@ -736,6 +754,7 @@ void MainWindow::textualSearchPrint(size_t index) {
     QString display = thisEntry->second;
     display = "<p align=\"justify\"><span style=\"font-family: Perpetua; font-size: 20px;\">" + display + "</span></p>";
     currentTab->result->setHtml(display);
+    onResultTextChanged(display);
 }
 
 void MainWindow::textualSearchThread(QString word, size_t index) {
@@ -885,6 +904,7 @@ void MainWindow::printAllPrint(size_t index) {
     fillInflectionForms(toprint);
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     currentTab->result->setHtml(toprint);
+    onResultTextChanged(toprint);
 }
 
 
@@ -1086,9 +1106,10 @@ void MainWindow::loadPage() {
     if (display == Infl::Results::No || display == Infl::Results::One) {
         currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
         currentTab->result->setHtml(currentTab->webpage);
+        onResultTextChanged(currentTab->webpage);
         currentTab->webpage.clear();
     }
-    else if (display == Infl::Results::Many || display == Infl::Results::Redirected) {
+    else if (display == Infl::Results::Many) {
         currentTab->options->clear();
         for (auto && i : currentTab->onlineEntries) {
             currentTab->options->addItem(i.first);
@@ -1098,9 +1119,10 @@ void MainWindow::loadPage() {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         downloadPage(firstEntry->second);
     }
-    else if (display == Infl::Results::Possible) {
+    else if (display == Infl::Results::Maybe) {
         currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
         currentTab->result->setHtml(currentTab->webpage);
+        onResultTextChanged(currentTab->webpage);
         currentTab->webpage.clear();
         onlineText(currentTab->wordAfterRedirection);
         currentTab->wordAfterRedirection.clear();
@@ -1136,7 +1158,7 @@ Infl::Results MainWindow::parsePage() {
             }
             currentTab->webpage = "No result has been found.\n\nRedirecting to " + word + "...";
             currentTab->wordAfterRedirection = word;
-            return Infl::Results::Possible;
+            return Infl::Results::Maybe;
 //            return false;
         }
         QString startMarker = "<h3>While searching in Icelandic Online Dictionary and Readings</h3>";
@@ -1145,29 +1167,6 @@ Infl::Results MainWindow::parsePage() {
         auto endPos = currentTab->webpage.indexOf(endMarker);
         currentTab->webpage = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length()) + ".";
         return Infl::Results::No;
-    }
-
-    else if (currentTab->webpage.contains("<strong>-&gt;</strong>")) // redirection appears
-    {
-        QString startMarker = "<strong>-&gt;</strong>";
-        QString endMarker = "</span>\n </div><!-- entry -->\n\t\t<hr />\n\t\t<span class=\"navlink\">";
-        auto startPos = currentTab->webpage.indexOf(startMarker);
-        auto endPos = currentTab->webpage.indexOf(endMarker);
-        auto snippet = currentTab->webpage.mid(startPos + startMarker.length(), endPos - startPos - startMarker.length());
-        snippet = snippet.trimmed();
-        auto tokens = snippet.split("<a href=\"", QString::SkipEmptyParts);
-        for (auto && token : tokens) {
-            QString mid_marker = "\">";
-            QString end_marker = "</a>";
-            auto mid_pos = token.indexOf(mid_marker);
-            auto end_pos = token.indexOf(end_marker);
-            auto entryLink = "http://digicoll.library.wisc.edu" + token.mid(0, mid_pos);
-            auto entryName = token.mid(mid_pos + mid_marker.length(), end_pos - mid_pos - mid_marker.length());
-            auto itr = currentTab->onlineEntries.find(kwRaw);
-            currentTab->onlineEntries.erase(currentTab->onlineEntries.find(kwRaw));
-            currentTab->onlineEntries.insert(std::make_pair(entryName, entryLink));
-        }
-        return Infl::Results::Redirected;
     }
 
     else if (currentTab->webpage.contains("<div class=\"results\">")) // found multiples results
@@ -1220,6 +1219,7 @@ Infl::Results MainWindow::parsePage() {
         }
         return Infl::Results::Many;
     }
+
     else // found only one result
     {
         QString startMarker = "<div class=\"entry\">";
@@ -1246,21 +1246,33 @@ Infl::Results MainWindow::parsePage() {
                 currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-style:italic;\" class=\"trans\">");
             }
         }
-
-        if (keyword != currentTab->textInQuery) {
-            auto tokens = currentTab->webpage.split(currentTab->textInQuery);
-            QString result;
-            for (auto i = 0; i < tokens.size(); ++i) {
-                if (tokens.at(i).length() == 0) continue;
-                if (i < tokens.size() - 1) {
-                    result += tokens.at(i) + "<b><span style=\"color:#ff0000;\">" + currentTab->textInQuery + "</span></b>";
-                }
-                else result += tokens.at(i);
-            }
-            currentTab->webpage = result;
-        }
         return Infl::Results::One;
     }
+}
+
+void MainWindow::onResultUrlClicked(QUrl url) {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    QString finalUrl = "http://digicoll.library.wisc.edu" + url.toString();
+    downloadPage(finalUrl);
+}
+
+void MainWindow::onResultTextChanged(QString display) {
+    if (display == "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\"></table></p></span>") return;
+
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+
+    if (tabResultHistoryIndex.at(currentTab->mainSplitter) < tabResultHistory.at(currentTab->mainSplitter).size() - 1) {
+        auto historyIndex = tabResultHistoryIndex.at(currentTab->mainSplitter);
+        auto& historyContainer = tabResultHistory.at(currentTab->mainSplitter);
+        auto historySize = historyContainer.size();
+
+        for (auto i = 0 ; i < historySize - historyIndex - 1; ++i) {
+            historyContainer.pop_back();
+        }
+    }
+
+    tabResultHistory.at(currentTab->mainSplitter).push_back(display);
+    tabResultHistoryIndex.at(currentTab->mainSplitter) += 1;
 }
 
 void MainWindow::on_actionMinimize_triggered()
@@ -1400,7 +1412,6 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
     for (auto && i : inflStruct) {
         qDebug() << i;
     }
-*/
 
     auto resultVec = ParseCheckStateChangeInfo();
 
@@ -1411,6 +1422,21 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
     }
     toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     currentTab->result->setHtml(toprint);
+    onResultTextChanged(toprint);
+    */
+}
+
+void MainWindow::proceedButtonPressed() {
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    auto resultVec = ParseCheckStateChangeInfo();
+    QString toprint;
+    for (auto i : resultVec) {
+       QString temp = addStyleToResults(i);
+       toprint += temp;
+    }
+    toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
+    currentTab->result->setHtml(toprint);
+    onResultTextChanged(toprint);
 }
 
 TreeWidgetItem * MainWindow::constructItem(QString label, TreeWidget * parent) {
@@ -2469,4 +2495,24 @@ void MainWindow::on_actionUndo_Close_Tab_triggered()
         tabIndices.insert(std::make_pair(pimpl->mainSplitter, pimpl));
         closedTabs.pop_back();
     }
+}
+
+void MainWindow::on_actionBack_triggered()
+{
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+
+    if (--tabResultHistoryIndex.at(currentTab->mainSplitter) == -1)
+        tabResultHistoryIndex.at(currentTab->mainSplitter) = 0;
+
+    currentTab->result->setHtml(tabResultHistory.at(currentTab->mainSplitter).at(tabResultHistoryIndex.at(currentTab->mainSplitter)));
+}
+
+void MainWindow::on_actionForward_triggered()
+{
+    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+
+    if (++tabResultHistoryIndex.at(currentTab->mainSplitter) == tabResultHistory.at(currentTab->mainSplitter).size())
+        tabResultHistoryIndex.at(currentTab->mainSplitter) = tabResultHistory.at(currentTab->mainSplitter).size() - 1;
+
+    currentTab->result->setHtml(tabResultHistory.at(currentTab->mainSplitter).at(tabResultHistoryIndex.at(currentTab->mainSplitter)));
 }
