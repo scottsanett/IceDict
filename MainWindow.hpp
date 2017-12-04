@@ -130,7 +130,6 @@ private:
         QTextBrowser * result;
         FindPane * findPane;
 
-//        QListWidget * resultsFromDictionaries;
         TreeWidget * inflectionForms;
         QPushButton * proceedButton;
 
@@ -210,7 +209,6 @@ private:
     setstr_t wordindex;
 
     QStringList wordIndexList;
-//    QStringList inflectionalsIndexList;
     QList<QTextEdit::ExtraSelection> findInPageSelections;
     QList<QTextEdit::ExtraSelection>::size_type findInPageSelectionIndex;
 
@@ -359,7 +357,6 @@ private:
     void importWordIndex();
     void importInflections();
     void importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i);
-//    void importInflectionIndex();
     void importOriginal();
     void importOriginalThread(std::array<map_t, 8> & mapvec, size_t i);
     void importDictionary();

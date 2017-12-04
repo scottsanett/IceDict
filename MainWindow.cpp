@@ -498,7 +498,6 @@ void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i
         thisMap.insert(std::make_pair(line.c_str(), index));
         ++index;
     }
-
     f.close();
 }
 
@@ -899,27 +898,11 @@ void MainWindow::onInputTextEdited(const QString &arg1)
     }
     else if (currentTab->flags[2] == 1) {
         currentTab->definitionResults.clear();
-        /*
-        QStringList display;
-        if (word.length() > 1) {
-            for (auto && entry : wordindex) {
-                auto pos = entry.indexOf(word);
-                if (pos == 0) {
-                    display.push_back(entry);
-                }
-            }
-            currentTab->options->addItems(display);
-        }
-        */
     }
     else if (currentTab->flags[3] == 1) {
-        currentTab->textualResults.clear();
+        currentTab->textualResults.clear();   
     }
     else if (currentTab->flags[4] == 1) {
-        if (word.length() > 2) {
-            QStringList display;
-            currentTab->options->addItems(display);
-        }
     }
     else if (currentTab->flags[5] == 1) {
         currentTab->resultsToPrint.clear();
