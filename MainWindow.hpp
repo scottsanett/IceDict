@@ -120,6 +120,10 @@ private:
 
         QVBoxLayout * centralLayout;
         QSplitter * mainSplitter;
+        QHBoxLayout * buttonLayout;
+        QWidget * buttonLayoutWidget;
+        QPushButton * backButton;
+        QPushButton * nextButton;
         QSplitter * inputLayout;
         QSplitter * resultLayout;
         QVBoxLayout * inputPaneLayout;
@@ -136,6 +140,10 @@ private:
         ~Pimpl() {
             centralLayout->deleteLater();
             mainSplitter->deleteLater();
+            buttonLayout->deleteLater();
+            buttonLayoutWidget->deleteLater();
+            backButton->deleteLater();
+            nextButton->deleteLater();
             inputLayout->deleteLater();
             resultLayout->deleteLater();
             inputPaneLayout->deleteLater();

@@ -68,6 +68,36 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout->setOrientation(Qt::Vertical);
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
+    currentTab->buttonLayout = new QHBoxLayout;
+    currentTab->buttonLayout->setSpacing(0);
+    currentTab->buttonLayout->setMargin(0);
+    currentTab->buttonLayoutWidget = new QWidget();
+#ifdef __APPLE__
+    currentTab->buttonLayoutWidget->setFixedHeight(28);
+#else
+    currentTab->buttonLayoutWidget->setFixedHeight(23);
+#endif
+    currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
+#ifdef __APPLE__
+    currentTab->backButton = new QPushButton("⬅");
+#else
+    currentTab->backButton = new QPushButton("Back");
+#endif
+    currentTab->backButton->setEnabled(false);
+    QObject::connect(currentTab->backButton, &QPushButton::pressed,
+                     this, &MainWindow::on_actionBack_triggered);
+#ifdef __APPLE__
+    currentTab->nextButton = new QPushButton("➡︎");
+#else
+    currentTab->nextButton = new QPushButton("Forward");
+#endif
+    currentTab->nextButton->setEnabled(false);
+    QObject::connect(currentTab->nextButton, &QPushButton::pressed,
+                     this, &MainWindow::on_actionForward_triggered);
+    currentTab->buttonLayout->addWidget(currentTab->backButton);
+    currentTab->buttonLayout->addWidget(currentTab->nextButton);
+    currentTab->inputLayout->addWidget(currentTab->buttonLayoutWidget);
+
     currentTab->inputPaneLayout = new QVBoxLayout;
     currentTab->inputPaneLayout->setMargin(0);
     currentTab->inputPaneLayout->setSpacing(0);
@@ -232,10 +262,9 @@ void MainWindow::initializeInflectionForms() {
         currentTab->proceedButton = new QPushButton("Proceed", this);
         QObject::connect(currentTab->proceedButton, &QPushButton::pressed,
                          this, &MainWindow::proceedButtonPressed);
-        auto height = currentTab->proceedButton->height();
-        currentTab->proceedButton->setFixedHeight(height);
+        currentTab->proceedButton->setFixedHeight(30);
+        currentTab->inputLayout->addWidget(currentTab->proceedButton);
     }
-    currentTab->inputLayout->addWidget(currentTab->proceedButton);
 }
 
 void MainWindow::clearInflectionForms() {
@@ -1248,13 +1277,26 @@ void MainWindow::onResultTextChanged(QString display) {
         auto& historyContainer = tabResultHistory.at(currentTab->mainSplitter);
         auto historySize = historyContainer.size();
 
-        for (auto i = 0 ; i < historySize - historyIndex - 1; ++i) {
+        for (auto i = 0 ; i < historySize - 1 - historyIndex; ++i) {
             historyContainer.pop_back();
         }
     }
 
     tabResultHistory.at(currentTab->mainSplitter).push_back(display);
     tabResultHistoryIndex.at(currentTab->mainSplitter) += 1;
+
+    if (tabResultHistory.at(currentTab->mainSplitter).size() > 1) {
+        ui->actionBack->setEnabled(true);
+        ui->actionForward->setEnabled(false);
+        currentTab->backButton->setEnabled(true);
+        currentTab->nextButton->setEnabled(false);
+    }
+    else {
+        ui->actionBack->setEnabled(false);
+        ui->actionForward->setEnabled(false);
+        currentTab->backButton->setEnabled(false);
+        currentTab->nextButton->setEnabled(false);
+    }
 }
 
 void MainWindow::on_actionMinimize_triggered()
@@ -2458,24 +2500,28 @@ void MainWindow::on_actionBack_triggered()
 {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
 
-    if (--tabResultHistoryIndex.at(currentTab->mainSplitter) == -1) {
+    if (--tabResultHistoryIndex.at(currentTab->mainSplitter) == 0) {
         ui->actionBack->setEnabled(false);
+        currentTab->backButton->setEnabled(false);
         tabResultHistoryIndex.at(currentTab->mainSplitter) = 0;
     }
 
     currentTab->result->setHtml(tabResultHistory.at(currentTab->mainSplitter).at(tabResultHistoryIndex.at(currentTab->mainSplitter)));
     ui->actionForward->setEnabled(true);
+    currentTab->nextButton->setEnabled(true);
 }
 
 void MainWindow::on_actionForward_triggered()
 {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
 
-    if (++tabResultHistoryIndex.at(currentTab->mainSplitter) == tabResultHistory.at(currentTab->mainSplitter).size()) {
+    if (++tabResultHistoryIndex.at(currentTab->mainSplitter) == tabResultHistory.at(currentTab->mainSplitter).size() - 1) {
         ui->actionForward->setEnabled(false);
+        currentTab->nextButton->setEnabled(false);
         tabResultHistoryIndex.at(currentTab->mainSplitter) = tabResultHistory.at(currentTab->mainSplitter).size() - 1;
     }
 
     currentTab->result->setHtml(tabResultHistory.at(currentTab->mainSplitter).at(tabResultHistoryIndex.at(currentTab->mainSplitter)));
     ui->actionBack->setEnabled(true);
+    currentTab->backButton->setEnabled(true);
 }
