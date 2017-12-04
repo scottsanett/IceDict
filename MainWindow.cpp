@@ -97,6 +97,7 @@ void MainWindow::addTab_clicked() {
     currentTab->input = new QLineEdit();
     currentTab->input->setPlaceholderText("Select a dictionary first...");
     currentTab->input->setStyleSheet("font-family: Segoe UI; font-size: 13px");
+    currentTab->input->setClearButtonEnabled(true);
     currentTab->input->setEnabled(false);
     currentTab->inputPaneLayout->addWidget(currentTab->input, 1, 0);
     QObject::connect(currentTab->input, &QLineEdit::textEdited,
@@ -203,37 +204,6 @@ void MainWindow::activateInput() {
     currentTab->input->selectAll();
 }
 
-void MainWindow::initializeResultFromDictionaries() {
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    if (!currentTab->resultsFromDictionaries)
-        currentTab->resultsFromDictionaries = new QListWidget(this);
-
-    currentTab->resultsFromDictionaries->setMaximumWidth(200);
-    currentTab->resultsFromDictionaries->setMaximumHeight(150);
-#ifdef __APPLE__
-    currentTab->resultsFromDictionaries->setFrameShape(QFrame::NoFrame);
-#else
-    currentTab->resultsFromDictionaries->setFrameStyle(QFrame::VLine);
-#endif
-    currentTab->resultsFromDictionaries->setStyleSheet("font-family: Segoe UI; font-size: 13px");
-    currentTab->inputLayout->addWidget(currentTab->resultsFromDictionaries);
-    QObject::connect(
-                currentTab->resultsFromDictionaries, &QListWidget::itemClicked,
-                this, &MainWindow::resultsFromDictionariesItemClicked
-                );
-}
-
-void MainWindow::clearResultFromDictionaries() {
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    if (currentTab->resultsFromDictionaries) {
-        currentTab->resultsFromDictionaries->clear();
-        delete currentTab->resultsFromDictionaries;
-        currentTab->resultsFromDictionaries = nullptr;
-    }
-    currentTab->perpetuaFontSize = 20;
-    currentTab->segoeFontSize = 14;
-}
-
 void MainWindow::initializeInflectionForms() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (!currentTab->inflectionForms)
@@ -337,6 +307,7 @@ void MainWindow::search_norse_word()
     currentTab->flags = {{0, 0, 1, 0, 0, 0}};
     currentTab->input->setPlaceholderText(tr("Insert word here..."));
     currentTab->input->clear();
+    currentTab->input->setCompleter(norseWordCompleter);
     currentTab->result->clear();
     currentTab->options->clear();
     statusBar->showMessage("search definitions for old Icelandic word");
@@ -478,15 +449,15 @@ bool MainWindow::isVowel(QChar ch) {
 /* import the index for all words in the two dictionaries */
 void MainWindow::importWordIndex() {
     QFile wd(":/alphabet/wordindex");
-
     wd.open(QIODevice::ReadOnly);
     QString file = wd.readAll();
-    std::istringstream wordindexfile(file.toStdString());
-    std::string line;
-    while (std::getline(wordindexfile, line)) {
-        wordindex.insert(line.c_str());
-    }
+    wordIndexList = file.split("\n");
+    wordIndexList.sort(Qt::CaseInsensitive);
     wd.close();
+    norseWordCompleter = new QCompleter(wordIndexList, this);
+    norseWordCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    norseWordCompleter->setMaxVisibleItems(30);
+    norseWordCompleter->popup()->setFont(QFont("Segoe UI", 13));
 }
 
 void MainWindow::importInflections() {
@@ -625,8 +596,6 @@ void MainWindow::findDefinition(QString word) {
         return;
     }
 
-    initializeResultFromDictionaries();
-
     currentTab->definitionResults.clear();
     for (auto itr = zisspair.first; itr != zisspair.second; ++itr) {
         auto key = itr->first;
@@ -654,8 +623,8 @@ void MainWindow::findDefinition(QString word) {
         alternatives.push_back(key.toLower());
     }
 
-    currentTab->resultsFromDictionaries->clear();
-    currentTab->resultsFromDictionaries->addItems(alternatives);
+    currentTab->options->clear();
+    currentTab->options->addItems(alternatives);
     findDefinitionPrint(0);
 }
 
@@ -922,6 +891,7 @@ void MainWindow::onInputTextEdited(const QString &arg1)
     }
     else if (currentTab->flags[2] == 1) {
         currentTab->definitionResults.clear();
+        /*
         QStringList display;
         if (word.length() > 1) {
             for (auto && entry : wordindex) {
@@ -932,6 +902,7 @@ void MainWindow::onInputTextEdited(const QString &arg1)
             }
             currentTab->options->addItems(display);
         }
+        */
     }
     else if (currentTab->flags[3] == 1) {
         currentTab->textualResults.clear();
@@ -1013,8 +984,18 @@ void MainWindow::onOptionsItemClicked(QListWidgetItem *item)
         downloadPage(itr->second);
     }
     else if (currentTab->flags[2] == 1) {
+        /*
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         findDefinition(tag);
+        */
+        ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
+        if (currentTab->definitionResults.size() == 0) {
+            findDefinition(tag);
+        }
+        else {
+            size_t index = currentTab->options->currentRow();
+            findDefinitionPrint(index);
+        }
     }
     else if (currentTab->flags[3] == 1) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
@@ -1034,7 +1015,7 @@ void MainWindow::onOptionsItemClicked(QListWidgetItem *item)
     }
 }
 
-
+/*
 void MainWindow::resultsFromDictionariesItemClicked(QListWidgetItem * item) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     auto itemText = item->text();
@@ -1050,6 +1031,7 @@ void MainWindow::resultsFromDictionariesItemClicked(QListWidgetItem * item) {
         }
     }
 }
+*/
 
 void MainWindow::connectionError() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
@@ -1332,7 +1314,6 @@ void MainWindow::onTabCloseButtonClicked(int index) {
 
 void MainWindow::on_actionModern_Icelandic_triggered()
 {
-    clearResultFromDictionaries();
     clearInflectionForms();
 
     ui->actionZoom_In->setEnabled(false);
@@ -1345,7 +1326,6 @@ void MainWindow::on_actionModern_Icelandic_triggered()
 
 void MainWindow::on_actionEnglish_Modern_Icelandic_triggered()
 {
-    clearResultFromDictionaries();
     clearInflectionForms();
 
     ui->actionZoom_In->setEnabled(false);
@@ -1357,7 +1337,6 @@ void MainWindow::on_actionEnglish_Modern_Icelandic_triggered()
 
 void MainWindow::on_actionOld_Icelandic_English_triggered()
 {
-    clearResultFromDictionaries();
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
@@ -1368,7 +1347,6 @@ void MainWindow::on_actionOld_Icelandic_English_triggered()
 
 void MainWindow::on_actionOld_Icelandic_Text_Search_triggered()
 {
-    clearResultFromDictionaries();
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
@@ -1378,7 +1356,6 @@ void MainWindow::on_actionOld_Icelandic_Text_Search_triggered()
 
 void MainWindow::on_actionSearch_Inflections_triggered()
 {
-    clearResultFromDictionaries();
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
@@ -1388,7 +1365,6 @@ void MainWindow::on_actionSearch_Inflections_triggered()
 
 void MainWindow::on_actionList_All_Forms_triggered()
 {
-    clearResultFromDictionaries();
     clearInflectionForms();
     ui->actionZoom_In->setEnabled(true);
     ui->actionZoom_Out->setEnabled(true);
@@ -1407,23 +1383,6 @@ void MainWindow::checkStateChanged(Qt::CheckState state, QVector<QString> const 
     else if (state == Qt::CheckState::Unchecked) {
         currentTab->inflStruct.erase(currentTab->inflStruct.find(vec));
     }
-
-/*
-    for (auto && i : inflStruct) {
-        qDebug() << i;
-    }
-
-    auto resultVec = ParseCheckStateChangeInfo();
-
-    QString toprint;
-    for (auto i : resultVec) {
-       QString temp = addStyleToResults(i);
-       toprint += temp;
-    }
-    toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-    currentTab->result->setHtml(toprint);
-    onResultTextChanged(toprint);
-    */
 }
 
 void MainWindow::proceedButtonPressed() {
@@ -1598,22 +1557,6 @@ void MainWindow::fillVerbs(QString const & str) {
             fillStructures<false, TYPE_NUMBER>(pastParticiple, str);
         }
     }
-
-    /*
-    bool findPresParticiple = InflManager.find(str, Infl::Short, Infl::PresentParticiple);
-    if (findPresParticiple) {
-        auto participle = constructItem(InflManager.nameOf(Infl::PresentParticiple), currentTab->inflectionForms);
-    }
-
-    bool findPastParticiple = InflManager.find(str, Infl::Short, Infl::PastParticiple);
-    if (findPastParticiple) {
-        auto participle = constructItem(InflManager.nameOf(Infl::PastParticiple), currentTab->inflectionForms);
-        fillStructures<false, TYPE_DEFINITENESS>(participle, str);
-        fillStructures<false, TYPE_GENDER>(participle, str);
-        fillStructures<false, TYPE_CASE>(participle, str);
-        fillStructures<false, TYPE_NUMBER>(participle, str);
-    }
-    */
 }
 
 void MainWindow::fillNouns(QString const & str) {

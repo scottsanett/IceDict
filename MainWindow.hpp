@@ -16,6 +16,7 @@
 #include "QTextStream"
 #include "QDebug"
 #include "QListWidgetItem"
+#include <QCompleter>
 #include "QStringList"
 #include "QString"
 #include "QIcon"
@@ -129,7 +130,7 @@ private:
         QTextBrowser * result;
         FindPane * findPane;
 
-        QListWidget * resultsFromDictionaries;
+//        QListWidget * resultsFromDictionaries;
         TreeWidget * inflectionForms;
         QPushButton * proceedButton;
 
@@ -153,6 +154,8 @@ private:
     PageDownloader * pageControl;
     StatusBar * statusBar;
     Inflection InflManager;
+    QCompleter * norseWordCompleter;
+//    QCompleter * inflectionalsCompleter;
 
     /* POD members */
     const char * writeUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
@@ -206,6 +209,8 @@ private:
 
     setstr_t wordindex;
 
+    QStringList wordIndexList;
+//    QStringList inflectionalsIndexList;
     QList<QTextEdit::ExtraSelection> findInPageSelections;
     QList<QTextEdit::ExtraSelection>::size_type findInPageSelectionIndex;
 
@@ -233,7 +238,6 @@ private slots:
     void onInputTextEdited(const QString &arg1);
     void onInputReturnPressed();
     void onOptionsItemClicked(QListWidgetItem *item);
-    void resultsFromDictionariesItemClicked(QListWidgetItem * item);
 
     void onResultContextMenuRequested(QPoint const & p);
     void onResultUrlClicked(QUrl);
@@ -302,8 +306,6 @@ private:
     bool isVowel(QChar ch);
 
     /* functions concerning user interface */
-    void initializeResultFromDictionaries();
-    void clearResultFromDictionaries();
     void initializeInflectionForms();
     void clearInflectionForms();
 
@@ -357,6 +359,7 @@ private:
     void importWordIndex();
     void importInflections();
     void importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i);
+//    void importInflectionIndex();
     void importOriginal();
     void importOriginalThread(std::array<map_t, 8> & mapvec, size_t i);
     void importDictionary();
