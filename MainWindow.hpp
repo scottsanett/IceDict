@@ -31,7 +31,7 @@
 #include "QShortcut"
 #include "QMessageBox"
 #include "QSplitter"
-#include "QWebEngineView"
+#include <QDesktopServices>
 
 #include <cstdlib>
 #include <thread>

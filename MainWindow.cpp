@@ -2360,23 +2360,8 @@ void MainWindow::on_actionZoom_Out_triggered()
     onContextMenuZoomOutTriggered();
 }
 
-void MainWindow::on_actionUser_Manual_triggered()
-{
-    /*
-    auto dialog = new QWidget(this);
-    dialog->setWindowFlag(Qt::Tool);
-    dialog->setLayout(new QVBoxLayout(dialog));
-    dialog->layout()->setMargin(0);
-    auto helpDoc = new QWebEngineView();
-    dialog->layout()->addWidget(helpDoc);
-    QFile file(":/documentation/doc.html");
-    if (file.open(QFile::ReadOnly)) {
-        auto str = file.readAll();
-        helpDoc->setHtml(str);
-        dialog->show();
-        dialog->move(this->x() + (this->width() - dialog->width()) / 2, this->y() + (this->height() - dialog->height()) / 2);
-    }
-    */
+void MainWindow::on_actionUser_Manual_triggered() {
+    QDesktopServices::openUrl(QUrl("https://github.com/scottsanett/IceDict_QtWidgets/blob/master/documentation/Welcome%20to%20IceDict.md"));
 }
 
 void MainWindow::on_actionAbout_IceDict_triggered()

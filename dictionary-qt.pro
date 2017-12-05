@@ -7,7 +7,6 @@
 QT       += core gui\
            network\
            widgets\
-           webenginewidgets\
 
 # greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
