@@ -1,7 +1,6 @@
 <h1><p align = center> Welcome to IceDict </p></h1>
 <h4><p align = center> The Inflectional Icelandic <-> English Dictionary </h4>
 
-<br>
 ## What Can It Do?
 IceDict is a Icelandic <-> English dictionary that supports:
 
@@ -48,7 +47,7 @@ This uses the same dictionary as the one above, only that now it searches text i
 This feature searches words in the two Old Icelandic dictionaries available: *Zoëga* and *Cleasby & Vifgusson*. Since *Cleasby* provides some of the entries in all caps, the search is performed in an case-insensitive manner. The panel under the search panel provides all the options that are available in the dictionaries, and it changes as you type to serve as a spelling clue. The penal under that are the actual results that have been found in the dictionaries. 
 
 ![searching vera in Zoëga](images/screenshot4.jpg)
-<p align=center><sup>search the word **vera** yields 4 alternatives</sup></p>
+<p align=center><sup>search the word <b>vera</b> yields 4 alternatives</sup></p>
 ![searching vera in Cleasby](images/screenshot5.jpg)
 
 #### 4. Textual Search in Old Icelandic Dictionaries
@@ -60,7 +59,7 @@ This feature works like #2 and #3 combined. All entries that have been found to 
 This feature searches for all words and inflectional tags that match the word in query. 
 
 ![searching loga](images/screenshot8.jpg)
-<p align=center><sup>search the word **loga** returns a neuter noun **log**, the genitive plural indefinite of which is **loga** etc.</sup></p>
+<p align=center><sup>search the word <b>loga</b> returns a neuter noun <b>log</b>, the genitive plural indefinite of which is <b>loga</b> etc.</sup></p>
 
 #### 6. List All Forms
 This feature provides functionalities to list all inflectional forms of a word that can be filtered as one likes. Since not all words of a particular part of speech have all the forms available for that part of speech (some verbs, for instance, don't have past participles), only the ones available for the word in query will be listed in the filter panel. All the filters are unchecked by default. 
@@ -68,7 +67,7 @@ This feature provides functionalities to list all inflectional forms of a word t
 Note that all requirements (voice, mood, tense, etc) of an inflectional category (impersonal, infinitive, imperative, etc) must be met for filtering to work. For non-impersonal verb forms, for instance, at least one option (e.g. active, middle) for each requirement (e.g. voice) needs to be checked, otherwise the result is blank.
 
 ![list all forms of kona](images/screenshot9.jpg)
-<p align=center><sup>list all inflectional forms of the word **kona**</sup></p>
+<p align=center><sup>list all inflectional forms of the word <b>kona</b></sup></p>
 
 ![list only definite forms of kona](images/screenshot10.jpg)
 <p align=center><sup>filter out all indefinite forms</sup></p>
@@ -77,9 +76,9 @@ Note that all requirements (voice, mood, tense, etc) of an inflectional category
 <p align=center><sup>filter out all indefinite forms and all cases that are not nominative</sup></p>
 
 ![the verb vera](images/screenshot12.jpg)
-<p align=center><sup>The verb **vera** doesn't have past participles</sup></p>
+<p align=center><sup>The verb <b>vera</b> doesn't have past participles</sup></p>
 
 ![the verb heyra](images/screenshot13.jpg)
-<p align=center><sup>The verb **heyra** does</sup></p>
+<p align=center><sup>The verb <b>heyra</b> does</sup></p>
 
 
