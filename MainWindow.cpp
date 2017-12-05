@@ -2362,6 +2362,7 @@ void MainWindow::on_actionZoom_Out_triggered()
 
 void MainWindow::on_actionUser_Manual_triggered()
 {
+    /*
     auto dialog = new QWidget(this);
     dialog->setWindowFlag(Qt::Tool);
     dialog->setLayout(new QVBoxLayout(dialog));
@@ -2375,6 +2376,7 @@ void MainWindow::on_actionUser_Manual_triggered()
         dialog->show();
         dialog->move(this->x() + (this->width() - dialog->width()) / 2, this->y() + (this->height() - dialog->height()) / 2);
     }
+    */
 }
 
 void MainWindow::on_actionAbout_IceDict_triggered()
