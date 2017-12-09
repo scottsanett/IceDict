@@ -439,6 +439,9 @@ QString MainWindow::oldToModern(QString word, Infl::Transforms flag) {
         else if (word.endsWith("r") && !isVowel(word.at(word.length() - 2))) {
             word.insert(word.length() - 1, "u");
         }
+        else if (word.endsWith("ss")) {
+            word = word.left(word.length() - 1);
+        }
         while (word.contains("z")) {
             auto index = word.indexOf("z");
             word.replace(index, 1, "s");
@@ -705,8 +708,10 @@ void MainWindow::findInflection(QString word) {
         findInflectionThread(results, word, i);
     }
 
-    for (size_t i = 0; i < 8; ++i) {
-        findInflectionThread(results, wordInfl, i);
+    if (word != wordInfl) {
+        for (size_t i = 0; i < 8; ++i) {
+            findInflectionThread(results, wordInfl, i);
+        }
     }
 
     auto resultSize = [&]() { int sz = 0; for (auto i : results) { sz += i.size(); } return sz; }();
