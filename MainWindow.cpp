@@ -249,7 +249,6 @@ void MainWindow::initializeInflectionForms() {
         currentTab->inflectionForms = new TreeWidget(this);
     currentTab->inflectionForms->setHeaderLabel("Inflections");
     currentTab->inflectionForms->setMaximumWidth(300);
-    currentTab->inflectionForms->setMinimumHeight(450);
 #ifdef __APPLE__
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
 #else
