@@ -618,6 +618,7 @@ void MainWindow::importDictionaryThread(QString const name, size_t i) {
 
 void MainWindow::findDefinition(QString word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    currentTab->definitionResults.clear();
     auto original = word;
 
     auto upper = QString(original).toUpper();
@@ -798,6 +799,7 @@ void MainWindow::textualSearchThread(QString word, size_t index) {
 
 void MainWindow::textualSearch(QString const & word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    currentTab->textualResults.clear();
 
     textualSearchThread(word, 0);
     textualSearchThread(word, 1);
@@ -962,7 +964,6 @@ void MainWindow::onInputReturnPressed()
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
         currentTab->textInQuery.clear();
-//        currentTab->wordAfterRedirection.clear();
         onlineDefinition(word);
     }
     else if (currentTab->flags[1] == 1 && word.length() > 0) {
@@ -970,7 +971,6 @@ void MainWindow::onInputReturnPressed()
         currentTab->options->clear();
         currentTab->onlineEntries.clear();
         currentTab->textInQuery.clear();
-//        currentTab->wordAfterRedirection.clear();
         onlineText(word);
     }
     else if (currentTab->flags[2] == 1 && word.length() > 0) {
@@ -979,11 +979,11 @@ void MainWindow::onInputReturnPressed()
     }
     else if (currentTab->flags[3] == 1 && word.length() > 0) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
-        currentTab->options->clear();
         textualSearch(word);
     }
     else if (currentTab->flags[4] == 1 && word.length() > 0) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
+        currentTab->options->clear();
         findInflection(word);
     }
     else if (currentTab->flags[5] == 1 && word.length() > 0) {
