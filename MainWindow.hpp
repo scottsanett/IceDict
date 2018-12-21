@@ -181,14 +181,14 @@ private:
 
 
     struct PartOfSpeech {
-        const char * MasNoun = "<td>kk</td>";
-        const char * FemNoun = "<td>kvk</td>";
-        const char * NetNoun = "<td>hk</td>";
-        const char * Adjective = "<td>lo</td>";
-        const char * Verb = "<td>so</td>";
-        const char * Pronoun = "<td>fn</td>";
-        const char * Adverb = "<td>ao</td>";
-        const char * Numerical = "<td>to</td>";
+        const char * MasNoun = "<td>masc</td>";
+        const char * FemNoun = "<td>fem</td>";
+        const char * NetNoun = "<td>neut</td>";
+        const char * Adjective = "<td>adj</td>";
+        const char * Verb = "<td>verb</td>";
+        const char * Pronoun = "<td>pron</td>";
+        const char * Adverb = "<td>adv</td>";
+        const char * Numerical = "<td>num</td>";
     } PartOfSpeech;
 
     /* Abstract data types */

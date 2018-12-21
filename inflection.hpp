@@ -56,7 +56,7 @@ private:
     std::array<const char *, 32> InflStruct {
         {"participle", "present participle", "past participle",
         "infinitive", "supine", "impersonal", "other",
-        "active voice", "middle voice",
+        "active", "middle",
         "indicative", "subjunctive", "imperative",
         "present tense", "past tense",
         "1st", "2nd", "3rd",
