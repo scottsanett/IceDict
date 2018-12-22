@@ -23,7 +23,7 @@ One may also choose to compile from source for other platforms. QtCreator is rec
 The online dictionary is powered by http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?id=IcelOnline.IEOrd
 
 
-The offline dictioanries:
+The offline dictionaries:
 
 
 Zoega: http://norse.ulver.com/dct/zoega/
