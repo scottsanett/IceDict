@@ -67,7 +67,7 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayout->setSpacing(0);
     currentTab->buttonLayout->setMargin(0);
     currentTab->buttonLayoutWidget = new QWidget();
-    currentTab->buttonLayoutWidget->setFixedHeight(28);
+    currentTab->buttonLayoutWidget->setFixedHeight(30);
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
     currentTab->backButton = new QPushButton("⬅");
     currentTab->backButton->setEnabled(false);
@@ -88,7 +88,7 @@ void MainWindow::addTab_clicked() {
     currentTab->inputPaneLayoutWidget->setLayout(currentTab->inputPaneLayout);
     currentTab->inputPaneLayoutWidget->setMinimumWidth(150);
     currentTab->inputPaneLayoutWidget->setMaximumWidth(200);
-    currentTab->inputPaneLayoutWidget->setFixedHeight(55);
+    currentTab->inputPaneLayoutWidget->setFixedHeight(60);
     currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
 
     currentTab->comboBox = new QComboBox();
