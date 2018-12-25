@@ -1319,6 +1319,7 @@ void MainWindow::onComboBoxIndexChanged(int index) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->input->setEnabled(true);
     currentTab->options->setEnabled(true);
+    clearInflectionForms();
     switch (index) {
     case (0): { search_icelandic_word(); break; }
     case (1): { search_icelandic_text(); break; }
@@ -2137,18 +2138,15 @@ void MainWindow::onResultContextMenuRequested(QPoint const &) {
     resultContextMenu->move(cursorPos.x(), cursorPos.y());
     resultContextMenu->addSeparator();
 
-#ifdef __APPLE__
     QAction * act1 = new QAction("Icelandic → English", this);
-#endif
     QObject::connect(act1, &QAction::triggered,
                      this, &MainWindow::onContextMenuIceToEngTriggered);
 
     QAction * act2 = new QAction("Icelandic Textual", this);
     QObject::connect(act2, &QAction::triggered,
                      this, &MainWindow::onContextMenuEngToIceTriggered);
-#ifdef __APPLE__
+
     QAction * act3 = new QAction("Norse → English", this);
-#endif
     QObject::connect(act3, &QAction::triggered,
                      this, &MainWindow::onContextMenuNorToEngTriggered);
 
