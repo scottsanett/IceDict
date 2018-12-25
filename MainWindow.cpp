@@ -1207,7 +1207,7 @@ Infl::Results MainWindow::parsePage() {
         auto pos = currentTab->webpage.indexOf("<span class=\"lemma\">");
         if (pos != -1) {
             QString tag = "<span class=\"lemma\">";
-            currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-weight: bold; font-size:24px;\" class=\"lemma\">");
+            currentTab->webpage.replace(pos, tag.length(), "<span style=\" font-weight: bold; font-size: " + QString::fromStdString(std::to_string(currentTab->perpetuaFontSize)) + "px;\" class=\"lemma\">");
         }
         while (currentTab->webpage.contains("<span class=\"orth\">")) {
             QString tag = "<span class=\"orth\">";
