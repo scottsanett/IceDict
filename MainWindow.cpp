@@ -34,9 +34,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setExpanding(true);
 
 #ifdef __APPLE__
-    ui->resultsTab->setFont(QFont("Segoe UI", 12));
-#else
-    ui->resultsTab->setFont(QFont("Segoe UI", 10));
+    ui->resultsTab->setFont(QFont("Segoe UI", 13));
 #endif
 
     QObject::connect(ui->resultsTab->tabBar(), &QTabBar::tabCloseRequested,
@@ -74,22 +72,16 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayoutWidget = new QWidget();
 #ifdef __APPLE__
     currentTab->buttonLayoutWidget->setFixedHeight(28);
-#else
-    currentTab->buttonLayoutWidget->setFixedHeight(23);
 #endif
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
 #ifdef __APPLE__
     currentTab->backButton = new QPushButton("⬅");
-#else
-    currentTab->backButton = new QPushButton("Back");
 #endif
     currentTab->backButton->setEnabled(false);
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
 #ifdef __APPLE__
     currentTab->nextButton = new QPushButton("➡︎");
-#else
-    currentTab->nextButton = new QPushButton("Forward");
 #endif
     currentTab->nextButton->setEnabled(false);
     QObject::connect(currentTab->nextButton, &QPushButton::pressed,
@@ -116,13 +108,6 @@ void MainWindow::addTab_clicked() {
     currentTab->comboBox->addItem("Norse Textual");
     currentTab->comboBox->addItem("Find Originals");
     currentTab->comboBox->addItem("All Inflections");
-#else
-    currentTab->comboBox->addItem("Icelandic -> English");
-    currentTab->comboBox->addItem("Icelandic Textual");
-    currentTab->comboBox->addItem("Norse -> English");
-    currentTab->comboBox->addItem("Norse Textual");
-    currentTab->comboBox->addItem("Find Originals");
-    currentTab->comboBox->addItem("All Inflections");
 #endif
     currentTab->comboBox->setCurrentIndex(-1);
     connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
@@ -145,8 +130,6 @@ void MainWindow::addTab_clicked() {
     currentTab->options->setMaximumWidth(200);
 #ifdef __APPLE__
     currentTab->options->setFrameStyle(QFrame::NoFrame);
-#else
-    currentTab->options->setFrameStyle(QFrame::HLine);
 #endif
     currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 13px");
 
@@ -251,8 +234,6 @@ void MainWindow::initializeInflectionForms() {
     currentTab->inflectionForms->setMaximumWidth(300);
 #ifdef __APPLE__
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
-#else
-    currentTab->inflectionForms->setFrameStyle(QFrame::VLine);
 #endif
     currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
@@ -503,8 +484,6 @@ void MainWindow::importWordIndex() {
     norseWordCompleter->setMaxVisibleItems(30);
 #ifdef __APPLE__
     norseWordCompleter->popup()->setFont(QFont("Segoe UI", 13));
-#else
-    norseWordCompleter->popup()->setFont(QFont("Segoe UI", 10));
 #endif
 }
 
@@ -729,7 +708,7 @@ void MainWindow::findInflection(QString word) {
         }
     }
 
-    toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
+    toprint = "<span style=\"font-family: Segoe UI; font-size: " + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     currentTab->result->setHtml(toprint);
     onResultTextChanged(toprint);
 }
@@ -912,19 +891,19 @@ void MainWindow::printAllPrint(size_t index) {
     currentTab->inflSelectResult.clear();
     currentTab->inflSelectResult = thisResult.second;
 
-    QString toprint;
+    QString display;
 
     for (auto i : thisResult.second) {
        QString temp = addStyleToResults(i);
-       toprint += temp;
+       display += temp;
     }
 
     clearInflectionForms();
     initializeInflectionForms();
-    fillInflectionForms(toprint);
-    toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
-    currentTab->result->setHtml(toprint);
-    onResultTextChanged(toprint);
+    fillInflectionForms(display);
+    display = "<span style=\"font-family: Segoe UI; font-size: " + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + display + "</table></p></span>";
+    currentTab->result->setHtml(display);
+    onResultTextChanged(display);
 }
 
 
@@ -944,7 +923,7 @@ void MainWindow::onInputTextEdited(const QString &arg1)
         currentTab->definitionResults.clear();
     }
     else if (currentTab->flags[3] == 1) {
-        currentTab->textualResults.clear();   
+        currentTab->textualResults.clear();
     }
     else if (currentTab->flags[4] == 1) {
     }
@@ -1026,7 +1005,7 @@ void MainWindow::onOptionsItemClicked(QListWidgetItem *item)
             findDefinition(tag);
         }
         else {
-            size_t index = currentTab->options->currentRow();
+            auto index = currentTab->options->currentRow();
             findDefinitionPrint(index);
         }
     }
@@ -1036,14 +1015,14 @@ void MainWindow::onOptionsItemClicked(QListWidgetItem *item)
             textualSearch(tag);
         }
         else {
-            size_t index = currentTab->options->currentRow();
+            auto index = currentTab->options->currentRow();
             textualSearchPrint(index);
         }
     }
     else if (currentTab->flags[5] == 1) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), tag);
         currentTab->result->clear();
-        size_t index = currentTab->options->currentRow();
+        auto index = currentTab->options->currentRow();
         printAllPrint(index);
     }
 }
@@ -1068,12 +1047,12 @@ void MainWindow::resultsFromDictionariesItemClicked(QListWidgetItem * item) {
 
 void MainWindow::connectionError() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->result->setHtml("<br/><br/><br/><br/><br/><span style=\"font-family: Perpetua; font-size: 20px; font-weight: bold;\"><p align='center'>Connection Error</p><p align='center' style='font-weight: normal'>Please check your network connection.</p></span>");
+    currentTab->result->setHtml("<br/><br/><br/><br/><br/><span style=\"font-family: Perpetua; font-size: " + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px; font-weight: bold;\"><p align='center'>Connection Error</p><p align='center' style='font-weight: normal'>Please check your network connection.</p></span>");
 }
 
 void MainWindow::timeoutError() {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->result->setHtml("<br/><br/><br/><br/><b/><span style=\"font-family: Perpetua; font-size: 20px; font-weight: bold;\"><p align='center'>Connection Timeout</p><p align='center' style='font-weight: normal'>Please check your network connection.</p></span>");
+    currentTab->result->setHtml("<br/><br/><br/><br/><b/><span style=\"font-family: Perpetua; font-size: " + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px; font-weight: bold;\"><p align='center'>Connection Timeout</p><p align='center' style='font-weight: normal'>Please check your network connection.</p></span>");
 }
 
 void MainWindow::onlineText(QString word) {
@@ -1119,7 +1098,7 @@ void MainWindow::loadPage() {
 
     auto display = parsePage();
     if (display == Infl::Results::No || display == Infl::Results::One) {
-        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
+        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: " + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;\">" + currentTab->webpage + "</span>";
         currentTab->result->setHtml(currentTab->webpage);
         onResultTextChanged(currentTab->webpage);
         currentTab->webpage.clear();
@@ -1135,7 +1114,7 @@ void MainWindow::loadPage() {
         downloadPage(firstEntry->second);
     }
     else if (display == Infl::Results::Maybe) {
-        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: 20px;\">" + currentTab->webpage + "</span>";
+        currentTab->webpage = "<span style=\"font-family: Perpetua; font-size: " + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;\">" + currentTab->webpage + "</span>";
         currentTab->result->setHtml(currentTab->webpage);
         onResultTextChanged(currentTab->webpage);
         currentTab->webpage.clear();
@@ -1272,9 +1251,8 @@ void MainWindow::onResultUrlClicked(QUrl url) {
 }
 
 void MainWindow::onResultTextChanged(QString display) {
-    if (display == "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\"></table></p></span>") return;
-
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
+    if (display == "<span style=\"font-family: Segoe UI; font-size: " + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\"></table></p></span>") return;
 
     if (tabResultHistoryIndex.at(currentTab->mainSplitter) < tabResultHistory.at(currentTab->mainSplitter).size() - 1) {
         auto historyIndex = tabResultHistoryIndex.at(currentTab->mainSplitter);
@@ -1365,8 +1343,8 @@ void MainWindow::on_actionModern_Icelandic_triggered()
 {
     clearInflectionForms();
 
-    ui->actionZoom_In->setEnabled(false);
-    ui->actionZoom_Out->setEnabled(false);
+    ui->actionZoom_In->setEnabled(true);
+    ui->actionZoom_Out->setEnabled(true);
     ui->actionFind_in_Page->setEnabled(true);
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
@@ -1378,8 +1356,8 @@ void MainWindow::on_actionEnglish_Modern_Icelandic_triggered()
 {
     clearInflectionForms();
 
-    ui->actionZoom_In->setEnabled(false);
-    ui->actionZoom_Out->setEnabled(false);
+    ui->actionZoom_In->setEnabled(true);
+    ui->actionZoom_Out->setEnabled(true);
     ui->actionFind_in_Page->setEnabled(true);
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
@@ -1449,7 +1427,7 @@ void MainWindow::proceedButtonPressed() {
        QString temp = addStyleToResults(i);
        toprint += temp;
     }
-    toprint = "<span style=\"font-family: Segoe UI; font-size: 14px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
+    toprint = "<span style=\"font-family: Segoe UI; font-size: " + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;\"><p align=\"center\"><table border=\"0.3\" cellpadding=\"10\">" + toprint + "</table></p></span>";
     currentTab->result->setHtml(toprint);
     onResultTextChanged(toprint);
 }
@@ -2161,8 +2139,6 @@ void MainWindow::onResultContextMenuRequested(QPoint const &) {
 
 #ifdef __APPLE__
     QAction * act1 = new QAction("Icelandic → English", this);
-#else
-    QAction * act1 = new QAction("Icelandic -> English", this);
 #endif
     QObject::connect(act1, &QAction::triggered,
                      this, &MainWindow::onContextMenuIceToEngTriggered);
@@ -2172,8 +2148,6 @@ void MainWindow::onResultContextMenuRequested(QPoint const &) {
                      this, &MainWindow::onContextMenuEngToIceTriggered);
 #ifdef __APPLE__
     QAction * act3 = new QAction("Norse → English", this);
-#else
-    QAction * act3 = new QAction("Norse -> English", this);
 #endif
     QObject::connect(act3, &QAction::triggered,
                      this, &MainWindow::onContextMenuNorToEngTriggered);
@@ -2277,33 +2251,25 @@ void MainWindow::onContextMenuZoomInTriggered() {
     auto text = result->toHtml();
     QString after;
     bool isPerpetua = text.contains(
-                          QString("font-size:") +
-                          to_string(currentTab->perpetuaFontSize).c_str() +
-                          "px;");
+                          QString("font-size:") + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;");
 
     if (isPerpetua) {
         auto tokens = text.split(
-                          QString("font-size:") +
-                          to_string(currentTab->perpetuaFontSize).c_str() +
-                          "px;");
+                          QString("font-size:") + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;");
         currentTab->perpetuaFontSize += 1;
         for (auto i = 0; i < tokens.size(); ++i) {
             if (i < tokens.size() - 1)
-                after += tokens.at(i) + QString("font-size:") +
-                         to_string(currentTab->perpetuaFontSize).c_str() + "px;";
+                after += tokens.at(i) + QString("font-size:") + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;";
             else
                 after += tokens.at(i);
         }
     }
     else {
-        auto tokens = text.split(QString("font-size:") +
-                                 to_string(currentTab->segoeFontSize).c_str() +
-                                 "px;");
+        auto tokens = text.split(QString("font-size:") + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;");
         currentTab->segoeFontSize += 1;
         for (auto i = 0; i < tokens.size(); ++i) {
             if (i < tokens.size() - 1)
-                after += tokens.at(i) + QString("font-size:") +
-                         to_string(currentTab->segoeFontSize).c_str() + "px;";
+                after += tokens.at(i) + QString("font-size:") + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;";
             else
                 after += tokens.at(i);
         }
@@ -2319,32 +2285,26 @@ void MainWindow::onContextMenuZoomOutTriggered() {
     QString after;
 
     bool isPerpetua = text.contains(
-                          QString("font-size:") +
-                          to_string(currentTab->perpetuaFontSize).c_str() + "px;");
+                          QString("font-size:") + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;");
 
     if (isPerpetua) {
         auto tokens = text.split(
-                          QString("font-size:") +
-                          to_string(currentTab->perpetuaFontSize).c_str() +
-                          "px;");
+                          QString("font-size:") + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;");
         currentTab->perpetuaFontSize -= 1;
         for (auto i = 0; i < tokens.size(); ++i) {
             if (i < tokens.size() - 1)
-                after += tokens.at(i) + QString("font-size:") +
-                         to_string(currentTab->perpetuaFontSize).c_str() + "px;";
+                after += tokens.at(i) + QString("font-size:") + QString::fromStdString(to_string(currentTab->perpetuaFontSize)) + "px;";
             else
                 after += tokens.at(i);
         }
     }
     else {
         auto tokens = text.split(
-                          QString("font-size:") +
-                          to_string(currentTab->segoeFontSize).c_str() + "px;");
+                          QString("font-size:") + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;");
         currentTab->segoeFontSize -= 1;
         for (auto i = 0; i < tokens.size(); ++i) {
             if (i < tokens.size() - 1)
-                after += tokens.at(i) + QString("font-size:") +
-                         to_string(currentTab->segoeFontSize).c_str() + "px;";
+                after += tokens.at(i) + QString("font-size:") + QString::fromStdString(to_string(currentTab->segoeFontSize)) + "px;";
             else
                 after += tokens.at(i);
         }

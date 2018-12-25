@@ -92,7 +92,7 @@ namespace Infl {
         return static_cast<Transforms>(static_cast<int>(a) | static_cast<int>(b));
     }
 
-    enum class Results { No, One, Many, Maybe};
+    enum class Results {No, One, Many, Maybe};
 }
 
 class MainWindow : public QMainWindow
@@ -244,11 +244,9 @@ private slots:
     void onInputTextEdited(const QString &arg1);
     void onInputReturnPressed();
     void onOptionsItemClicked(QListWidgetItem *item);
-
     void onResultContextMenuRequested(QPoint const & p);
     void onResultUrlClicked(QUrl);
     void onResultTextChanged(QString);
-
     void on_actionMinimize_triggered();
     void on_actionFullscreen_triggered();
     void on_actionNew_Tab_triggered();
@@ -259,46 +257,29 @@ private slots:
     void on_actionOld_Icelandic_Text_Search_triggered();
     void on_actionSearch_Inflections_triggered();
     void on_actionList_All_Forms_triggered();
-
     void onContextMenuIceToEngTriggered();
     void onContextMenuEngToIceTriggered();
     void onContextMenuNorToEngTriggered();
     void onContextMenuEngToNorTriggered();
     void onContextMenuSearchInfReverseTriggered();
     void onContextMenuSearchInfTriggered();
-
     void onContextMenuZoomInTriggered();
     void onContextMenuZoomOutTriggered();
-
     void onComboBoxIndexChanged(int index);
-
     void onTabCloseButtonClicked(int index);
-
     void on_actionZoom_In_triggered();
     void on_actionZoom_Out_triggered();
-
     void on_actionUser_Manual_triggered();
-
     void on_actionAbout_IceDict_triggered();
-
     void on_actionAbout_Qt_triggered();
-
     void on_actionAcknowledgements_triggered();
-
     void on_actionFind_in_Page_triggered();
-
     void on_actionShow_Status_Bar_triggered();
-
     void on_actionFind_triggered();
-
     void on_actionShow_Next_Tab_triggered();
-
     void on_actionShow_Previous_Tab_triggered();
-
     void on_actionUndo_Close_Tab_triggered();
-
     void on_actionBack_triggered();
-
     void on_actionForward_triggered();
 
 private:

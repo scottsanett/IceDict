@@ -12,7 +12,7 @@ void PageDownloader::DownloadPage(QUrl fileUrl) {
     QEventLoop loop;
     connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
     connect(pReply, SIGNAL(finished()), &loop, SLOT(quit()));
-    timer.start(5000);
+    timer.start(20000);
     loop.exec();
 
     if (timer.isActive()) {
