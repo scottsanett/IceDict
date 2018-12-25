@@ -32,10 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setMovable(true);
     ui->resultsTab->tabBar()->setAutoHide(true);
     ui->resultsTab->tabBar()->setExpanding(true);
-
-#ifdef __APPLE__
     ui->resultsTab->setFont(QFont("Segoe UI", 13));
-#endif
 
     QObject::connect(ui->resultsTab->tabBar(), &QTabBar::tabCloseRequested,
                      this, &MainWindow::onTabCloseButtonClicked);
@@ -70,19 +67,13 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayout->setSpacing(0);
     currentTab->buttonLayout->setMargin(0);
     currentTab->buttonLayoutWidget = new QWidget();
-#ifdef __APPLE__
     currentTab->buttonLayoutWidget->setFixedHeight(28);
-#endif
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
-#ifdef __APPLE__
     currentTab->backButton = new QPushButton("⬅");
-#endif
     currentTab->backButton->setEnabled(false);
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
-#ifdef __APPLE__
     currentTab->nextButton = new QPushButton("➡︎");
-#endif
     currentTab->nextButton->setEnabled(false);
     QObject::connect(currentTab->nextButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionForward_triggered);
@@ -101,14 +92,12 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
 
     currentTab->comboBox = new QComboBox();
-#ifdef __APPLE__
     currentTab->comboBox->addItem("Icelandic → English");
     currentTab->comboBox->addItem("Icelandic Textual");
     currentTab->comboBox->addItem("Norse → English");
     currentTab->comboBox->addItem("Norse Textual");
     currentTab->comboBox->addItem("Find Originals");
     currentTab->comboBox->addItem("All Inflections");
-#endif
     currentTab->comboBox->setCurrentIndex(-1);
     connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onComboBoxIndexChanged(int)));
@@ -128,9 +117,7 @@ void MainWindow::addTab_clicked() {
     currentTab->options = new QListWidget(this);
     currentTab->options->setMinimumWidth(150);
     currentTab->options->setMaximumWidth(200);
-#ifdef __APPLE__
     currentTab->options->setFrameStyle(QFrame::NoFrame);
-#endif
     currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 13px");
 
     currentTab->options->setEnabled(false);
@@ -232,9 +219,7 @@ void MainWindow::initializeInflectionForms() {
         currentTab->inflectionForms = new TreeWidget(this);
     currentTab->inflectionForms->setHeaderLabel("Inflections");
     currentTab->inflectionForms->setMaximumWidth(300);
-#ifdef __APPLE__
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
-#endif
     currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
 
@@ -482,9 +467,7 @@ void MainWindow::importWordIndex() {
     norseWordCompleter = new QCompleter(wordIndexList, this);
     norseWordCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     norseWordCompleter->setMaxVisibleItems(30);
-#ifdef __APPLE__
     norseWordCompleter->popup()->setFont(QFont("Segoe UI", 13));
-#endif
 }
 
 void MainWindow::importInflections() {
