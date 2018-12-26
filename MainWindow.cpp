@@ -67,16 +67,22 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayout->setSpacing(0);
     currentTab->buttonLayout->setMargin(0);
     currentTab->buttonLayoutWidget = new QWidget();
-    currentTab->buttonLayoutWidget->setFixedHeight(30);
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
+
     currentTab->backButton = new QPushButton("⬅");
     currentTab->backButton->setEnabled(false);
+    auto buttonSizeHint = currentTab->backButton->sizeHint();
+    currentTab->buttonLayoutWidget->setMaximumHeight(buttonSizeHint.height());
+    currentTab->buttonLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
+    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 3.5);
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
+
     currentTab->nextButton = new QPushButton("➡︎");
     currentTab->nextButton->setEnabled(false);
     QObject::connect(currentTab->nextButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionForward_triggered);
+
     currentTab->buttonLayout->addWidget(currentTab->backButton);
     currentTab->buttonLayout->addWidget(currentTab->nextButton);
     currentTab->inputLayout->addWidget(currentTab->buttonLayoutWidget);
@@ -86,9 +92,8 @@ void MainWindow::addTab_clicked() {
     currentTab->inputPaneLayout->setSpacing(0);
     currentTab->inputPaneLayoutWidget = new QWidget;
     currentTab->inputPaneLayoutWidget->setLayout(currentTab->inputPaneLayout);
-    currentTab->inputPaneLayoutWidget->setMinimumWidth(150);
-    currentTab->inputPaneLayoutWidget->setMaximumWidth(200);
-    currentTab->inputPaneLayoutWidget->setFixedHeight(60);
+    currentTab->inputPaneLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
+    currentTab->inputPaneLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 3.5);
     currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
 
     currentTab->comboBox = new QComboBox();
@@ -102,6 +107,7 @@ void MainWindow::addTab_clicked() {
     connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onComboBoxIndexChanged(int)));
     currentTab->inputPaneLayout->addWidget(currentTab->comboBox);
+    auto comboBoxSizeHint = currentTab->comboBox->sizeHint();
 
     currentTab->input = new QLineEdit();
     currentTab->input->setPlaceholderText("Select a dictionary first...");
@@ -113,11 +119,14 @@ void MainWindow::addTab_clicked() {
                      this, &MainWindow::onInputTextEdited);
     QObject::connect(currentTab->input, &QLineEdit::returnPressed,
                      this, &MainWindow::onInputReturnPressed);
+    auto inputBoxSizeHint = currentTab->input->sizeHint();
+    currentTab->inputPaneLayoutWidget->setMaximumHeight(comboBoxSizeHint.height() + inputBoxSizeHint.height() + 10);
 
     currentTab->options = new QListWidget(this);
-    currentTab->options->setMinimumWidth(150);
-    currentTab->options->setMaximumWidth(200);
-    currentTab->options->setFrameStyle(QFrame::NoFrame);
+    currentTab->options->setMinimumWidth(buttonSizeHint.width() * 3);
+    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 3.5);
+    currentTab->options->setFrameStyle(QFrame::HLine);
+
     currentTab->options->setStyleSheet("font-family: Segoe UI; font-size: 13px");
 
     currentTab->options->setEnabled(false);
@@ -129,6 +138,7 @@ void MainWindow::addTab_clicked() {
     currentTab->resultLayout->setOrientation(Qt::Vertical);
     currentTab->resultLayout->setFrameStyle(QFrame::NoFrame);
     currentTab->resultLayout->setHandleWidth(0);
+    currentTab->resultLayout->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     currentTab->mainSplitter->addWidget(currentTab->resultLayout);
     currentTab->result = new QTextBrowser();
     currentTab->result->setHtml(startScreen);
@@ -218,7 +228,9 @@ void MainWindow::initializeInflectionForms() {
     if (!currentTab->inflectionForms)
         currentTab->inflectionForms = new TreeWidget(this);
     currentTab->inflectionForms->setHeaderLabel("Inflections");
-    currentTab->inflectionForms->setMaximumWidth(300);
+    auto buttonSizeHint = currentTab->backButton->sizeHint();
+    currentTab->inflectionForms->setMinimumWidth(buttonSizeHint.width() * 3);
+    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 3.5);
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
     currentTab->inflectionForms->setStyleSheet("font-family: Segoe UI; font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
@@ -2314,7 +2326,7 @@ void MainWindow::on_actionAbout_IceDict_triggered()
     auto aboutMessage =
             R"foo(
             <p align=center><h2>IceDict</h2></p>
-            <p align=center style="font-weight: normal">Version 1.9</p>
+            <p align=center style="font-weight: normal">Version )foo" + QString::fromUtf8(VERSION_STRING) + R"foo(</p>
             <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2018 Li Xianpeng<br><br>Licensed under GNU LGPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
