@@ -107,8 +107,7 @@ private:
     struct Pimpl {
         QString textInQuery;
         QString wordAfterRedirection;
-        size_t perpetuaFontSize = 20;
-        size_t segoeFontSize = 14;
+        size_t fontSize = 14;
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
         QString webpage;
         std::set<QVector<QString>> inflStruct;
@@ -171,9 +170,9 @@ private:
     const char * textUrl2 = "&submit=Search";
 
 #ifdef _WIN64
-    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"<br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
+    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\"font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"<br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
 #else
-    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\" font-family: 'Perpetua'; font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\"font-family: Segoe UI Symbol; font-size:20px;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
+    const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\"font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"><span style=\"font-size:20px;\">ᚢᛁᛚᚴᚢᛉᛁᚾ᛬ᛏᛁᛚ᛬ᚢᚱᚦᛅᛒᚢᚴᛅᛣ᛬ᛁᛋᛚᛁᚾᛋᚴᚱᛅᛣ</span></p><p align=\"center\"></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
 #endif
 
     enum class POS { Noun, Verb, Adjective, Adverb, Pronoun, Numerical};
