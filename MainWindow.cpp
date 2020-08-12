@@ -62,6 +62,13 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout->setOrientation(Qt::Vertical);
     currentTab->mainSplitter->addWidget(currentTab->inputLayout);
 
+    currentTab->inputPaneLayout = new QVBoxLayout;
+    currentTab->inputPaneLayout->setSpacing(0);
+    currentTab->inputPaneLayout->setMargin(0);
+    currentTab->inputPaneLayoutWidget = new QWidget;
+    currentTab->inputPaneLayoutWidget->setLayout(currentTab->inputPaneLayout);
+    currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
+
     currentTab->buttonLayout = new QHBoxLayout;
     currentTab->buttonLayout->setSpacing(0);
     currentTab->buttonLayout->setMargin(0);
@@ -71,9 +78,9 @@ void MainWindow::addTab_clicked() {
     currentTab->backButton = new QPushButton("⬅");
     currentTab->backButton->setEnabled(false);
     auto buttonSizeHint = currentTab->backButton->sizeHint();
-    currentTab->buttonLayoutWidget->setMaximumHeight(buttonSizeHint.height());
+//    currentTab->buttonLayoutWidget->setMaximumHeight(buttonSizeHint.height());
     currentTab->buttonLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 3.5);
+    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 4);
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
 
@@ -84,23 +91,14 @@ void MainWindow::addTab_clicked() {
 
     currentTab->buttonLayout->addWidget(currentTab->backButton);
     currentTab->buttonLayout->addWidget(currentTab->nextButton);
-    currentTab->inputLayout->addWidget(currentTab->buttonLayoutWidget);
-
-    currentTab->inputPaneLayout = new QVBoxLayout;
-    currentTab->inputPaneLayout->setMargin(0);
-    currentTab->inputPaneLayout->setSpacing(0);
-    currentTab->inputPaneLayoutWidget = new QWidget;
-    currentTab->inputPaneLayoutWidget->setLayout(currentTab->inputPaneLayout);
-    currentTab->inputPaneLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->inputPaneLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 3.5);
-    currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
+    currentTab->inputPaneLayout->addWidget(currentTab->buttonLayoutWidget);
 
     currentTab->comboBox = new QComboBox();
     currentTab->comboBox->addItem("Icelandic → English");
     currentTab->comboBox->addItem("Icelandic Textual");
     currentTab->comboBox->addItem("Norse → English");
     currentTab->comboBox->addItem("Norse Textual");
-    currentTab->comboBox->addItem("Find Originals");
+    currentTab->comboBox->addItem("Find Headword");
     currentTab->comboBox->addItem("All Inflections");
     currentTab->comboBox->setCurrentIndex(-1);
     connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
@@ -110,7 +108,7 @@ void MainWindow::addTab_clicked() {
 
     currentTab->input = new QLineEdit();
     currentTab->input->setPlaceholderText("Select a dictionary first...");
-    currentTab->input->setStyleSheet("font-size: 13px");
+    //currentTab->input->setStyleSheet("font-size: 13px");
     currentTab->input->setClearButtonEnabled(true);
     currentTab->input->setEnabled(false);
     currentTab->inputPaneLayout->addWidget(currentTab->input, 1, 0);
@@ -119,15 +117,13 @@ void MainWindow::addTab_clicked() {
     QObject::connect(currentTab->input, &QLineEdit::returnPressed,
                      this, &MainWindow::onInputReturnPressed);
     auto inputBoxSizeHint = currentTab->input->sizeHint();
-    currentTab->inputPaneLayoutWidget->setMaximumHeight(comboBoxSizeHint.height() + inputBoxSizeHint.height() + 10);
+    currentTab->inputPaneLayoutWidget->setMaximumHeight(buttonSizeHint.height() + comboBoxSizeHint.height() + inputBoxSizeHint.height());
 
     currentTab->options = new QListWidget(this);
     currentTab->options->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 3.5);
+    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 4);
+    currentTab->options->setStyleSheet("font-size: 14px");
     currentTab->options->setFrameStyle(QFrame::HLine);
-
-    currentTab->options->setStyleSheet("font-size: 13px");
-
     currentTab->options->setEnabled(false);
     currentTab->inputLayout->addWidget(currentTab->options);
     QObject::connect(currentTab->options, &QListWidget::itemClicked,
@@ -142,6 +138,7 @@ void MainWindow::addTab_clicked() {
     currentTab->result = new QTextBrowser();
     currentTab->result->setHtml(startScreen);
     currentTab->result->setFrameStyle(QFrame::NoFrame);
+    currentTab->result->setFont(QFont("Georgia"));
     currentTab->result->setContextMenuPolicy(Qt::CustomContextMenu);
     QObject::connect(currentTab->result, &QTextBrowser::anchorClicked,
                      this, &MainWindow::onResultUrlClicked);
@@ -289,81 +286,6 @@ QString MainWindow::addStyleToResults(QString line) {
     return result.c_str();
 }
 
-
-void MainWindow::search_icelandic_word()
-{
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->flags = {{1, 0, 0, 0, 0, 0}};
-    currentTab->input->clear();
-    currentTab->input->setCompleter(nullptr);
-    currentTab->onlineEntries.clear();
-    currentTab->options->clear();
-    currentTab->result->clear();
-    currentTab->input->setPlaceholderText("Insert word here...");
-    statusBar->showMessage("search definitions for modern Icelandic word (online)");
-}
-
-
-void MainWindow::search_icelandic_text()
-{
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->flags = {{0, 1, 0, 0, 0, 0}};
-    currentTab->input->clear();
-    currentTab->input->setCompleter(nullptr);
-    currentTab->onlineEntries.clear();
-    currentTab->options->clear();
-    currentTab->result->clear();
-    currentTab->input->setPlaceholderText("Insert text here...");
-    statusBar->showMessage("search text in modern Icelandic dictionary (online)");
-}
-
-void MainWindow::search_norse_word()
-{
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->flags = {{0, 0, 1, 0, 0, 0}};
-    currentTab->input->setPlaceholderText(tr("Insert word here..."));
-    currentTab->input->clear();
-    currentTab->input->setCompleter(norseWordCompleter);
-    currentTab->result->clear();
-    currentTab->options->clear();
-    statusBar->showMessage("search definitions for old Icelandic word");
-}
-
-void MainWindow::search_norse_text()
-{
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->flags = {{0, 0, 0, 1, 0, 0}};
-    currentTab->input->clear();
-    currentTab->options->clear();
-    currentTab->result->clear();
-    currentTab->input->setPlaceholderText("Insert text here...");
-    statusBar->showMessage("search text in old Icelandic dictionaries");
-}
-
-void MainWindow::search_original()
-{
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->flags = {{0, 0, 0, 0, 1, 0}};
-    currentTab->input->clear();
-    currentTab->input->setCompleter(nullptr);
-    currentTab->options->clear();
-    currentTab->result->clear();
-    currentTab->input->setPlaceholderText("Insert word here...");
-    statusBar->showMessage("find all entries that can be inflected to the word just entered");
-}
-
-void MainWindow::search_all_inflections()
-{
-    auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    currentTab->flags = {{0, 0, 0, 0, 0, 1}};
-    currentTab->input->clear();
-    currentTab->input->setCompleter(nullptr);
-    currentTab->options->clear();
-    currentTab->result->clear();
-    currentTab->input->setPlaceholderText("Insert word here...");
-    statusBar->showMessage("search all inflections of a word");
-}
-
 QString MainWindow::wordToWrite(QString arg) {
     auto str = arg;
     for (auto && i : writeRules) {
@@ -455,9 +377,11 @@ QString MainWindow::oldToModern(QString word, Infl::Transforms flag) {
         else if (word == "ek" || word == "eg") {
             word = "ég";
         }
+        /*
         else if (word.endsWith("a")) {
             word.replace(word.length() - 1, 1, "i");
         }
+        */
     }
     return word;
 }
@@ -679,6 +603,7 @@ void MainWindow::findInflection(QString word) {
     for (size_t i = 0; i < 8; ++i) {
         findInflectionThread(results, word, i);
     }
+
 
     if (word != wordInfl) {
         for (size_t i = 0; i < 8; ++i) {
@@ -1310,12 +1235,12 @@ void MainWindow::onComboBoxIndexChanged(int index) {
     currentTab->options->setEnabled(true);
     clearInflectionForms();
     switch (index) {
-    case (0): { search_icelandic_word(); break; }
-    case (1): { search_icelandic_text(); break; }
-    case (2): { search_norse_word(); break; }
-    case (3): { search_norse_text(); break; }
-    case (4): { search_original(); break; }
-    case (5): { search_all_inflections(); break; }
+    case (0): { on_actionModern_Icelandic_triggered(); break; }
+    case (1): { on_actionEnglish_Modern_Icelandic_triggered(); break; }
+    case (2): { on_actionOld_Icelandic_English_triggered(); break; }
+    case (3): { on_actionOld_Icelandic_Text_Search_triggered(); break; }
+    case (4): { on_actionSearch_Inflections_triggered(); break; }
+    case (5): { on_actionList_All_Forms_triggered(); break; }
     default: {}
     }
 }
@@ -1339,6 +1264,14 @@ void MainWindow::on_actionModern_Icelandic_triggered()
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(0);
+    currentTab->flags = {{1, 0, 0, 0, 0, 0}};
+    currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
+    currentTab->onlineEntries.clear();
+    currentTab->options->clear();
+    currentTab->result->clear();
+    currentTab->input->setPlaceholderText("Insert word here...");
+    statusBar->showMessage("search definitions for modern Icelandic word (online)");
 }
 
 
@@ -1352,6 +1285,14 @@ void MainWindow::on_actionEnglish_Modern_Icelandic_triggered()
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(1);
+    currentTab->flags = {{0, 1, 0, 0, 0, 0}};
+    currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
+    currentTab->onlineEntries.clear();
+    currentTab->options->clear();
+    currentTab->result->clear();
+    currentTab->input->setPlaceholderText("Insert text here...");
+    statusBar->showMessage("search text in modern Icelandic dictionary (online)");
 }
 
 void MainWindow::on_actionOld_Icelandic_English_triggered()
@@ -1363,6 +1304,13 @@ void MainWindow::on_actionOld_Icelandic_English_triggered()
 
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(2);
+    currentTab->flags = {{0, 0, 1, 0, 0, 0}};
+    currentTab->input->setPlaceholderText(tr("Insert word here..."));
+    currentTab->input->clear();
+    currentTab->input->setCompleter(norseWordCompleter);
+    currentTab->result->clear();
+    currentTab->options->clear();
+    statusBar->showMessage("search definitions for old Icelandic word");
 }
 
 
@@ -1374,6 +1322,12 @@ void MainWindow::on_actionOld_Icelandic_Text_Search_triggered()
     ui->actionFind_in_Page->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(3);
+    currentTab->flags = {{0, 0, 0, 1, 0, 0}};
+    currentTab->input->clear();
+    currentTab->options->clear();
+    currentTab->result->clear();
+    currentTab->input->setPlaceholderText("Insert text here...");
+    statusBar->showMessage("search text in old Icelandic dictionaries");
 }
 
 void MainWindow::on_actionSearch_Inflections_triggered()
@@ -1384,6 +1338,13 @@ void MainWindow::on_actionSearch_Inflections_triggered()
     ui->actionFind_in_Page->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(4);
+    currentTab->flags = {{0, 0, 0, 0, 1, 0}};
+    currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
+    currentTab->options->clear();
+    currentTab->result->clear();
+    currentTab->input->setPlaceholderText("Insert word here...");
+    statusBar->showMessage("find all entries that can be inflected to the word just entered");
 }
 
 void MainWindow::on_actionList_All_Forms_triggered()
@@ -1394,6 +1355,13 @@ void MainWindow::on_actionList_All_Forms_triggered()
     ui->actionFind_in_Page->setEnabled(true);
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     currentTab->comboBox->setCurrentIndex(5);
+    currentTab->flags = {{0, 0, 0, 0, 0, 1}};
+    currentTab->input->clear();
+    currentTab->input->setCompleter(nullptr);
+    currentTab->options->clear();
+    currentTab->result->clear();
+    currentTab->input->setPlaceholderText("Insert word here...");
+    statusBar->showMessage("search all inflections of a word");
 }
 
 
@@ -2143,7 +2111,7 @@ void MainWindow::onResultContextMenuRequested(QPoint const &) {
     QObject::connect(act4, &QAction::triggered,
                      this, &MainWindow::onContextMenuEngToNorTriggered);
 
-    QAction * act5 = new QAction("Find Originals", this);
+    QAction * act5 = new QAction("Find Headword", this);
     QObject::connect(act5, &QAction::triggered,
                      this, &MainWindow::onContextMenuSearchInfReverseTriggered);
 

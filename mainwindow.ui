@@ -282,7 +282,7 @@
     <string>Find in Page</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Alt+F</string>
+    <string>Ctrl+Shift+F</string>
    </property>
   </action>
   <action name="actionShow_Status_Bar">

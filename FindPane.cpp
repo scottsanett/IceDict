@@ -17,21 +17,21 @@ FindPane::FindPane(QWidget *parent) : QWidget(parent)
     searchLayout->addWidget(searchPanel);
 
 #ifdef __APPLE__
-    prevButton = new QPushButton("←", parent);
+    prevButton = new QPushButton("⬅", parent);
 #else
     prevButton = new QPushButton("<", parent);
 #endif
     prevButton->setFlat(true);
-    prevButton->setFixedWidth(20);
+//    prevButton->setFixedWidth(30);
     connect(prevButton, &QPushButton::pressed, this, &FindPane::prevButtonPressedSignal);
     searchLayout->addWidget(prevButton);
 #ifdef __APPLE__
-    nextButton = new QPushButton("→", parent);
+    nextButton = new QPushButton("➡", parent);
 #else
     nextButton = new QPushButton(">", parent);
 #endif
     nextButton->setFlat(true);
-    nextButton->setFixedWidth(20);
+//    nextButton->setFixedWidth(30);
     connect(nextButton, &QPushButton::pressed, this, &FindPane::nextButtonPressedSignal);
     searchLayout->addWidget(nextButton);
     caseSensitivity = new QCheckBox("Case Sensitive", parent);

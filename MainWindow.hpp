@@ -107,7 +107,7 @@ private:
     struct Pimpl {
         QString textInQuery;
         QString wordAfterRedirection;
-        size_t fontSize = 14;
+        size_t fontSize = 15;
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
         QString webpage;
         std::set<QVector<QString>> inflStruct;
@@ -220,13 +220,6 @@ private:
     QList<QTextEdit::ExtraSelection>::size_type findInPageSelectionIndex;
 
 private slots:
-    void search_norse_word();
-    void search_norse_text();
-    void search_original();
-    void search_all_inflections();
-    void search_icelandic_word();
-    void search_icelandic_text();
-
     void activateInput();
     void loadPage();
     void connectionError();
