@@ -7,7 +7,7 @@ This is a dictionary written in C++/Qt that focuses on the search and query of o
 on macOS:
 https://github.com/scottsanett/Old-Icelandic-Dictionary-Qt-/issues/2
 
-on Windows (Not optimized for HiDPI screens):
+on Windows:
 https://github.com/scottsanett/IceDict_QtWidgets/issues/3
 
 ## Download:
