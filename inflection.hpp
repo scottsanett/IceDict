@@ -12,8 +12,9 @@ namespace Infl {
 
     enum Forms {
         Participle, PresentParticiple, PastParticiple,
-        Infinitive, Supine, Impersonal, Other,
-        Active, Middle,
+        Infinitive, Supine, Impersonal, Question, Other,
+        AccSubject, DatSubject, GenSubject, DumSubject,
+        Active, Middle, Mediopassive,
         Indicative, Subjunctive, Imperative,
         Present, Past,
         FirstPerson, SecondPerson, ThirdPerson,
@@ -25,7 +26,7 @@ namespace Infl {
     };
 
     enum Category {
-        Impersonality, Voice, Mood,
+        Impersonality, Voice, Mood, SubjectCase,
         Tense, ParticipleTense, Person, Number,
         Case, Gender, Definiteness, Form
     };
@@ -39,10 +40,11 @@ namespace Infl {
 class Inflection
 {
 private:
-    std::array<const char *, 32> InflName {
+    std::array<const char *, 38> InflName {
         {"Participle", "Present Participle", "Past Participle",
-        "Infinitive", "Supine", "Impersonal", "Other",
-        "Active", "Middle",
+        "Infinitive", "Supine", "Impersonal", "Question", "Other",
+        "Accusative Subject", "Dative Subject", "Genitive Subject", "Dummy Subject",
+        "Active", "Middle", "Mediopassive",
         "Indicative", "Subjunctive", "Imperative",
         "Present", "Past",
         "First", "Second", "Third",
@@ -53,12 +55,13 @@ private:
         "Positive", "Comparative", "Superlative"}
     };
 
-    std::array<const char *, 32> InflStruct {
-        {"participle", "present participle", "past participle",
-        "infinitive", "supine", "impersonal", "other",
-        "active", "middle",
+    std::array<const char *, 38> InflStruct {
+        {"participle", "present-participle", "past-participle",
+        "infinitive", "supine", "impersonal", "question", "other",
+        "accusative-subject", "dative-subject", "genitive-subject", "dummy-subject",
+        "active", "middle", "mediopassive",
         "indicative", "subjunctive", "imperative",
-        "present tense", "past tense",
+        "present-tense", "past-tense",
         "1st", "2nd", "3rd",
         "singular", "plural", "clipped",
         "nominative", "accusative", "dative", "genitive",
@@ -67,8 +70,8 @@ private:
         "positive", "comparative", "superlative"}
     };
 
-    std::array<const char *, 11> InflCategory {
-        {"Impersonality", "Voice", "Mood",
+    std::array<const char *, 12> InflCategory {
+        {"Impersonality", "Voice", "Mood", "Subject Case",
         "Tense", "Tense", "Person", "Number",
         "Case", "Gender", "Definiteness", "Degree"}
     };

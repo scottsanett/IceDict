@@ -180,14 +180,14 @@ private:
 
 
     struct PartOfSpeech {
-        const char * MasNoun = "<td>masc</td>";
-        const char * FemNoun = "<td>fem</td>";
-        const char * NetNoun = "<td>neut</td>";
-        const char * Adjective = "<td>adj</td>";
-        const char * Verb = "<td>verb</td>";
-        const char * Pronoun = "<td>pron</td>";
-        const char * Adverb = "<td>adv</td>";
-        const char * Numerical = "<td>num</td>";
+        const char * MasNoun = " masc; ";
+        const char * FemNoun = " fem; ";
+        const char * NetNoun = " neut; ";
+        const char * Adjective = " adj; ";
+        const char * Verb = " verb; ";
+        const char * Pronoun = " pron; ";
+        const char * Adverb = " adv; ";
+        const char * Numerical = " num; ";
     } PartOfSpeech;
 
     /* Abstract data types */
@@ -288,15 +288,15 @@ private:
     void initializeInflectionForms();
     void clearInflectionForms();
 
-    void fillInflectionForms(QString const &);
+    void fillInflectionForms(vecstr_t const &);
 
     /* functions concerning inflectional menu */
     /* first level */
-    void fillVerbs(QString const &);
-    void fillNouns(QString const &);
-    void fillAdjectives(QString const &);
-    void fillPronouns(QString const &);
-    void fillAdverbs(QString const &);
+    void fillVerbs(vecstr_t const &);
+    void fillNouns(vecstr_t const &);
+    void fillAdjectives(vecstr_t const &);
+    void fillPronouns(vecstr_t const &);
+    void fillAdverbs(vecstr_t const &);
 
     /* second level, templates */
     template <bool D,
@@ -318,17 +318,6 @@ private:
     QVector<QString> ParseAdjective();
     QVector<QString> ParseAdverb();
     QVector<QString> ParsePronoun();
-
-    bool findImpersonal(QString const &);
-    bool findActive(QString const &);
-    bool findMiddle(QString const &);
-    bool findIndicative(QString const &);
-    bool findSubjunctive(QString const &);
-    bool findImperative(QString const &);
-    bool findPresent(QString const &);
-    bool findPast(QString const &);
-    bool findFstPrs(QString const &);
-    bool findSndPrs(QString const &);
 
     /* functions concerning online query */
     void downloadPage(QString url);

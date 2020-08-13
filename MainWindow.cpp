@@ -50,13 +50,21 @@ void MainWindow::addTab_clicked() {
     auto currentTab = std::make_shared<Pimpl>();
     currentTab->centralLayout = new QVBoxLayout();
     currentTab->mainSplitter = new QSplitter();
+#ifdef _WIN32
+    currentTab->mainSplitter->setHandleWidth(5);
+#elif __APPLE__
     currentTab->mainSplitter->setHandleWidth(0);
+#endif
     tabIndices.insert(std::make_pair(currentTab->mainSplitter, currentTab));
     tabResultHistory.insert(std::make_pair(currentTab->mainSplitter, std::deque<QString>{}));
     tabResultHistoryIndex.insert(std::make_pair(currentTab->mainSplitter, -1));
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
     currentTab->inputLayout = new QSplitter();
+#ifdef _WIN32
+    currentTab->inputLayout->setHandleWidth(5);
+#elif __APPLE__
     currentTab->inputLayout->setHandleWidth(0);
+#endif
     currentTab->inputLayout->setContentsMargins(0, 0, 0, 0);
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
     currentTab->inputLayout->setOrientation(Qt::Vertical);
@@ -71,20 +79,25 @@ void MainWindow::addTab_clicked() {
 
     currentTab->buttonLayout = new QHBoxLayout;
     currentTab->buttonLayout->setSpacing(0);
-    currentTab->buttonLayout->setMargin(0);
+    currentTab->buttonLayout->setMargin(10);
     currentTab->buttonLayoutWidget = new QWidget();
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
-
+#ifdef _WIN32
+    currentTab->backButton = new QPushButton("Back");
+#elif __APPLE__
     currentTab->backButton = new QPushButton("⬅");
+#endif
     currentTab->backButton->setEnabled(false);
     auto buttonSizeHint = currentTab->backButton->sizeHint();
-//    currentTab->buttonLayoutWidget->setMaximumHeight(buttonSizeHint.height());
     currentTab->buttonLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 4);
+    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 9 / 2);
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
-
+#ifdef _WIN32
+    currentTab->nextButton = new QPushButton("Forward");
+#elif __APPLE__
     currentTab->nextButton = new QPushButton("➡︎");
+#endif
     currentTab->nextButton->setEnabled(false);
     QObject::connect(currentTab->nextButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionForward_triggered);
@@ -94,9 +107,15 @@ void MainWindow::addTab_clicked() {
     currentTab->inputPaneLayout->addWidget(currentTab->buttonLayoutWidget);
 
     currentTab->comboBox = new QComboBox();
+#ifdef _WIN32
+    currentTab->comboBox->addItem("Icelandic to English");
+    currentTab->comboBox->addItem("Icelandic Textual");
+    currentTab->comboBox->addItem("Norse to English");
+#elif __APPLE__
     currentTab->comboBox->addItem("Icelandic → English");
     currentTab->comboBox->addItem("Icelandic Textual");
     currentTab->comboBox->addItem("Norse → English");
+#endif
     currentTab->comboBox->addItem("Norse Textual");
     currentTab->comboBox->addItem("Find Headword");
     currentTab->comboBox->addItem("All Inflections");
@@ -121,7 +140,7 @@ void MainWindow::addTab_clicked() {
 
     currentTab->options = new QListWidget(this);
     currentTab->options->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 4);
+    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 9 / 2);
     currentTab->options->setStyleSheet("font-size: 14px");
     currentTab->options->setFrameStyle(QFrame::HLine);
     currentTab->options->setEnabled(false);
@@ -226,9 +245,9 @@ void MainWindow::initializeInflectionForms() {
     currentTab->inflectionForms->setHeaderLabel("Inflections");
     auto buttonSizeHint = currentTab->backButton->sizeHint();
     currentTab->inflectionForms->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 3.5);
+    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 9 / 2);
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
-    currentTab->inflectionForms->setStyleSheet("font-size: 13px");
+    currentTab->inflectionForms->setStyleSheet("font-size: 14px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
 
     if (!currentTab->proceedButton) {
@@ -267,22 +286,22 @@ QString MainWindow::addStyleToResults(QString line) {
         key = key.substr(0, key.length() - 1);
     }
     key = "<th>" + key + "</th>";
-    std::string arg2;
-    iss >> arg2;
-    arg2 = arg2.substr(0, arg2.length() - 1);
-    arg2 = "<td>" + arg2 + "</td>";
-    std::string arg3;
-    iss >> arg3;
+    std::string arg2, arg3;
+    iss >> arg2 >> arg3;
     arg3 = arg3.substr(0, arg3.length() - 1);
-    arg3 = "<td><font color=\"red\">" + arg3 + "</font></td>";
+    arg3 = "<td>" + arg3 + "</td>";
     std::string arg4;
+    iss >> arg4;
+    arg4 = arg4.substr(0, arg4.length() - 1);
+    arg4 = "<td><font color=\"red\">" + arg4 + "</font></td>";
+    std::string arg5;
     std::string temp;
     while (iss >> temp) {
-        arg4 += temp + ' ';
+        arg5 += temp + ' ';
     }
-    arg4 = arg4.substr(0, arg4.length() - 1);
-    arg4 = "<td>" + arg4 + "</td>";
-    result = "<tr>" + key + arg2 + arg3 + arg4 + "</tr>";
+    arg5 = arg5.substr(0, arg5.length() - 1);
+    arg5 = "<td>" + arg5 + "</td>";
+    result = "<tr>" + key + arg3 + arg4 + arg5 + "</tr>";
     return result.c_str();
 }
 
@@ -763,7 +782,7 @@ void MainWindow::printAllThread(QString word, size_t index) {
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
     std::istringstream issfile(qfile.toStdString());
-    std::string line, partOfSpeech;
+    std::string line, wordIndex;
     int currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
@@ -778,14 +797,11 @@ void MainWindow::printAllThread(QString word, size_t index) {
                 iss >> temp1;
                 std::string temp2;
                 iss >> temp2;
-                if (currentPos == pos) { partOfSpeech = temp2; }
-                if (temp1.c_str() != key) {
+                if (currentPos == pos) { wordIndex = temp2; }
+                if (temp1.c_str() != key) { ++currentPos; break;}
+                else if (temp2 != wordIndex) {
                     ++currentPos;
-                    break;
-                }
-                else if (temp2 != partOfSpeech) {
-                    ++currentPos;
-                    partOfSpeech = temp2;
+                    wordIndex = temp2;
                     thisResult.push_back(std::make_pair(key, thisEntry));
                     thisEntry.clear();
                     thisEntry.push_back(line.c_str());
@@ -809,16 +825,16 @@ void MainWindow::printAllPrint(size_t index) {
     currentTab->inflSelectResult.clear();
     currentTab->inflSelectResult = thisResult.second;
 
-    QString display;
+    clearInflectionForms();
+    initializeInflectionForms();
+    fillInflectionForms(thisResult.second);
 
+    QString display;
     for (auto i : thisResult.second) {
        QString temp = addStyleToResults(i);
        display += temp;
     }
 
-    clearInflectionForms();
-    initializeInflectionForms();
-    fillInflectionForms(display);
     display = "<span style=\"font-size: " + QString::fromStdString(to_string(currentTab->fontSize)) + "px;\"><p align=\"center\"><table border=\"1\" cellpadding=\"10\">" + display + "</table></p></span>";
     currentTab->result->setHtml(display);
     onResultTextChanged(display);
@@ -1454,114 +1470,167 @@ void MainWindow::fillStructureItemConstructor(TreeWidgetItem * item, std::array<
     });
 }
 
-void MainWindow::fillInflectionForms(QString const & str) {
+void MainWindow::fillInflectionForms(vecstr_t const & result) {
+    // rewrite this function except for verbs
+    auto && str = result.at(0);
     if (str.contains(PartOfSpeech.MasNoun)) {
         currentPOS = POS::Noun;
-        fillNouns(str);
+        fillNouns(result);
     }
     else if (str.contains(PartOfSpeech.FemNoun)) {
         currentPOS = POS::Noun;
-        fillNouns(str);
+        fillNouns(result);
     }
     else if (str.contains(PartOfSpeech.NetNoun)) {
         currentPOS = POS::Noun;
-        fillNouns(str);
+        fillNouns(result);
     }
     else if (str.contains(PartOfSpeech.Verb)) {
         currentPOS = POS::Verb;
-        fillVerbs(str);
+        fillVerbs(result);
     }
     else if (str.contains(PartOfSpeech.Adjective)) {
         currentPOS = POS::Adjective;
-        fillAdjectives(str);
+        fillAdjectives(result);
     }
     else if (str.contains(PartOfSpeech.Adverb)) {
         currentPOS = POS::Adverb;
-        fillAdverbs(str);
+        fillAdverbs(result);
     }
     else if (str.contains(PartOfSpeech.Pronoun)) {
         currentPOS = POS::Pronoun;
-        fillPronouns(str);
+        fillPronouns(result);
     }
     else if (str.contains(PartOfSpeech.Numerical)) {
         currentPOS = POS::Numerical;
-        fillPronouns(str);
+        fillPronouns(result);
     }
     else ;
 }
 
-void MainWindow::fillVerbs(QString const & str) {
+void MainWindow::fillVerbs(vecstr_t const & result) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (!currentTab->inflectionForms) return;
 
-    auto none = constructItem("Non-Impersonal", currentTab->inflectionForms);
-    if (none) {
-        fillStructures<false, TYPE_VOICE>(none, str);
-        fillStructures<false, TYPE_MOOD>(none, str);
-        fillStructures<false, TYPE_TENSE>(none, str);
-        fillStructures<false, TYPE_PERSON>(none, str);
-        fillStructures<false, TYPE_NUMBER>(none, str);
+    QString none_str,
+            impersonal_str,
+            question_str,
+            infinitive_str,
+            imperative_str,
+            supine_str,
+            presparticiple_str,
+            pastparticiple_str;
+
+    for (auto && item : result) {
+        if (InflManager.find(item, Infl::Short, Infl::Impersonal)) {
+            impersonal_str += item + ";";
+        }
+        else if (InflManager.find(item, Infl::Short, Infl::Question)) {
+            question_str += item + ";";
+        }
+        else if (InflManager.find(item, Infl::Short, Infl::Infinitive)) {
+            infinitive_str += item + ";";
+        }
+        else if (InflManager.find(item, Infl::Short, Infl::Imperative)) {
+            imperative_str += item + ";";
+        }
+        else if (InflManager.find(item, Infl::Short, Infl::Supine)) {
+            supine_str += item + ";";
+        }
+        else if (InflManager.find(item, Infl::Short, Infl::PresentParticiple)) {
+            presparticiple_str += item + ";";
+        }
+        else if (InflManager.find(item, Infl::Short, Infl::PastParticiple)) {
+            pastparticiple_str += item + ";";
+        }
+        else {
+            none_str += item + ";";
+        }
     }
 
-    bool findImpersonal = InflManager.find(str, Infl::Short, Infl::Impersonal);
-    if (findImpersonal) {
+    if (!none_str.isEmpty()) {
+        auto none = constructItem("Non-Impersonal", currentTab->inflectionForms);
+        fillStructures<false, TYPE_VOICE>(none, none_str);
+        fillStructures<false, TYPE_MOOD>(none, none_str);
+        fillStructures<false, TYPE_TENSE>(none, none_str);
+        fillStructures<false, TYPE_PERSON>(none, none_str);
+        fillStructures<false, TYPE_NUMBER>(none, none_str);
+    }
+
+    if (!impersonal_str.isEmpty()) {
         auto impersonal = constructItem(InflManager.nameOf(Infl::Impersonal), currentTab->inflectionForms);
-        fillStructures<false, TYPE_VOICE>(impersonal, str);
-        fillStructures<false, TYPE_MOOD>(impersonal, str);
-        fillStructures<false, TYPE_TENSE>(impersonal, str);
-        fillStructures<false, TYPE_PERSON>(impersonal, str);
-        fillStructures<false, TYPE_NUMBER>(impersonal, str);
+        fillStructures<false, TYPE_SUBJECT_CASE>(impersonal, impersonal_str);
+        fillStructures<false, TYPE_VOICE>(impersonal, impersonal_str);
+        fillStructures<false, TYPE_MOOD>(impersonal, impersonal_str);
+        fillStructures<false, TYPE_TENSE>(impersonal, impersonal_str);
+        fillStructures<false, TYPE_PERSON>(impersonal, impersonal_str);
+        fillStructures<false, TYPE_NUMBER>(impersonal, impersonal_str);
     }
 
-    bool findInfinitive = InflManager.find(str, Infl::Short, Infl::Infinitive);
-    if (findInfinitive) {
+    if (!question_str.isEmpty()) {
+        auto question = constructItem(InflManager.nameOf(Infl::Question), currentTab->inflectionForms);
+        fillStructures<false, TYPE_VOICE>(question, question_str);
+        fillStructures<false, TYPE_MOOD>(question, question_str);
+        fillStructures<false, TYPE_TENSE>(question, question_str);
+        fillStructures<false, TYPE_PERSON>(question, question_str);
+        fillStructures<false, TYPE_NUMBER>(question, question_str);
+    }
+
+    if (!infinitive_str.isEmpty()) {
         auto infinitive = constructItem(InflManager.nameOf(Infl::Infinitive), currentTab->inflectionForms);
-        fillStructures<false, TYPE_VOICE>(infinitive, str);
+        fillStructures<false, TYPE_VOICE>(infinitive, infinitive_str);
     }
 
-    bool findImperative = InflManager.find(str, Infl::Short, Infl::Imperative);
-    if (findImperative) {
+    if (!imperative_str.isEmpty()) {
         auto imperative = constructItem(InflManager.nameOf(Infl::Imperative), currentTab->inflectionForms);
-        fillStructures<false, TYPE_IMPERAT_NUMBER>(imperative, str);
+        fillStructures<false, TYPE_IMPERAT_NUMBER>(imperative, imperative_str);
     }
 
-    bool findSupine = InflManager.find(str, Infl::Short, Infl::Supine);
-    if (findSupine) {
+    if (!supine_str.isEmpty()) {
         auto supine = constructItem(InflManager.nameOf(Infl::Supine), currentTab->inflectionForms);
-        fillStructures<false, TYPE_VOICE>(supine, str);
+        fillStructures<false, TYPE_VOICE>(supine, supine_str);
     }
 
-    bool findParticiple = InflManager.find(str, Infl::Short, Infl::Participle);
-    if (findParticiple) {
+    if (!presparticiple_str.isEmpty() || !pastparticiple_str.isEmpty()) {
         auto participle = constructItem(InflManager.nameOf(Infl::Participle), currentTab->inflectionForms);
-
-        bool findPresParticiple = InflManager.find(str, Infl::Short, Infl::PresentParticiple);
-        if (findPresParticiple) {
+        if (!presparticiple_str.isEmpty())
             constructItem(InflManager.nameOf(Infl::PresentParticiple), participle);
-        }
-
-        bool findPastParticiple = InflManager.find(str, Infl::Short, Infl::PastParticiple);
-        if (findPastParticiple) {
+        if (!pastparticiple_str.isEmpty()) {
             auto pastParticiple = constructItem(InflManager.nameOf(Infl::PastParticiple), participle);
-            fillStructures<false, TYPE_DEFINITENESS>(pastParticiple, str);
-            fillStructures<false, TYPE_GENDER>(pastParticiple, str);
-            fillStructures<false, TYPE_CASE>(pastParticiple, str);
-            fillStructures<false, TYPE_NUMBER>(pastParticiple, str);
+            fillStructures<false, TYPE_DEFINITENESS>(pastParticiple, pastparticiple_str);
+            fillStructures<false, TYPE_GENDER>(pastParticiple, pastparticiple_str);
+            fillStructures<false, TYPE_CASE>(pastParticiple, pastparticiple_str);
+            fillStructures<false, TYPE_NUMBER>(pastParticiple, pastparticiple_str);
         }
     }
+
+//TODO: past participle needs to go through the same process
 }
 
-void MainWindow::fillNouns(QString const & str) {
+void MainWindow::fillNouns(vecstr_t const & result) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (!currentTab->inflectionForms) return;
+
+    QString str;
+
+    for (auto && i : result) {
+        str += i + ";";
+    }
+
     fillStructures<true, TYPE_DEFINITENESS>(currentTab->inflectionForms, str);
     fillStructures<true, TYPE_CASE>(currentTab->inflectionForms, str);
     fillStructures<true, TYPE_NUMBER>(currentTab->inflectionForms, str);
 }
 
-void MainWindow::fillAdjectives(QString const & str) {
+void MainWindow::fillAdjectives(vecstr_t const & result) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     if (!currentTab->inflectionForms) return;
+
+    QString str;
+
+    for (auto && i : result) {
+        str += i + ";";
+    }
 
     bool findPositive = InflManager.find(str, Infl::Short, Infl::Positive);
     bool findComparat = InflManager.find(str, Infl::Short, Infl::Comparative);
@@ -1591,20 +1660,30 @@ void MainWindow::fillAdjectives(QString const & str) {
     }
 }
 
-void MainWindow::fillPronouns(QString const & str) {
+void MainWindow::fillPronouns(vecstr_t const & result) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-
     if (!currentTab->inflectionForms) return;
+
+    QString str;
+
+    for (auto && i : result) {
+        str += i + ";";
+    }
 
     fillStructures<true, TYPE_GENDER>(currentTab->inflectionForms, str);
     fillStructures<true, TYPE_CASE>(currentTab->inflectionForms, str);
     fillStructures<true, TYPE_NUMBER>(currentTab->inflectionForms, str);
 }
 
-void MainWindow::fillAdverbs(QString const & str) {
+void MainWindow::fillAdverbs(vecstr_t const & result) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-
     if (!currentTab->inflectionForms) return;
+
+    QString str;
+
+    for (auto && i : result) {
+        str += i + ";";
+    }
 
     bool findPositive = InflManager.find(str, Infl::Short, Infl::Positive);
     bool findComparat = InflManager.find(str, Infl::Short, Infl::Comparative);
@@ -1618,24 +1697,24 @@ void MainWindow::fillAdverbs(QString const & str) {
 
 QVector<QString> MainWindow::ParseCheckStateChangeInfo() {
     switch (currentPOS) {
-    case (POS::Verb): {
-        return ParseVerb();
-    }
-    case (POS::Noun): {
-        return ParseNoun();
-    }
-    case (POS::Adjective): {
-        return ParseAdjective();
-    }
-    case (POS::Adverb): {
-        return ParseAdverb();
-    }
-    case (POS::Pronoun): {
-        return ParsePronoun();
-    }
-    case (POS::Numerical): {
-        return ParsePronoun();
-    }
+        case (POS::Verb): {
+            return ParseVerb();
+        }
+        case (POS::Noun): {
+            return ParseNoun();
+        }
+        case (POS::Adjective): {
+            return ParseAdjective();
+        }
+        case (POS::Adverb): {
+            return ParseAdverb();
+        }
+        case (POS::Pronoun): {
+            return ParsePronoun();
+        }
+        case (POS::Numerical): {
+            return ParsePronoun();
+        }
     }
 }
 
@@ -1649,25 +1728,27 @@ QVector<QString> MainWindow::ParseVerb() {
     auto end = currentTab->inflStruct.cend();
     auto itr = currentTab->inflStruct.cbegin();
 
+        /********** Non-Impersonal  *********/
     std::array<QVector<Infl::Forms>, 5> verbContainer;
     verbContainer.fill(QVector<Infl::Forms>{});
 
-    while (itr != end && itr->at(0) != "Non-Impersonal") itr = std::next(itr);
-    while (itr != end && itr->at(0) == "Non-Impersonal") {
-        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
-            verbContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
-            verbContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
-            verbContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
-            verbContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
-            verbContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
+    while (itr != end) {
+        if (itr->at(0) == "Non-Impersonal") {
+            if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+                verbContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
+                verbContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
+                verbContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
+                verbContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+                verbContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
         }
         itr = std::next(itr);
     }
@@ -1679,6 +1760,7 @@ QVector<QString> MainWindow::ParseVerb() {
                     for (auto && d : verbContainer.at(3)) {
                         for (auto && e : verbContainer.at(4)) {
                             auto satisfied = !InflManager.find(entry, Infl::Short, Infl::Impersonal) &&
+                                             !InflManager.find(entry, Infl::Short, Infl::Question) &&
                                              !InflManager.find(entry, Infl::Short, Infl::Infinitive) &&
                                              !InflManager.find(entry, Infl::Short, Infl::Imperative) &&
                                              !InflManager.find(entry, Infl::Short, Infl::Supine) &&
@@ -1697,26 +1779,32 @@ QVector<QString> MainWindow::ParseVerb() {
         }
     }
 
-    std::array<QVector<Infl::Forms>, 5> impersonalContainer;
+        /********** Impersonal *********/
+    std::array<QVector<Infl::Forms>, 6> impersonalContainer;
     impersonalContainer.fill(QVector<Infl::Forms>{});
 
     itr = currentTab->inflStruct.cbegin();
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Impersonal)) itr = std::next(itr);
-    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Impersonal)) {
-        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
-            impersonalContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
-            impersonalContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
-            impersonalContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
-            impersonalContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
-        }
-        else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
-            impersonalContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
+//    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Impersonal)) itr = std::next(itr);
+    while (itr != end) {
+        if (itr->at(0) == InflManager.nameOf(Infl::Impersonal)) {
+            if (itr->at(1) == InflManager.categoryOf(Infl::SubjectCase)) {
+                impersonalContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+                impersonalContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
+                impersonalContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
+                impersonalContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
+                impersonalContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+                impersonalContainer.at(5).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
         }
         itr = std::next(itr);
     }
@@ -1727,7 +1815,56 @@ QVector<QString> MainWindow::ParseVerb() {
                 for (auto && c : impersonalContainer.at(2)) {
                     for (auto && d : impersonalContainer.at(3)) {
                         for (auto && e : impersonalContainer.at(4)) {
-                            auto satisfied = InflManager.find(entry, Infl::Short, Infl::Impersonal) &&
+                            for (auto && f : impersonalContainer.at(5)) {
+                                    auto satisfied =
+                                        InflManager.find(entry, Infl::Short, Infl::Impersonal) &&
+                                             InflManager.find(entry, Infl::Short, a) &&
+                                             InflManager.find(entry, Infl::Short, b) &&
+                                             InflManager.find(entry, Infl::Short, c) &&
+                                             InflManager.find(entry, Infl::Short, d) &&
+                                             InflManager.find(entry, Infl::Short, e) &&
+                                             InflManager.find(entry, Infl::Short, f);
+                                if (satisfied) result.push_back(entry);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+        /********** Question *********/
+    std::array<QVector<Infl::Forms>, 5> questionContainer;
+    questionContainer.fill(QVector<Infl::Forms>{});
+    itr = currentTab->inflStruct.cbegin();
+    while (itr != end) {
+        if (itr->at(0) == InflManager.nameOf(Infl::Question)) {
+            if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+                questionContainer.at(0).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Mood)) {
+                questionContainer.at(1).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Tense)) {
+                questionContainer.at(2).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Person)) {
+                questionContainer.at(3).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+            else if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+                questionContainer.at(4).push_back(InflManager.enumOfForms((itr->at(2))));
+            }
+        }
+        itr = std::next(itr);
+    }
+
+    for (auto && entry : currentTab->inflSelectResult) {
+        for (auto && a : questionContainer.at(0)) {
+            for (auto && b : questionContainer.at(1)) {
+                for (auto && c : questionContainer.at(2)) {
+                    for (auto && d : questionContainer.at(3)) {
+                        for (auto && e : questionContainer.at(4)) {
+                            auto satisfied = InflManager.find(entry, Infl::Short, Infl::Question) &&
                                              InflManager.find(entry, Infl::Short, a) &&
                                              InflManager.find(entry, Infl::Short, b) &&
                                              InflManager.find(entry, Infl::Short, c) &&
@@ -1741,13 +1878,15 @@ QVector<QString> MainWindow::ParseVerb() {
         }
     }
 
-    itr = currentTab->inflStruct.cbegin();
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Infinitive)) itr = std::next(itr);
 
+        /********** Infinitive *********/
+    itr = currentTab->inflStruct.cbegin();
     QVector<Infl::Forms> infinitiveContainer;
-    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Infinitive)) {
-        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
-            infinitiveContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+    while (itr != end) {
+        if (itr->at(0) == InflManager.nameOf(Infl::Infinitive)) {
+            if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+                infinitiveContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+            }
         }
         itr = std::next(itr);
     }
@@ -1760,12 +1899,14 @@ QVector<QString> MainWindow::ParseVerb() {
         }
     }
 
+            /********** Imperative *********/
     itr = currentTab->inflStruct.cbegin();
     QVector<Infl::Forms> imperativeContainer;
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Imperative)) itr = std::next(itr);
-    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Imperative)) {
-        if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
-            imperativeContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+    while (itr != end) {
+        if (itr->at(0) == InflManager.nameOf(Infl::Imperative)) {
+            if (itr->at(1) == InflManager.categoryOf(Infl::Number)) {
+                imperativeContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+            }
         }
         itr = std::next(itr);
     }
@@ -1778,12 +1919,14 @@ QVector<QString> MainWindow::ParseVerb() {
         }
     }
 
+            /********** Supine *********/
     itr = currentTab->inflStruct.cbegin();
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Supine)) itr = std::next(itr);
     QVector<Infl::Forms> supineContainer;
-    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Supine)) {
-        if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
-            supineContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+    while (itr != end) {
+        if (itr->at(0) == InflManager.nameOf(Infl::Supine)) {
+            if (itr->at(1) == InflManager.categoryOf(Infl::Voice)) {
+                supineContainer.push_back(InflManager.enumOfForms(itr->at(2)));
+            }
         }
         itr = std::next(itr);
     }
@@ -1796,32 +1939,34 @@ QVector<QString> MainWindow::ParseVerb() {
         }
     }
 
+            /********** Participle *********/
     itr = currentTab->inflStruct.cbegin();
-    while (itr != end && itr->at(0) != InflManager.nameOf(Infl::Participle)) itr = std::next(itr);
     QVector<Infl::Forms> presPartContainer;
     std::array<QVector<Infl::Forms>, 4> pastPartContainer;
-    while (itr != end && itr->at(0) == InflManager.nameOf(Infl::Participle)) {
-        if (itr->at(1) == InflManager.nameOf(Infl::PresentParticiple)) {
-            presPartContainer.push_back(InflManager.enumOfForms(itr->at(1)));
-            itr = std::next(itr);
+    while (itr != end) {
+        if (itr->at(0) == InflManager.nameOf(Infl::Participle)) {
+            if (itr->at(1) == InflManager.nameOf(Infl::PresentParticiple)) {
+                presPartContainer.push_back(InflManager.enumOfForms(itr->at(1)));
+            }
+            else if (itr->at(1) == InflManager.nameOf(Infl::PastParticiple)) {
+                if (itr->at(2) == InflManager.categoryOf(Infl::Definiteness)) {
+                    pastPartContainer.at(0).push_back(InflManager.enumOfForms(itr->at(3)));
+                }
+                else if (itr->at(2) == InflManager.categoryOf(Infl::Gender)) {
+                    pastPartContainer.at(1).push_back(InflManager.enumOfForms(itr->at(3)));
+                }
+                else if (itr->at(2) == InflManager.categoryOf(Infl::Case)) {
+                    pastPartContainer.at(2).push_back(InflManager.enumOfForms(itr->at(3)));
+                }
+                else if (itr->at(2) == InflManager.categoryOf(Infl::Number)) {
+                    pastPartContainer.at(3).push_back(InflManager.enumOfForms(itr->at(3)));
+                }
+            }
         }
-        else if (itr->at(1) == InflManager.nameOf(Infl::PastParticiple)) {
-            if (itr->at(2) == InflManager.categoryOf(Infl::Definiteness)) {
-                pastPartContainer.at(0).push_back(InflManager.enumOfForms(itr->at(3)));
-            }
-            else if (itr->at(2) == InflManager.categoryOf(Infl::Gender)) {
-                pastPartContainer.at(1).push_back(InflManager.enumOfForms(itr->at(3)));
-            }
-            else if (itr->at(2) == InflManager.categoryOf(Infl::Case)) {
-                pastPartContainer.at(2).push_back(InflManager.enumOfForms(itr->at(3)));
-            }
-            else if (itr->at(2) == InflManager.categoryOf(Infl::Number)) {
-                pastPartContainer.at(3).push_back(InflManager.enumOfForms(itr->at(3)));
-            }
-            itr = std::next(itr);
-        }
+        itr = std::next(itr);
     }
 
+            /********** Present Participle *********/
     for (auto && entry : currentTab->inflSelectResult) {
         for (auto && a : presPartContainer) {
             auto satisfied = InflManager.find(entry, Infl::Short, Infl::PresentParticiple) &&
@@ -1830,12 +1975,13 @@ QVector<QString> MainWindow::ParseVerb() {
         }
     }
 
+            /********** Past Participle *********/
     for (auto && entry : currentTab->inflSelectResult) {
         for (auto && a : pastPartContainer.at(0)) {
             for (auto && b : pastPartContainer.at(1)) {
                 for (auto && c : pastPartContainer.at(2)) {
                     for (auto && d : pastPartContainer.at(3)) {
-                        auto satisfied = InflManager.find(entry, Infl::Short, Infl::Participle) &&
+                        auto satisfied = InflManager.find(entry, Infl::Short, Infl::PastParticiple) &&
                                     InflManager.find(entry, Infl::Short, a) &&
                                     InflManager.find(entry, Infl::Short, b) &&
                                     InflManager.find(entry, Infl::Short, c) &&
@@ -2393,3 +2539,4 @@ void MainWindow::on_actionForward_triggered()
     ui->actionBack->setEnabled(true);
     currentTab->backButton->setEnabled(true);
 }
+
