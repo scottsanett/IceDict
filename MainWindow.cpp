@@ -51,8 +51,6 @@ void MainWindow::addTab_clicked() {
     currentTab->centralLayout = new QVBoxLayout();
     currentTab->mainSplitter = new QSplitter();
 #ifdef _WIN32
-    currentTab->mainSplitter->setHandleWidth(5);
-#elif __APPLE__
     currentTab->mainSplitter->setHandleWidth(0);
 #endif
     tabIndices.insert(std::make_pair(currentTab->mainSplitter, currentTab));
@@ -61,8 +59,6 @@ void MainWindow::addTab_clicked() {
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
     currentTab->inputLayout = new QSplitter();
 #ifdef _WIN32
-    currentTab->inputLayout->setHandleWidth(5);
-#elif __APPLE__
     currentTab->inputLayout->setHandleWidth(0);
 #endif
     currentTab->inputLayout->setContentsMargins(0, 0, 0, 0);
@@ -79,14 +75,19 @@ void MainWindow::addTab_clicked() {
 
     currentTab->buttonLayout = new QHBoxLayout;
     currentTab->buttonLayout->setSpacing(0);
+#ifdef _WIN32
+    currentTab->buttonLayout->setMargin(0);
+#elif __APPLE__
     currentTab->buttonLayout->setMargin(10);
+#endif
     currentTab->buttonLayoutWidget = new QWidget();
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
 #ifdef _WIN32
-    currentTab->backButton = new QPushButton("Back");
+    currentTab->backButton = new QPushButton("◀");
 #elif __APPLE__
     currentTab->backButton = new QPushButton("⬅");
 #endif
+    currentTab->backButton->setStyleSheet("font-size: 13px");
     currentTab->backButton->setEnabled(false);
     auto buttonSizeHint = currentTab->backButton->sizeHint();
     currentTab->buttonLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
@@ -94,10 +95,11 @@ void MainWindow::addTab_clicked() {
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
 #ifdef _WIN32
-    currentTab->nextButton = new QPushButton("Forward");
+    currentTab->nextButton = new QPushButton("▶");
 #elif __APPLE__
     currentTab->nextButton = new QPushButton("➡︎");
 #endif
+    currentTab->nextButton->setStyleSheet("font-size: 13px");
     currentTab->nextButton->setEnabled(false);
     QObject::connect(currentTab->nextButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionForward_triggered);
@@ -119,6 +121,7 @@ void MainWindow::addTab_clicked() {
     currentTab->comboBox->addItem("Norse Textual");
     currentTab->comboBox->addItem("Find Headword");
     currentTab->comboBox->addItem("All Inflections");
+    currentTab->comboBox->setStyleSheet("font-size: 13px");
     currentTab->comboBox->setCurrentIndex(-1);
     connect(currentTab->comboBox, SIGNAL(currentIndexChanged(int)),
             this, SLOT(onComboBoxIndexChanged(int)));
@@ -127,7 +130,7 @@ void MainWindow::addTab_clicked() {
 
     currentTab->input = new QLineEdit();
     currentTab->input->setPlaceholderText("Select a dictionary first...");
-    //currentTab->input->setStyleSheet("font-size: 13px");
+    currentTab->input->setStyleSheet("font-size: 13px");
     currentTab->input->setClearButtonEnabled(true);
     currentTab->input->setEnabled(false);
     currentTab->inputPaneLayout->addWidget(currentTab->input, 1, 0);
@@ -136,7 +139,11 @@ void MainWindow::addTab_clicked() {
     QObject::connect(currentTab->input, &QLineEdit::returnPressed,
                      this, &MainWindow::onInputReturnPressed);
     auto inputBoxSizeHint = currentTab->input->sizeHint();
+#ifdef _WIN32
     currentTab->inputPaneLayoutWidget->setMaximumHeight(buttonSizeHint.height() + comboBoxSizeHint.height() + inputBoxSizeHint.height());
+#elif __APPLE__
+    currentTab->inputPaneLayoutWidget->setMaximumHeight(buttonSizeHint.height() + comboBoxSizeHint.height() + inputBoxSizeHint.height() + 10);
+#endif
 
     currentTab->options = new QListWidget(this);
     currentTab->options->setMinimumWidth(buttonSizeHint.width() * 3);
@@ -255,6 +262,7 @@ void MainWindow::initializeInflectionForms() {
         QObject::connect(currentTab->proceedButton, &QPushButton::pressed,
                          this, &MainWindow::proceedButtonPressed);
         currentTab->proceedButton->setFixedHeight(30);
+        currentTab->proceedButton->setStyleSheet("font-size: 13px");
         currentTab->inputLayout->addWidget(currentTab->proceedButton);
     }
 }

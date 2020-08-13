@@ -19,19 +19,23 @@ FindPane::FindPane(QWidget *parent) : QWidget(parent)
 #ifdef __APPLE__
     prevButton = new QPushButton("⬅", parent);
 #else
-    prevButton = new QPushButton("<", parent);
+    prevButton = new QPushButton("◀", parent);
 #endif
     prevButton->setFlat(true);
-//    prevButton->setFixedWidth(30);
+#ifdef _WIN32
+    prevButton->setFixedWidth(30);
+#endif
     connect(prevButton, &QPushButton::pressed, this, &FindPane::prevButtonPressedSignal);
     searchLayout->addWidget(prevButton);
 #ifdef __APPLE__
     nextButton = new QPushButton("➡", parent);
 #else
-    nextButton = new QPushButton(">", parent);
+    nextButton = new QPushButton("▶", parent);
 #endif
     nextButton->setFlat(true);
-//    nextButton->setFixedWidth(30);
+#ifdef _WIN32
+    nextButton->setFixedWidth(30);
+#endif
     connect(nextButton, &QPushButton::pressed, this, &FindPane::nextButtonPressedSignal);
     searchLayout->addWidget(nextButton);
     caseSensitivity = new QCheckBox("Case Sensitive", parent);
