@@ -1,0 +1,951 @@
+EF genitive reflexive
+ÞF accusative reflexive
+ÞGF dative reflexive
+EST superlative
+FST positive
+MST comparative
+MST2 comparative variant 2
+EFET genitive singular indefinite
+EFET2 genitive singular indefinite variant 2
+EFET3 genitive singular indefinite variant 3
+EFETgr genitive singular definite
+EFETgr2 genitive singular definite variant 2
+EFETgr3 genitive singular definite variant 3
+EFFT genitive plural indefinite
+EFFT2 genitive plural indefinite variant 2
+EFFTgr genitive plural definite
+EFFTgr2 genitive plural definite variant 2
+ESB-HK-EFET superlative indefinite neuter genitive singular
+ESB-HK-EFET2 superlative indefinite neuter genitive singular variant 2
+ESB-HK-EFFT superlative indefinite neuter genitive plural
+ESB-HK-EFFT2 superlative indefinite neuter genitive plural variant 2
+ESB-HK-NFET superlative indefinite neuter nominative singular
+ESB-HK-NFET2 superlative indefinite neuter nominative singular variant 2
+ESB-HK-NFFT superlative indefinite neuter nominative plural
+ESB-HK-NFFT2 superlative indefinite neuter nominative plural variant 2
+ESB-HK-ÞFET superlative indefinite neuter accusative singular
+ESB-HK-ÞFET2 superlative indefinite neuter accusative singular variant 2
+ESB-HK-ÞFFT superlative indefinite neuter accusative plural
+ESB-HK-ÞFFT2 superlative indefinite neuter accusative plural variant 2
+ESB-HK-ÞGFET superlative indefinite neuter dative singular
+ESB-HK-ÞGFET2 superlative indefinite neuter dative singular variant 2
+ESB-HK-ÞGFFT superlative indefinite neuter dative plural
+ESB-HK-ÞGFFT2 superlative indefinite neuter dative plural variant 2
+ESB-KK-EFET superlative indefinite masculine genitive singular
+ESB-KK-EFET2 superlative indefinite masculine genitive singular variant 2
+ESB-KK-EFFT superlative indefinite masculine genitive plural
+ESB-KK-EFFT2 superlative indefinite masculine genitive plural variant 2
+ESB-KK-NFET superlative indefinite masculine nominative singular
+ESB-KK-NFET2 superlative indefinite masculine nominative singular variant 2
+ESB-KK-NFFT superlative indefinite masculine nominative plural
+ESB-KK-NFFT2 superlative indefinite masculine nominative plural variant 2
+ESB-KK-ÞFET superlative indefinite masculine accusative singular
+ESB-KK-ÞFET2 superlative indefinite masculine accusative singular variant 2
+ESB-KK-ÞFFT superlative indefinite masculine accusative plural
+ESB-KK-ÞFFT2 superlative indefinite masculine accusative plural variant 2
+ESB-KK-ÞGFET superlative indefinite masculine dative singular
+ESB-KK-ÞGFET2 superlative indefinite masculine dative singular variant 2
+ESB-KK-ÞGFFT superlative indefinite masculine dative plural
+ESB-KK-ÞGFFT2 superlative indefinite masculine dative plural variant 2
+ESB-KVK-EFET superlative indefinite feminine genitive singular
+ESB-KVK-EFET2 superlative indefinite feminine genitive singular variant 2
+ESB-KVK-EFFT superlative indefinite feminine genitive plural
+ESB-KVK-EFFT2 superlative indefinite feminine genitive plural variant 2
+ESB-KVK-NFET superlative indefinite feminine nominative singular
+ESB-KVK-NFET2 superlative indefinite feminine nominative singular variant 2
+ESB-KVK-NFFT superlative indefinite feminine nominative plural
+ESB-KVK-NFFT2 superlative indefinite feminine nominative plural variant 2
+ESB-KVK-ÞFET superlative indefinite feminine accusative singular
+ESB-KVK-ÞFET2 superlative indefinite feminine accusative singular variant 2
+ESB-KVK-ÞFFT superlative indefinite feminine accusative plural
+ESB-KVK-ÞFFT2 superlative indefinite feminine accusative plural variant 2
+ESB-KVK-ÞGFET superlative indefinite feminine dative singular
+ESB-KVK-ÞGFET2 superlative indefinite feminine þágufal singular variant 2
+ESB-KVK-ÞGFFT superlative indefinite feminine dative plural
+ESB-KVK-ÞGFFT2 superlative indefinite feminine dative plural variant 2
+EVB-HK-EFET superlative definite neuter genitive singular
+EVB-HK-EFET2 superlative definite neuter genitive singular variant 2
+EVB-HK-EFFT superlative definite neuter genitive plural
+EVB-HK-EFFT2 superlative definite neuter genitive plural variant 2
+EVB-HK-NFET superlative definite neuter nominative singular
+EVB-HK-NFET2 superlative definite neuter nominative singular variant 2
+EVB-HK-NFFT superlative definite neuter nominative plural
+EVB-HK-NFFT2 superlative definite neuter nominative plural variant 2
+EVB-HK-ÞFET superlative definite neuter accusative singular
+EVB-HK-ÞFET2 superlative definite neuter accusative singular variant 2
+EVB-HK-ÞFFT superlative definite neuter accusative plural
+EVB-HK-ÞFFT2 superlative definite neuter accusative plural variant 2
+EVB-HK-ÞGFET superlative definite neuter dative singular
+EVB-HK-ÞGFET2 superlative definite neuter dative singular variant 2
+EVB-HK-ÞGFFT superlative definite neuter dative plural
+EVB-HK-ÞGFFT2 superlative definite neuter dative plural variant 2
+EVB-KK-EFET superlative definite masculine genitive singular
+EVB-KK-EFET2 superlative definite masculine genitive singular variant 2
+EVB-KK-EFFT superlative definite masculine genitive plural
+EVB-KK-EFFT2 superlative definite masculine genitive plural variant 2
+EVB-KK-NFET superlative definite masculine nominative singular
+EVB-KK-NFET2 superlative definite masculine nominative singular variant 2
+EVB-KK-NFFT superlative definite masculine nominative plural
+EVB-KK-NFFT2 superlative definite masculine nominative plural variant 2
+EVB-KK-ÞFET superlative definite masculine accusative singular
+EVB-KK-ÞFET2 superlative definite masculine accusative singular variant 2
+EVB-KK-ÞFFT superlative definite masculine accusative plural
+EVB-KK-ÞFFT2 superlative definite masculine accusative plural variant 2
+EVB-KK-ÞGFET superlative definite masculine dative singular
+EVB-KK-ÞGFET2 superlative definite masculine dative singular variant 2
+EVB-KK-ÞGFFT superlative definite masculine dative plural
+EVB-KK-ÞGFFT2 superlative definite masculine dative plural variant 2
+EVB-KVK-EFET superlative definite feminine genitive singular
+EVB-KVK-EFET2 superlative definite feminine genitive singular variant 2
+EVB-KVK-EFFT superlative definite feminine genitive plural
+EVB-KVK-EFFT2 superlative definite feminine genitive plural variant 2
+EVB-KVK-NFET superlative definite feminine nominative singular
+EVB-KVK-NFET2 superlative definite feminine nominative singular variant 2
+EVB-KVK-NFFT superlative definite feminine nominative plural
+EVB-KVK-NFFT2 superlative definite feminine nominative plural variant 2
+EVB-KVK-ÞFET superlative definite feminine accusative singular
+EVB-KVK-ÞFET2 superlative definite feminine accusative singular variant 2
+EVB-KVK-ÞFFT superlative definite feminine accusative plural
+EVB-KVK-ÞFFT2 superlative definite feminine accusative plural variant 2
+EVB-KVK-ÞGFET superlative definite feminine dative singular
+EVB-KVK-ÞGFET2 superlative definite feminine dative singular variant 2
+EVB-KVK-ÞGFFT superlative definite feminine dative plural
+EVB-KVK-ÞGFFT2 superlative definite feminine dative plural variant 2
+fn_HK_EFET neuter genitive singular
+fn_HK_EFFT neuter genitive plural
+fn_HK_NFET neuter nominative singular
+fn_HK_NFET2 neuter nominative singular variant 2
+fn_HK_NFFT neuter nominative plural
+fn_HK_ÞFET neuter accusative singular
+fn_HK_ÞFET2 neuter accusative singular variant 2
+fn_HK_ÞFFT neuter accusative plural
+fn_HK_ÞGFET neuter dative singular
+fn_HK_ÞGFFT neuter dative plural
+fn_KK_EFET masculine genitive singular
+fn_KK_EFFT masculine genitive plural
+fn_KK_NFET masculine nominative singular
+fn_KK_NFFT masculine nominative plural
+fn_KK_ÞFET masculine accusative singular
+fn_KK_ÞFFT masculine accusative plural
+fn_KK_ÞGFET masculine dative singular
+fn_KK_ÞGFFT masculine dative plural
+fn_KVK_EFET feminine genitive singular
+fn_KVK_EFFT feminine genitive plural
+fn_KVK_NFET feminine nominative singular
+fn_KVK_NFFT feminine nominative plural
+fn_KVK_ÞFET feminine accusative singular
+fn_KVK_ÞFFT feminine accusative plural
+fn_KVK_ÞGFET feminine dative singular
+fn_KVK_ÞGFFT feminine dative plural
+FSB-HK-EFET positive indefinite neuter genitive singular
+FSB-HK-EFFT positive indefinite neuter genitive plural
+FSB-HK-NFET positive indefinite neuter nominative singular
+FSB-HK-NFFT positive indefinite neuter nominative plural
+FSB-HK-ÞFET positive indefinite neuter accusative singular
+FSB-HK-ÞFFT positive indefinite neuter accusative plural
+FSB-HK-ÞGFET positive indefinite neuter dative singular
+FSB-HK-ÞGFET2 positive indefinite neuter dative singular variant 2
+FSB-HK-ÞGFFT positive indefinite neuter dative plural
+FSB-HK-ÞGFFT2 positive indefinite neuter dative plural variant 2
+FSB-KK-EFET positive indefinite masculine genitive singular
+FSB-KK-EFFT positive indefinite masculine genitive plural
+FSB-KK-NFET positive indefinite masculine nominative singular
+FSB-KK-NFFT positive indefinite masculine nominative plural
+FSB-KK-NFFT2 positive indefinite masculine nominative plural variant 2
+FSB-KK-ÞFET positive indefinite masculine accusative singular
+FSB-KK-ÞFET2 positive indefinite masculine accusative singular variant 2
+FSB-KK-ÞFFT positive indefinite masculine accusative plural
+FSB-KK-ÞFFT2 positive indefinite masculine accusative plural variant 2
+FSB-KK-ÞGFET positive indefinite masculine dative singular
+FSB-KK-ÞGFET2 positive indefinite masculine dative singular variant 2
+FSB-KK-ÞGFFT positive indefinite masculine dative plural
+FSB-KK-ÞGFFT2 positive indefinite masculine dative plural variant 2
+FSB-KVK-EFET positive indefinite feminine genitive singular
+FSB-KVK-EFFT positive indefinite feminine genitive plural
+FSB-KVK-NFET positive indefinite feminine nominative singular
+FSB-KVK-NFFT positive indefinite feminine nominative plural
+FSB-KVK-NFFT2 positive indefinite feminine nominative plural variant 2
+FSB-KVK-ÞFET positive indefinite feminine accusative singular
+FSB-KVK-ÞFET2 positive indefinite feminine accusative singular variant 2
+FSB-KVK-ÞFFT positive indefinite feminine accusative plural
+FSB-KVK-ÞFFT2 positive indefinite feminine accusative plural variant 2
+FSB-KVK-ÞGFET positive indefinite feminine dative singular
+FSB-KVK-ÞGFFT positive indefinite feminine dative plural
+FSB-KVK-ÞGFFT2 positive indefinite feminine dative plural variant 2
+FVB-HK-EFET positive definite neuter genitive singular
+FVB-HK-EFET2 positive definite neuter genitive singular variant 2
+FVB-HK-EFFT positive definite neuter genitive plural
+FVB-HK-EFFT2 positive definite neuter genitive plural variant 2
+FVB-HK-NFET positive definite neuter nominative singular
+FVB-HK-NFET2 positive definite neuter nominative singular variant 2
+FVB-HK-NFFT positive definite neuter nominative plural
+FVB-HK-NFFT2 positive definite neuter nominative plural variant 2
+FVB-HK-ÞFET positive definite neuter accusative singular
+FVB-HK-ÞFET2 positive definite neuter accusative singular variant 2
+FVB-HK-ÞFFT positive definite neuter accusative plural
+FVB-HK-ÞFFT2 positive definite neuter accusative plural variant 2
+FVB-HK-ÞGFET positive definite neuter dative singular
+FVB-HK-ÞGFET2 positive definite neuter dative singular variant 2
+FVB-HK-ÞGFFT positive definite neuter dative plural
+FVB-HK-ÞGFFT2 positive definite neuter dative plural variant 2
+FVB-KK-EFET positive definite masculine genitive singular
+FVB-KK-EFET2 positive definite masculine genitive singular variant 2
+FVB-KK-EFFT positive definite masculine genitive plural
+FVB-KK-EFFT2 positive definite masculine genitive plural variant 2
+FVB-KK-NFET positive definite masculine nominative singular
+FVB-KK-NFET2 positive definite masculine nominative singular variant 2
+FVB-KK-NFFT positive definite masculine nominative plural
+FVB-KK-NFFT2 positive definite masculine nominative plural variant 2
+FVB-KK-ÞFET positive definite masculine accusative singular
+FVB-KK-ÞFET2 positive definite masculine accusative singular variant 2
+FVB-KK-ÞFFT positive definite masculine accusative plural
+FVB-KK-ÞFFT2 positive definite masculine accusative plural variant 2
+FVB-KK-ÞGFET positive definite masculine dative singular
+FVB-KK-ÞGFET2 positive definite masculine dative singular variant 2
+FVB-KK-ÞGFFT positive definite masculine dative plural
+FVB-KK-ÞGFFT2 positive definite masculine dative plural variant 2
+FVB-KVK-EFET positive definite feminine genitive singular
+FVB-KVK-EFET2 positive definite feminine genitive singular variant 2
+FVB-KVK-EFFT positive definite feminine genitive plural
+FVB-KVK-EFFT2 positive definite feminine genitive plural variant 2
+FVB-KVK-NFET positive definite feminine nominative singular
+FVB-KVK-NFET2 positive definite feminine nominative singular variant 2
+FVB-KVK-NFFT positive definite feminine nominative plural
+FVB-KVK-NFFT2 positive definite feminine nominative plural variant 2
+FVB-KVK-ÞFET positive definite feminine accusative singular
+FVB-KVK-ÞFET2 positive definite feminine accusative singular variant 2
+FVB-KVK-ÞFFT positive definite feminine accusative plural
+FVB-KVK-ÞFFT2 positive definite feminine accusative plural variant 2
+FVB-KVK-ÞGFET positive definite feminine dative singular
+FVB-KVK-ÞGFET2 positive definite feminine dative singular variant 2
+FVB-KVK-ÞGFFT positive definite feminine dative plural
+FVB-KVK-ÞGFFT2 positive definite feminine dative plural variant 2
+GM-BH-ET active imperative singular
+GM-BH-ET2 active imperative singular variant 2
+GM-BH-FT active imperative plural
+GM-BH-ST active clipped imperative
+GM-BH-ST2 active clipped imperative variant 2
+GM-FH-NT-1P-ET active indicative present-tense 1st person singular
+GM-FH-NT-1P-ET2 active indicative present-tense 1st person singular variant 2
+GM-FH-NT-1P-FT active indicative present-tense 1st person plural
+GM-FH-NT-1P-FT2 active indicative present-tense 1st person plural variant 2
+GM-FH-NT-2P-ET active indicative present-tense 2nd person singular
+GM-FH-NT-2P-ET2 active indicative present-tense 2nd person singular variant 2
+GM-FH-NT-2P-FT active indicative present-tense 2nd person plural
+GM-FH-NT-3P-ET active indicative present-tense 3rd person singular
+GM-FH-NT-3P-ET2 active indicative present-tense 3rd person singular variant 2
+GM-FH-NT-3P-FT active indicative present-tense 3rd person plural
+GM-FH-ÞT-1P-ET active indicative past-tense 1st person singular
+GM-FH-ÞT-1P-ET2 active indicative past-tense 1st person singular variant 2
+GM-FH-ÞT-1P-FT active indicative past-tense 1st person plural
+GM-FH-ÞT-1P-FT2 active indicative past-tense 1st person plural variant 2
+GM-FH-ÞT-2P-ET active indicative past-tense 2nd person singular
+GM-FH-ÞT-2P-ET2 active indicative past-tense 2nd person singular variant 2
+GM-FH-ÞT-2P-FT active indicative past-tense 2nd person plural
+GM-FH-ÞT-2P-FT2 active indicative past-tense 2nd person plural variant 2
+GM-FH-ÞT-3P-ET active indicative past-tense 3rd person singular
+GM-FH-ÞT-3P-ET2 active indicative past-tense 3rd person singular variant 2
+GM-FH-ÞT-3P-FT active indicative past-tense 3rd person plural
+GM-FH-ÞT-3P-FT2 active indicative past-tense 3rd person plural variant 2
+GM-NH active infinitive
+GM-NH-ÞT active infinitive past-tense tense
+GM-NH-ÞT active infinitive past-tense variant 2
+GM-SAGNB active supine
+GM-SAGNB2 active supine variant 2
+GM-VH-NT-1P-ET active subjunctive present-tense 1st person singular
+GM-VH-NT-1P-FT active subjunctive present-tense 1st person plural
+GM-VH-NT-1P-FT2 active subjunctive present-tense 1st person plural variant 2
+GM-VH-NT-2P-ET active subjunctive present-tense 2nd person singular
+GM-VH-NT-2P-FT active subjunctive present-tense 2nd person plural
+GM-VH-NT-3P-ET active subjunctive present-tense 3rd person singular
+GM-VH-NT-3P-FT active subjunctive present-tense 3rd person plural
+GM-VH-ÞT-1P-ET active subjunctive past-tense 1st person singular
+GM-VH-ÞT-1P-ET2 active subjunctive past-tense 1st person singular variant 2
+GM-VH-ÞT-1P-FT active subjunctive past-tense 1st person plural
+GM-VH-ÞT-1P-FT2 active subjunctive past-tense 1st person plural variant 2
+GM-VH-ÞT-2P-ET active subjunctive past-tense 2nd person singular
+GM-VH-ÞT-2P-ET2 active subjunctive past-tense 2nd person singular variant 2
+GM-VH-ÞT-2P-FT active subjunctive past-tense 2nd person plural
+GM-VH-ÞT-2P-FT2 active subjunctive past-tense 2nd person plural variant 2
+GM-VH-ÞT-3P-ET active subjunctive past-tense 3rd person singular
+GM-VH-ÞT-3P-ET2 active subjunctive past-tense 3rd person singular variant 2
+GM-VH-ÞT-3P-FT active subjunctive past-tense 3rd person plural
+GM-VH-ÞT-3P-FT2 active subjunctive past-tense 3rd person plural variant 2
+gr_hk_EFET neuter genitive singular
+gr_hk_EFFT neuter genitive plural
+gr_hk_NFET neuter nominative singular
+gr_hk_NFFT neuter nominative plural
+gr_hk_ÞFET neuter accusative singular
+gr_hk_ÞFFT neuter accusative plural
+gr_hk_ÞGFET neuter dative singular
+gr_hk_ÞGFFT neuter dative plural
+gr_kk_EFET masculine genitive singular
+gr_kk_EFFT masculine genitive plural
+gr_kk_NFET masculine nominative singular
+gr_kk_NFFT masculine nominative plural
+gr_kk_ÞFET masculine accusative singular
+gr_kk_ÞFFT masculine accusative plural
+gr_kk_ÞGFET masculine dative singular
+gr_kk_ÞGFFT masculine dative plural
+gr_kvk_EFET feminine genitive singular
+gr_kvk_EFFT feminine genitive plural
+gr_kvk_NFET feminine nominative singular
+gr_kvk_NFFT feminine nominative plural
+gr_kvk_ÞFET feminine accusative singular
+gr_kvk_ÞFFT feminine accusative plural
+gr_kvk_ÞGFET feminine dative singular
+gr_kvk_ÞGFFT feminine dative plural
+HK-EFET neuter genitive singular
+HK-EFFT neuter genitive plural
+HK-NFET neuter nominative singular
+HK-NFFT neuter nominative plural
+HK-ÞFET neuter accusative singular
+HK-ÞFFT neuter accusative plural
+HK-ÞGFET neuter dative singular
+HK-ÞGFFT neuter dative plural
+KK-EFET masculine genitive singular
+KK-EFFT masculine genitive plural
+KK-NFET masculine nominative singular
+KK-NFFT masculine nominative plural
+KK-ÞFET masculine accusative singular
+KK-ÞFFT masculine accusative plural
+KK-ÞGFET masculine dative singular
+KK-ÞGFFT masculine dative plural
+KVK-EFET feminine genitive singular
+KVK-EFFT feminine genitive plural
+KVK-NFET feminine nominative singular
+KVK-NFFT feminine nominative plural
+KVK-ÞFET feminine accusative singular
+KVK-ÞFFT feminine accusative plural
+KVK-ÞGFET feminine dative singular
+KVK-ÞGFFT feminine dative plural
+LHNT present-participle
+LHNT2 present-participle variant 2
+LHÞT-SB-HK-EFET past-participle indefinite neuter genitive singular
+LHÞT-SB-HK-EFET2 past-participle indefinite neuter genitive singular variant 2
+LHÞT-SB-HK-EFFT past-participle indefinite neuter genitive plural
+LHÞT-SB-HK-EFFT2 past-participle indefinite neuter genitive plural variant 2
+LHÞT-SB-HK-NFET past-participle indefinite neuter nominative singular
+LHÞT-SB-HK-NFET2 past-participle indefinite neuter nominative singular variant 2
+LHÞT-SB-HK-NFFT past-participle indefinite neuter nominative plural
+LHÞT-SB-HK-NFFT2 past-participle indefinite neuter nominative plural variant 2
+LHÞT-SB-HK-ÞFET past-participle indefinite neuter accusative singular
+LHÞT-SB-HK-ÞFET2 past-participle indefinite neuter accusative singular variant 2
+LHÞT-SB-HK-ÞFFT past-participle indefinite neuter accusative plural
+LHÞT-SB-HK-ÞFFT2 past-participle indefinite neuter accusative plural variant 2
+LHÞT-SB-HK-ÞGFET past-participle indefinite neuter dative singular
+LHÞT-SB-HK-ÞGFET2 past-participle indefinite neuter dative singular variant 2
+LHÞT-SB-HK-ÞGFFT past-participle indefinite neuter dative plural
+LHÞT-SB-HK-ÞGFFT2 past-participle indefinite neuter dative plural variant 2
+LHÞT-SB-KK-EFET past-participle indefinite masculine genitive singular
+LHÞT-SB-KK-EFET2 past-participle indefinite masculine genitive singular variant 2
+LHÞT-SB-KK-EFFT past-participle indefinite masculine genitive plural
+LHÞT-SB-KK-EFFT2 past-participle indefinite masculine genitive plural variant 2
+LHÞT-SB-KK-NFET past-participle indefinite masculine nominative singular
+LHÞT-SB-KK-NFET2 past-participle indefinite masculine nominative singular variant 2
+LHÞT-SB-KK-NFFT past-participle indefinite masculine nominative plural
+LHÞT-SB-KK-NFFT2 past-participle indefinite masculine nominative plural variant 2
+LHÞT-SB-KK-ÞFET past-participle indefinite masculine accusative singular
+LHÞT-SB-KK-ÞFET2 past-participle indefinite masculine accusative singular variant 2
+LHÞT-SB-KK-ÞFFT past-participle indefinite masculine accusative plural
+LHÞT-SB-KK-ÞFFT2 past-participle indefinite masculine accusative plural variant 2
+LHÞT-SB-KK-ÞGFET past-participle indefinite masculine dative singular
+LHÞT-SB-KK-ÞGFET2 past-participle indefinite masculine dative singular variant 2
+LHÞT-SB-KK-ÞGFFT past-participle indefinite masculine dative plural
+LHÞT-SB-KK-ÞGFFT2 past-participle indefinite masculine dative plural variant 2
+LHÞT-SB-KVK-EFET past-participle indefinite feminine genitive singular
+LHÞT-SB-KVK-EFET2 past-participle indefinite feminine genitive singular variant 2
+LHÞT-SB-KVK-EFFT past-participle indefinite feminine genitive plural
+LHÞT-SB-KVK-EFFT2 past-participle indefinite feminine genitive plural variant 2
+LHÞT-SB-KVK-NFET past-participle indefinite feminine nominative singular
+LHÞT-SB-KVK-NFET2 past-participle indefinite feminine nominative singular variant 2
+LHÞT-SB-KVK-NFFT past-participle indefinite feminine nominative plural
+LHÞT-SB-KVK-NFFT2 past-participle indefinite feminine nominative plural variant 2
+LHÞT-SB-KVK-ÞFET past-participle indefinite feminine accusative singular
+LHÞT-SB-KVK-ÞFET2 past-participle indefinite feminine accusative singular variant 2
+LHÞT-SB-KVK-ÞFFT past-participle indefinite feminine accusative plural
+LHÞT-SB-KVK-ÞFFT2 past-participle indefinite feminine accusative plural variant 2
+LHÞT-SB-KVK-ÞGFET past-participle indefinite feminine dative singular
+LHÞT-SB-KVK-ÞGFET2 past-participle indefinite feminine dative singular variant 2
+LHÞT-SB-KVK-ÞGFFT past-participle indefinite feminine dative plural
+LHÞT-SB-KVK-ÞGFFT2 past-participle indefinite feminine dative plural variant 2
+LHÞT-VB-HK-EFET past-participle definite neuter genitive singular
+LHÞT-VB-HK-EFET2 past-participle definite neuter genitive singular variant 2
+LHÞT-VB-HK-EFFT past-participle definite neuter genitive plural
+LHÞT-VB-HK-EFFT2 past-participle definite neuter genitive plural variant 2
+LHÞT-VB-HK-NFET past-participle definite neuter nominative singular
+LHÞT-VB-HK-NFET2 past-participle definite neuter nominative singular variant 2
+LHÞT-VB-HK-NFFT past-participle definite neuter nominative plural
+LHÞT-VB-HK-NFFT2 past-participle definite neuter nominative plural variant 2
+LHÞT-VB-HK-ÞFET past-participle definite neuter accusative singular
+LHÞT-VB-HK-ÞFET2 past-participle definite neuter accusative singular variant 2
+LHÞT-VB-HK-ÞFFT past-participle definite neuter accusative plural
+LHÞT-VB-HK-ÞFFT2 past-participle definite neuter accusative plural variant 2
+LHÞT-VB-HK-ÞGFET past-participle definite neuter dative singular
+LHÞT-VB-HK-ÞGFET2 past-participle definite neuter dative singular variant 2
+LHÞT-VB-HK-ÞGFFT past-participle definite neuter dative plural
+LHÞT-VB-HK-ÞGFFT2 past-participle definite neuter dative plural variant 2
+LHÞT-VB-KK-EFET past-participle definite masculine genitive singular
+LHÞT-VB-KK-EFET2 past-participle definite masculine genitive singular variant 2
+LHÞT-VB-KK-EFFT past-participle definite masculine genitive plural
+LHÞT-VB-KK-EFFT2 past-participle definite masculine genitive plural variant 2
+LHÞT-VB-KK-NFET past-participle definite masculine nominative singular
+LHÞT-VB-KK-NFET2 past-participle definite masculine nominative singular variant 2
+LHÞT-VB-KK-NFET3 past-participle definite masculine nominative singular variant 3
+LHÞT-VB-KK-NFFT past-participle definite masculine nominative plural
+LHÞT-VB-KK-NFFT2 past-participle definite masculine nominative plural variant 2
+LHÞT-VB-KK-ÞFET past-participle definite masculine accusative singular
+LHÞT-VB-KK-ÞFET2 past-participle definite masculine accusative singular variant 2
+LHÞT-VB-KK-ÞFFT past-participle definite masculine accusative plural
+LHÞT-VB-KK-ÞFFT2 past-participle definite masculine accusative plural variant 2
+LHÞT-VB-KK-ÞGFET past-participle definite masculine dative singular
+LHÞT-VB-KK-ÞGFET2 past-participle definite masculine dative singular variant 2
+LHÞT-VB-KK-ÞGFFT past-participle definite masculine dative plural
+LHÞT-VB-KK-ÞGFFT2 past-participle definite masculine dative plural variant 2
+LHÞT-VB-KVK-EFET past-participle definite feminine genitive singular
+LHÞT-VB-KVK-EFET2 past-participle definite feminine genitive singular variant 2
+LHÞT-VB-KVK-EFFT past-participle definite feminine genitive plural
+LHÞT-VB-KVK-EFFT2 past-participle definite feminine genitive plural variant 2
+LHÞT-VB-KVK-NFET past-participle definite feminine nominative singular
+LHÞT-VB-KVK-NFET2 past-participle definite feminine nominative singular variant 2
+LHÞT-VB-KVK-NFFT past-participle definite feminine nominative plural
+LHÞT-VB-KVK-NFFT2 past-participle definite feminine nominative plural variant 2
+LHÞT-VB-KVK-ÞFET past-participle definite feminine accusative singular
+LHÞT-VB-KVK-ÞFET2 past-participle definite feminine accusative singular variant 2
+LHÞT-VB-KVK-ÞFFT past-participle definite feminine accusative plural
+LHÞT-VB-KVK-ÞFFT2 past-participle definite feminine accusative plural variant 2
+LHÞT-VB-KVK-ÞGFET past-participle definite feminine dative singular
+LHÞT-VB-KVK-ÞGFET2 past-participle definite feminine dative singular variant 2
+LHÞT-VB-KVK-ÞGFET3 past-participle definite feminine dative singular variant 3
+LHÞT-VB-KVK-ÞGFFT past-participle definite feminine dative plural
+LHÞT-VB-KVK-ÞGFFT2 past-participle definite feminine dative plural variant 2
+MM-BH-ET middle imperative singular
+MM-BH-FT middle imperative plural
+MM-FH-NT-1P-ET middle indicative present-tense 1st person singular
+MM-FH-NT-1P-ET2 middle indicative present-tense 1st person singular variant 2
+MM-FH-NT-1P-FT middle indicative present-tense 1st person plural
+MM-FH-NT-1P-FT2 middle indicative present-tense 1st person plural variant 2
+MM-FH-NT-2P-ET middle indicative present-tense 2nd person singular
+MM-FH-NT-2P-ET2 middle indicative present-tense 2nd person singular variant 2
+MM-FH-NT-2P-FT middle indicative present-tense 2nd person plural
+MM-FH-NT-3P-ET middle indicative present-tense 3rd person singular
+MM-FH-NT-3P-ET2 middle indicative present-tense 3rd person singular variant 2
+MM-FH-NT-3P-FT middle indicative present-tense 3rd person plural
+MM-FH-ÞT-1P-ET middle indicative past-tense 1st person singular
+MM-FH-ÞT-1P-ET2 middle indicative past-tense 1st person singular variant 2
+MM-FH-ÞT-1P-FT middle indicative past-tense 1st person plural
+MM-FH-ÞT-1P-FT2 middle indicative past-tense 1st person plural variant 2
+MM-FH-ÞT-2P-ET middle indicative past-tense 2nd person singular
+MM-FH-ÞT-2P-ET2 middle indicative past-tense 2nd person singular variant 2
+MM-FH-ÞT-2P-FT middle indicative past-tense 2nd person plural
+MM-FH-ÞT-2P-FT2 middle indicative past-tense 2nd person plural variant 2
+MM-FH-ÞT-3P-ET middle indicative past-tense 3rd person singular
+MM-FH-ÞT-3P-ET2 middle indicative past-tense 3rd person singular variant 2
+MM-FH-ÞT-3P-FT middle indicative past-tense 3rd person plural
+MM-FH-ÞT-3P-FT2 middle indicative past-tense 3rd person plural variant 2
+MM-NH middle infinitive
+MM-SAGNB middle supine
+MM-SAGNB2 middle supine variant 2
+MM-VH-NT-1P-ET middle subjunctive present-tense 1st person singular
+MM-VH-NT-1P-FT middle subjunctive present-tense 1st person plural
+MM-VH-NT-1P-FT2 middle subjunctive present-tense 1st person plural variant 2
+MM-VH-NT-2P-ET middle subjunctive present-tense 2nd person singular
+MM-VH-NT-2P-FT middle subjunctive present-tense 2nd person plural
+MM-VH-NT-3P-ET middle subjunctive present-tense 3rd person singular
+MM-VH-NT-3P-FT middle subjunctive present-tense 3rd person plural
+MM-VH-ÞT-1P-ET middle subjunctive past-tense 1st person singular
+MM-VH-ÞT-1P-ET2 middle subjunctive past-tense 1st person singular variant 2
+MM-VH-ÞT-1P-FT middle subjunctive past-tense 1st person plural
+MM-VH-ÞT-1P-FT2 middle subjunctive past-tense 1st person plural variant 2
+MM-VH-ÞT-2P-ET middle subjunctive past-tense 2nd person singular
+MM-VH-ÞT-2P-ET2 middle subjunctive past-tense 2nd person singular variant 2
+MM-VH-ÞT-2P-FT middle subjunctive past-tense 2nd person plural
+MM-VH-ÞT-2P-FT2 middle subjunctive past-tense 2nd person plural variant 2
+MM-VH-ÞT-3P-ET middle subjunctive past-tense 3rd person singular
+MM-VH-ÞT-3P-ET2 middle subjunctive past-tense 3rd person singular variant 2
+MM-VH-ÞT-3P-FT middle subjunctive past-tense 3rd person plural
+MM-VH-ÞT-3P-FT2 middle subjunctive past-tense 3rd person plural variant 2
+MST-HK-EFET comparative neuter genitive singular
+MST-HK-EFET2 comparative neuter genitive singular variant 2
+MST-HK-EFFT comparative neuter genitive plural
+MST-HK-EFFT2 comparative neuter genitive plural variant 2
+MST-HK-NFET comparative neuter nominative singular
+MST-HK-NFET2 comparative neuter nominative singular variant 2
+MST-HK-NFFT comparative neuter nominative plural
+MST-HK-NFFT2 comparative neuter nominative plural variant 2
+MST-HK-ÞFET comparative neuter accusative singular
+MST-HK-ÞFET2 comparative neuter accusative singular variant 2
+MST-HK-ÞFFT comparative neuter accusative plural
+MST-HK-ÞFFT2 comparative neuter accusative plural variant 2
+MST-HK-ÞGFET comparative neuter dative singular
+MST-HK-ÞGFET2 comparative neuter dative singular variant 2
+MST-HK-ÞGFFT comparative neuter dative plural
+MST-HK-ÞGFFT2 comparative neuter dative plural variant 2
+MST-KK-EFET comparative masculine genitive singular
+MST-KK-EFET2 comparative masculine genitive singular variant 2
+MST-KK-EFFT comparative masculine genitive plural
+MST-KK-EFFT2 comparative masculine genitive plural variant 2
+MST-KK-NFET comparative masculine nominative singular
+MST-KK-NFET2 comparative masculine nominative singular variant 2
+MST-KK-NFFT comparative masculine nominative plural
+MST-KK-NFFT2 comparative masculine nominative plural variant 2
+MST-KK-ÞFET comparative masculine accusative singular
+MST-KK-ÞFET2 comparative masculine accusative singular variant 2
+MST-KK-ÞFFT comparative masculine accusative plural
+MST-KK-ÞFFT2 comparative masculine accusative plural variant 2
+MST-KK-ÞGFET comparative masculine dative singular
+MST-KK-ÞGFET2 comparative masculine dative singular variant 2
+MST-KK-ÞGFFT comparative masculine dative plural
+MST-KK-ÞGFFT2 comparative masculine dative plural variant 2
+MST-KVK-EFET comparative feminine genitive singular
+MST-KVK-EFET2 comparative feminine genitive singular variant 2
+MST-KVK-EFFT comparative feminine genitive plural
+MST-KVK-EFFT2 comparative feminine genitive plural variant 2
+MST-KVK-NFET comparative feminine nominative singular
+MST-KVK-NFET2 comparative feminine nominative singular variant 2
+MST-KVK-NFFT comparative feminine nominative plural
+MST-KVK-NFFT2 comparative feminine nominative plural variant 2
+MST-KVK-ÞFET comparative feminine accusative singular
+MST-KVK-ÞFET2 comparative feminine accusative singular variant 2
+MST-KVK-ÞFFT comparative feminine accusative plural
+MST-KVK-ÞFFT2 comparative feminine accusative plural variant 2
+MST-KVK-ÞGFET comparative feminine dative singular
+MST-KVK-ÞGFET2 comparative feminine dative singular variant 2
+MST-KVK-ÞGFFT comparative feminine dative plural
+MST-KVK-ÞGFFT2 comparative feminine dative plural variant 2
+NFET nominative singular indefinite
+NFET2 nominative singular indefinite variant 2
+NFET3 nominative singular indefinite variant 3
+NFETgr nominative singular definite
+NFETgr2 nominative singular definite variant 2
+NFETgr3 nominative singular definite variant 3
+NFFT nominative plural indefinite
+NFFT2 nominative plural indefinite variant 2
+NFFT3 nominative plural indefinite variant 3
+NFFTgr nominative plural definite
+NFFTgr2 nominative plural definite variant 2
+NFFTgr3 nominative plural definite variant 3
+OBEYGJANLEGT uninflected
+OP-EF-GM-FH-NT-1P-ET impersonal genitive-subject active indicative present-tense 1st person singular
+OP-EF-GM-FH-NT-1P-FT impersonal genitive-subject active indicative present-tense 1st person plural
+OP-EF-GM-FH-NT-2P-ET impersonal genitive-subject active indicative present-tense 2nd person singular
+OP-EF-GM-FH-NT-2P-FT impersonal genitive-subject active indicative present-tense 2nd person plural
+OP-EF-GM-FH-NT-3P-ET impersonal genitive-subject active indicative present-tense 3rd person singular
+OP-EF-GM-FH-NT-3P-FT impersonal genitive-subject active indicative present-tense 3rd person plural
+OP-EF-GM-FH-ÞT-1P-ET impersonal genitive-subject active indicative past-tense 1st person singular
+OP-EF-GM-FH-ÞT-1P-FT impersonal genitive-subject active indicative past-tense 1st person plural
+OP-EF-GM-FH-ÞT-2P-ET impersonal genitive-subject active indicative past-tense 2nd person singular
+OP-EF-GM-FH-ÞT-2P-FT impersonal genitive-subject active indicative past-tense 2nd person plural
+OP-EF-GM-FH-ÞT-3P-ET impersonal genitive-subject active indicative past-tense 3rd person singular
+OP-EF-GM-FH-ÞT-3P-FT impersonal genitive-subject active indicative past-tense 3rd person plural
+OP-EF-GM-VH-NT-1P-ET impersonal genitive-subject active subjunctive present-tense 1st person singular
+OP-EF-GM-VH-NT-1P-FT impersonal genitive-subject active subjunctive present-tense 1st person plural
+OP-EF-GM-VH-NT-2P-ET impersonal genitive-subject active subjunctive present-tense 2nd person singular
+OP-EF-GM-VH-NT-2P-FT impersonal genitive-subject active subjunctive present-tense 2nd person plural
+OP-EF-GM-VH-NT-3P-ET impersonal genitive-subject active subjunctive present-tense 3rd person singular
+OP-EF-GM-VH-NT-3P-FT impersonal genitive-subject active subjunctive present-tense 3rd person plural
+OP-EF-GM-VH-ÞT-1P-ET impersonal genitive-subject active subjunctive past-tense 1st person singular
+OP-EF-GM-VH-ÞT-1P-FT impersonal genitive-subject active subjunctive past-tense 1st person plural
+OP-EF-GM-VH-ÞT-2P-ET impersonal genitive-subject active subjunctive past-tense 2nd person singular
+OP-EF-GM-VH-ÞT-2P-FT impersonal genitive-subject active subjunctive past-tense 2nd person plural
+OP-EF-GM-VH-ÞT-3P-ET impersonal genitive-subject active subjunctive past-tense 3rd person singular
+OP-EF-GM-VH-ÞT-3P-FT impersonal genitive-subject active subjunctive past-tense 3rd person plural
+OP-það-GM-FH-NT-3P-ET impersonal dummy-subject active indicative present-tense 3rd person singular
+OP-það-GM-FH-ÞT-3P-ET impersonal dummy-subject active indicative past-tense 3rd person singular
+OP-það-GM-VH-NT-3P-ET impersonal dummy-subject active subjunctive present-tense 3rd person singular
+OP-það-GM-VH-ÞT-3P-ET impersonal dummy-subject active subjunctive past-tense 3rd person singular
+OP-það-MM-FH-NT-3P-ET impersonal dummy-subject mediopassive indicative present-tense 3rd person singular
+OP-það-MM-FH-ÞT-3P-ET impersonal dummy-subject mediopassive indicative past-tense 3rd person singular
+OP-það-MM-VH-NT-3P-ET impersonal dummy-subject mediopassive subjunctive present-tense 3rd person singular
+OP-það-MM-VH-ÞT-3P-ET impersonal dummy-subject mediopassive subjunctive past-tense 3rd person singular
+OP-ÞF-GM-FH-NT-1P-ET impersonal accusative-subject active indicative present-tense 1st person singular
+OP-ÞF-GM-FH-NT-1P-FT impersonal accusative-subject active indicative present-tense 1st person plural
+OP-ÞF-GM-FH-NT-2P-ET impersonal accusative-subject active indicative present-tense 2nd person singular
+OP-ÞF-GM-FH-NT-2P-FT impersonal accusative-subject active indicative present-tense 2nd person plural
+OP-ÞF-GM-FH-NT-3P-ET impersonal accusative-subject active indicative present-tense 3rd person singular
+OP-ÞF-GM-FH-NT-3P-FT impersonal accusative-subject active indicative present-tense 3rd person plural
+OP-ÞF-GM-FH-ÞT-1P-ET impersonal accusative-subject active indicative past-tense 1st person singular
+OP-ÞF-GM-FH-ÞT-1P-FT impersonal accusative-subject active indicative past-tense 1st person plural
+OP-ÞF-GM-FH-ÞT-2P-ET impersonal accusative-subject active indicative past-tense 2nd person singular
+OP-ÞF-GM-FH-ÞT-2P-FT impersonal accusative-subject active indicative past-tense 2nd person plural
+OP-ÞF-GM-FH-ÞT-3P-ET impersonal accusative-subject active indicative past-tense 3rd person singular
+OP-ÞF-GM-FH-ÞT-3P-FT impersonal accusative-subject active indicative past-tense 3rd person plural
+OP-ÞF-GM-VH-NT-1P-ET impersonal accusative-subject active subjunctive present-tense 1st person singular
+OP-ÞF-GM-VH-NT-1P-FT impersonal accusative-subject active subjunctive present-tense 1st person plural
+OP-ÞF-GM-VH-NT-2P-ET impersonal accusative-subject active subjunctive present-tense 2nd person singular
+OP-ÞF-GM-VH-NT-2P-FT impersonal accusative-subject active subjunctive present-tense 2nd person plural
+OP-ÞF-GM-VH-NT-3P-ET impersonal accusative-subject active subjunctive present-tense 3rd person singular
+OP-ÞF-GM-VH-NT-3P-FT impersonal accusative-subject active subjunctive present-tense 3rd person plural
+OP-ÞF-GM-VH-ÞT-1P-ET impersonal accusative-subject active subjunctive past-tense 1st person singular
+OP-ÞF-GM-VH-ÞT-1P-FT impersonal accusative-subject active subjunctive past-tense 1st person plural
+OP-ÞF-GM-VH-ÞT-2P-ET impersonal accusative-subject active subjunctive past-tense 2nd person singular
+OP-ÞF-GM-VH-ÞT-2P-FT impersonal accusative-subject active subjunctive past-tense 2nd person plural
+OP-ÞF-GM-VH-ÞT-3P-ET impersonal accusative-subject active subjunctive past-tense 3rd person singular
+OP-ÞF-GM-VH-ÞT-3P-FT impersonal accusative-subject active subjunctive past-tense 3rd person plural
+OP-ÞGF-GM-FH-NT-1P-ET impersonal dative-subject active indicative present-tense 1st person singular
+OP-ÞGF-GM-FH-NT-1P-FT impersonal dative-subject active indicative present-tense 1st person plural
+OP-ÞGF-GM-FH-NT-2P-ET impersonal dative-subject active indicative present-tense 2nd person singular
+OP-ÞGF-GM-FH-NT-2P-FT impersonal dative-subject active indicative present-tense 2nd person plural
+OP-ÞGF-GM-FH-NT-3P-ET impersonal dative-subject active indicative present-tense 3rd person singular
+OP-ÞGF-GM-FH-NT-3P-FT impersonal dative-subject active indicative present-tense 3rd person plural
+OP-ÞGF-GM-FH-ÞT-1P-ET impersonal dative-subject active indicative past-tense 1st person singular
+OP-ÞGF-GM-FH-ÞT-1P-FT impersonal dative-subject active indicative past-tense 1st person plural
+OP-ÞGF-GM-FH-ÞT-2P-ET impersonal dative-subject active indicative past-tense 2nd person singular
+OP-ÞGF-GM-FH-ÞT-2P-FT impersonal dative-subject active indicative past-tense 2nd person plural
+OP-ÞGF-GM-FH-ÞT-3P-ET impersonal dative-subject active indicative past-tense 3rd person singular
+OP-ÞGF-GM-FH-ÞT-3P-FT impersonal dative-subject active indicative past-tense 3rd person plural
+OP-ÞGF-GM-VH-NT-1P-ET impersonal dative-subject active subjunctive present-tense 1st person singular
+OP-ÞGF-GM-VH-NT-1P-FT impersonal dative-subject active subjunctive present-tense 1st person plural
+OP-ÞGF-GM-VH-NT-2P-ET impersonal dative-subject active subjunctive present-tense 2nd person singular
+OP-ÞGF-GM-VH-NT-2P-FT impersonal dative-subject active subjunctive present-tense 2nd person plural
+OP-ÞGF-GM-VH-NT-3P-ET impersonal dative-subject active subjunctive present-tense 3rd person singular
+OP-ÞGF-GM-VH-NT-3P-FT impersonal dative-subject active subjunctive present-tense 3rd person plural
+OP-ÞGF-GM-VH-ÞT-1P-ET impersonal dative-subject active subjunctive past-tense 1st person singular
+OP-ÞGF-GM-VH-ÞT-1P-FT impersonal dative-subject active subjunctive past-tense 1st person plural
+OP-ÞGF-GM-VH-ÞT-2P-ET impersonal dative-subject active subjunctive past-tense 2nd person singular
+OP-ÞGF-GM-VH-ÞT-2P-FT impersonal dative-subject active subjunctive past-tense 2nd person plural
+OP-ÞGF-GM-VH-ÞT-3P-ET impersonal dative-subject active subjunctive past-tense 3rd person singular
+OP-ÞGF-GM-VH-ÞT-3P-FT impersonal dative-subject active subjunctive past-tense 3rd person plural
+OP-ÞGF-MM-FH-NT-1P-ET impersonal dative-subject middle indicative present-tense 1st person singular
+OP-ÞGF-MM-FH-NT-1P-FT impersonal dative-subject middle indicative present-tense 1st person plural
+OP-ÞGF-MM-FH-NT-2P-ET impersonal dative-subject middle indicative present-tense 2nd person singular
+OP-ÞGF-MM-FH-NT-2P-FT impersonal dative-subject middle indicative present-tense 2nd person plural
+OP-ÞGF-MM-FH-NT-3P-ET impersonal dative-subject middle indicative present-tense 3rd person singular
+OP-ÞGF-MM-FH-NT-3P-FT impersonal dative-subject middle indicative present-tense 3rd person plural
+OP-ÞGF-MM-FH-ÞT-1P-ET impersonal dative-subject middle indicative past-tense 1st person singular
+OP-ÞGF-MM-FH-ÞT-1P-FT impersonal dative-subject middle indicative past-tense 1st person plural
+OP-ÞGF-MM-FH-ÞT-2P-ET impersonal dative-subject middle indicative past-tense 2nd person singular
+OP-ÞGF-MM-FH-ÞT-2P-FT impersonal dative-subject middle indicative past-tense 2nd person plural
+OP-ÞGF-MM-FH-ÞT-3P-ET impersonal dative-subject middle indicative past-tense 3rd person singular
+OP-ÞGF-MM-FH-ÞT-3P-FT impersonal dative-subject middle indicative past-tense 3rd person plural
+OP-ÞGF-MM-VH-NT-1P-ET impersonal dative-subject middle subjunctive present-tense 1st person singular
+OP-ÞGF-MM-VH-NT-1P-FT impersonal dative-subject middle subjunctive present-tense 1st person plural
+OP-ÞGF-MM-VH-NT-2P-ET impersonal dative-subject middle subjunctive present-tense 2nd person singular
+OP-ÞGF-MM-VH-NT-2P-FT impersonal dative-subject middle subjunctive present-tense 2nd person plural
+OP-ÞGF-MM-VH-NT-3P-ET impersonal dative-subject middle subjunctive present-tense 3rd person singular
+OP-ÞGF-MM-VH-NT-3P-FT impersonal dative-subject middle subjunctive present-tense 3rd person plural
+OP-ÞGF-MM-VH-ÞT-1P-ET impersonal dative-subject middle subjunctive past-tense 1st person plural
+OP-ÞGF-MM-VH-ÞT-1P-FT impersonal dative-subject middle subjunctive past-tense 1st person plural
+OP-ÞGF-MM-VH-ÞT-2P-ET impersonal dative-subject middle subjunctive past-tense 2nd person singular
+OP-ÞGF-MM-VH-ÞT-2P-FT impersonal dative-subject middle subjunctive past-tense 2nd person plural
+OP-ÞGF-MM-VH-ÞT-3P-ET impersonal dative-subject middle subjunctive past-tense 3rd person singular
+OP-ÞGF-MM-VH-ÞT-3P-FT impersonal dative-subject middle subjunctive past-tense 3rd person plural
+OP-EF-GM-FH-NT-1P-ET2 impersonal genitive-subject active indicative present-tense 1st person singular variant 2
+OP-EF-GM-FH-NT-1P-FT2 impersonal genitive-subject active indicative present-tense 1st person plural variant 2
+OP-EF-GM-FH-NT-2P-ET2 impersonal genitive-subject active indicative present-tense 2nd person singular variant 2
+OP-EF-GM-FH-NT-2P-FT2 impersonal genitive-subject active indicative present-tense 2nd person plural variant 2
+OP-EF-GM-FH-NT-3P-ET2 impersonal genitive-subject active indicative present-tense 3rd person singular variant 2
+OP-EF-GM-FH-NT-3P-FT2 impersonal genitive-subject active indicative present-tense 3rd person plural variant 2
+OP-EF-GM-FH-ÞT-1P-ET2 impersonal genitive-subject active indicative past-tense 1st person singular variant 2
+OP-EF-GM-FH-ÞT-1P-FT2 impersonal genitive-subject active indicative past-tense 1st person plural variant 2
+OP-EF-GM-FH-ÞT-2P-ET2 impersonal genitive-subject active indicative past-tense 2nd person singular variant 2
+OP-EF-GM-FH-ÞT-2P-FT2 impersonal genitive-subject active indicative past-tense 2nd person plural variant 2
+OP-EF-GM-FH-ÞT-3P-ET2 impersonal genitive-subject active indicative past-tense 3rd person singular variant 2
+OP-EF-GM-FH-ÞT-3P-FT2 impersonal genitive-subject active indicative past-tense 3rd person plural variant 2
+OP-EF-GM-VH-NT-1P-ET2 impersonal genitive-subject active subjunctive present-tense 1st person singular variant 2
+OP-EF-GM-VH-NT-1P-FT2 impersonal genitive-subject active subjunctive present-tense 1st person plural variant 2
+OP-EF-GM-VH-NT-2P-ET2 impersonal genitive-subject active subjunctive present-tense 2nd person singular variant 2
+OP-EF-GM-VH-NT-2P-FT2 impersonal genitive-subject active subjunctive present-tense 2nd person plural variant 2
+OP-EF-GM-VH-NT-3P-ET2 impersonal genitive-subject active subjunctive present-tense 3rd person singular variant 2
+OP-EF-GM-VH-NT-3P-FT2 impersonal genitive-subject active subjunctive present-tense 3rd person plural variant 2
+OP-EF-GM-VH-ÞT-1P-ET2 impersonal genitive-subject active subjunctive past-tense 1st person singular variant 2
+OP-EF-GM-VH-ÞT-1P-FT2 impersonal genitive-subject active subjunctive past-tense 1st person plural variant 2
+OP-EF-GM-VH-ÞT-2P-ET2 impersonal genitive-subject active subjunctive past-tense 2nd person singular variant 2
+OP-EF-GM-VH-ÞT-2P-FT2 impersonal genitive-subject active subjunctive past-tense 2nd person plural variant 2
+OP-EF-GM-VH-ÞT-3P-ET2 impersonal genitive-subject active subjunctive past-tense 3rd person singular variant 2
+OP-EF-GM-VH-ÞT-3P-FT2 impersonal genitive-subject active subjunctive past-tense 3rd person plural variant 2
+OP-það-GM-FH-NT-3P-ET2 impersonal dummy-subject active indicative present-tense 3rd person singular variant 2
+OP-það-GM-FH-ÞT-3P-ET2 impersonal dummy-subject active indicative past-tense 3rd person singular variant 2
+OP-það-GM-VH-NT-3P-ET2 impersonal dummy-subject active subjunctive present-tense 3rd person singular variant 2
+OP-það-GM-VH-ÞT-3P-ET2 impersonal dummy-subject active subjunctive past-tense 3rd person singular variant 2
+OP-það-MM-FH-NT-3P-ET2 impersonal dummy-subject mediopassive indicative present-tense 3rd person singular variant 2
+OP-það-MM-FH-ÞT-3P-ET2 impersonal dummy-subject mediopassive indicative past-tense 3rd person singular variant 2
+OP-það-MM-VH-NT-3P-ET2 impersonal dummy-subject mediopassive subjunctive present-tense 3rd person singular variant 2
+OP-það-MM-VH-ÞT-3P-ET2 impersonal dummy-subject mediopassive subjunctive past-tense 3rd person singular variant 2
+OP-ÞF-GM-FH-NT-1P-ET2 impersonal accusative-subject active indicative present-tense 1st person singular variant 2
+OP-ÞF-GM-FH-NT-1P-FT2 impersonal accusative-subject active indicative present-tense 1st person plural variant 2
+OP-ÞF-GM-FH-NT-2P-ET2 impersonal accusative-subject active indicative present-tense 2nd person singular variant 2
+OP-ÞF-GM-FH-NT-2P-FT2 impersonal accusative-subject active indicative present-tense 2nd person plural variant 2
+OP-ÞF-GM-FH-NT-3P-ET2 impersonal accusative-subject active indicative present-tense 3rd person singular variant 2
+OP-ÞF-GM-FH-NT-3P-FT2 impersonal accusative-subject active indicative present-tense 3rd person plural variant 2
+OP-ÞF-GM-FH-ÞT-1P-ET2 impersonal accusative-subject active indicative past-tense 1st person singular variant 2
+OP-ÞF-GM-FH-ÞT-1P-FT2 impersonal accusative-subject active indicative past-tense 1st person plural variant 2
+OP-ÞF-GM-FH-ÞT-2P-ET2 impersonal accusative-subject active indicative past-tense 2nd person singular variant 2
+OP-ÞF-GM-FH-ÞT-2P-FT2 impersonal accusative-subject active indicative past-tense 2nd person plural variant 2
+OP-ÞF-GM-FH-ÞT-3P-ET2 impersonal accusative-subject active indicative past-tense 3rd person singular variant 2
+OP-ÞF-GM-FH-ÞT-3P-FT2 impersonal accusative-subject active indicative past-tense 3rd person plural variant 2
+OP-ÞF-GM-VH-NT-1P-ET2 impersonal accusative-subject active subjunctive present-tense 1st person singular variant 2
+OP-ÞF-GM-VH-NT-1P-FT2 impersonal accusative-subject active subjunctive present-tense 1st person plural variant 2
+OP-ÞF-GM-VH-NT-2P-ET2 impersonal accusative-subject active subjunctive present-tense 2nd person singular variant 2
+OP-ÞF-GM-VH-NT-2P-FT2 impersonal accusative-subject active subjunctive present-tense 2nd person plural variant 2
+OP-ÞF-GM-VH-NT-3P-ET2 impersonal accusative-subject active subjunctive present-tense 3rd person singular variant 2
+OP-ÞF-GM-VH-NT-3P-FT2 impersonal accusative-subject active subjunctive present-tense 3rd person plural variant 2
+OP-ÞF-GM-VH-ÞT-1P-ET2 impersonal accusative-subject active subjunctive past-tense 1st person singular variant 2
+OP-ÞF-GM-VH-ÞT-1P-FT2 impersonal accusative-subject active subjunctive past-tense 1st person plural variant 2
+OP-ÞF-GM-VH-ÞT-2P-ET2 impersonal accusative-subject active subjunctive past-tense 2nd person singular variant 2
+OP-ÞF-GM-VH-ÞT-2P-FT2 impersonal accusative-subject active subjunctive past-tense 2nd person plural variant 2
+OP-ÞF-GM-VH-ÞT-3P-ET2 impersonal accusative-subject active subjunctive past-tense 3rd person singular variant 2
+OP-ÞF-GM-VH-ÞT-3P-FT2 impersonal accusative-subject active subjunctive past-tense 3rd person plural variant 2
+OP-ÞGF-GM-FH-NT-1P-ET2 impersonal dative-subject active indicative present-tense 1st person singular variant 2
+OP-ÞGF-GM-FH-NT-1P-FT2 impersonal dative-subject active indicative present-tense 1st person plural variant 2
+OP-ÞGF-GM-FH-NT-2P-ET2 impersonal dative-subject active indicative present-tense 2nd person singular variant 2
+OP-ÞGF-GM-FH-NT-2P-FT2 impersonal dative-subject active indicative present-tense 2nd person plural variant 2
+OP-ÞGF-GM-FH-NT-3P-ET2 impersonal dative-subject active indicative present-tense 3rd person singular variant 2
+OP-ÞGF-GM-FH-NT-3P-FT2 impersonal dative-subject active indicative present-tense 3rd person plural variant 2
+OP-ÞGF-GM-FH-ÞT-1P-ET2 impersonal dative-subject active indicative past-tense 1st person singular variant 2
+OP-ÞGF-GM-FH-ÞT-1P-FT2 impersonal dative-subject active indicative past-tense 1st person plural variant 2
+OP-ÞGF-GM-FH-ÞT-2P-ET2 impersonal dative-subject active indicative past-tense 2nd person singular variant 2
+OP-ÞGF-GM-FH-ÞT-2P-FT2 impersonal dative-subject active indicative past-tense 2nd person plural variant 2
+OP-ÞGF-GM-FH-ÞT-3P-ET2 impersonal dative-subject active indicative past-tense 3rd person singular variant 2
+OP-ÞGF-GM-FH-ÞT-3P-FT2 impersonal dative-subject active indicative past-tense 3rd person plural variant 2
+OP-ÞGF-GM-VH-NT-1P-ET2 impersonal dative-subject active subjunctive present-tense 1st person singular variant 2
+OP-ÞGF-GM-VH-NT-1P-FT2 impersonal dative-subject active subjunctive present-tense 1st person plural variant 2
+OP-ÞGF-GM-VH-NT-2P-ET2 impersonal dative-subject active subjunctive present-tense 2nd person singular variant 2
+OP-ÞGF-GM-VH-NT-2P-FT2 impersonal dative-subject active subjunctive present-tense 2nd person plural variant 2
+OP-ÞGF-GM-VH-NT-3P-ET2 impersonal dative-subject active subjunctive present-tense 3rd person singular variant 2
+OP-ÞGF-GM-VH-NT-3P-FT2 impersonal dative-subject active subjunctive present-tense 3rd person plural variant 2
+OP-ÞGF-GM-VH-ÞT-1P-ET2 impersonal dative-subject active subjunctive past-tense 1st person singular variant 2
+OP-ÞGF-GM-VH-ÞT-1P-FT2 impersonal dative-subject active subjunctive past-tense 1st person plural variant 2
+OP-ÞGF-GM-VH-ÞT-2P-ET2 impersonal dative-subject active subjunctive past-tense 2nd person singular variant 2
+OP-ÞGF-GM-VH-ÞT-2P-FT2 impersonal dative-subject active subjunctive past-tense 2nd person plural variant 2
+OP-ÞGF-GM-VH-ÞT-3P-ET2 impersonal dative-subject active subjunctive past-tense 3rd person singular variant 2
+OP-ÞGF-GM-VH-ÞT-3P-FT2 impersonal dative-subject active subjunctive past-tense 3rd person plural variant 2
+OP-ÞGF-MM-FH-NT-1P-ET2 impersonal dative-subject middle indicative present-tense 1st person singular variant 2
+OP-ÞGF-MM-FH-NT-1P-FT2 impersonal dative-subject middle indicative present-tense 1st person plural variant 2
+OP-ÞGF-MM-FH-NT-2P-ET2 impersonal dative-subject middle indicative present-tense 2nd person singular variant 2
+OP-ÞGF-MM-FH-NT-2P-FT2 impersonal dative-subject middle indicative present-tense 2nd person plural variant 2
+OP-ÞGF-MM-FH-NT-3P-ET2 impersonal dative-subject middle indicative present-tense 3rd person singular variant 2
+OP-ÞGF-MM-FH-NT-3P-FT2 impersonal dative-subject middle indicative present-tense 3rd person plural variant 2
+OP-ÞGF-MM-FH-ÞT-1P-ET2 impersonal dative-subject middle indicative past-tense 1st person singular variant 2
+OP-ÞGF-MM-FH-ÞT-1P-FT2 impersonal dative-subject middle indicative past-tense 1st person plural variant 2
+OP-ÞGF-MM-FH-ÞT-2P-ET2 impersonal dative-subject middle indicative past-tense 2nd person singular variant 2
+OP-ÞGF-MM-FH-ÞT-2P-FT2 impersonal dative-subject middle indicative past-tense 2nd person plural variant 2
+OP-ÞGF-MM-FH-ÞT-3P-ET2 impersonal dative-subject middle indicative past-tense 3rd person singular variant 2
+OP-ÞGF-MM-FH-ÞT-3P-FT2 impersonal dative-subject middle indicative past-tense 3rd person plural variant 2
+OP-ÞGF-MM-VH-NT-1P-ET2 impersonal dative-subject middle subjunctive present-tense 1st person singular variant 2
+OP-ÞGF-MM-VH-NT-1P-FT2 impersonal dative-subject middle subjunctive present-tense 1st person plural variant 2
+OP-ÞGF-MM-VH-NT-2P-ET2 impersonal dative-subject middle subjunctive present-tense 2nd person singular variant 2
+OP-ÞGF-MM-VH-NT-2P-FT2 impersonal dative-subject middle subjunctive present-tense 2nd person plural variant 2
+OP-ÞGF-MM-VH-NT-3P-ET2 impersonal dative-subject middle subjunctive present-tense 3rd person singular variant 2
+OP-ÞGF-MM-VH-NT-3P-FT2 impersonal dative-subject middle subjunctive present-tense 3rd person plural variant 2
+OP-ÞGF-MM-VH-ÞT-1P-ET2 impersonal dative-subject middle subjunctive past-tense 1st person plural variant 2
+OP-ÞGF-MM-VH-ÞT-1P-FT2 impersonal dative-subject middle subjunctive past-tense 1st person plural variant 2
+OP-ÞGF-MM-VH-ÞT-2P-ET2 impersonal dative-subject middle subjunctive past-tense 2nd person singular variant 2
+OP-ÞGF-MM-VH-ÞT-2P-FT2 impersonal dative-subject middle subjunctive past-tense 2nd person plural variant 2
+OP-ÞGF-MM-VH-ÞT-3P-ET2 impersonal dative-subject middle subjunctive past-tense 3rd person singular variant 2
+OP-ÞGF-MM-VH-ÞT-3P-FT2 impersonal dative-subject middle subjunctive past-tense 3rd person plural variant 2
+OP-EF-GM-FH-NT-1P-ET3 impersonal genitive-subject active indicative present-tense 1st person singular variant 3
+OP-EF-GM-FH-NT-1P-FT3 impersonal genitive-subject active indicative present-tense 1st person plural variant 3
+OP-EF-GM-FH-NT-2P-ET3 impersonal genitive-subject active indicative present-tense 2nd person singular variant 3
+OP-EF-GM-FH-NT-2P-FT3 impersonal genitive-subject active indicative present-tense 2nd person plural variant 3
+OP-EF-GM-FH-NT-3P-ET3 impersonal genitive-subject active indicative present-tense 3rd person singular variant 3
+OP-EF-GM-FH-NT-3P-FT3 impersonal genitive-subject active indicative present-tense 3rd person plural variant 3
+OP-EF-GM-FH-ÞT-1P-ET3 impersonal genitive-subject active indicative past-tense 1st person singular variant 3
+OP-EF-GM-FH-ÞT-1P-FT3 impersonal genitive-subject active indicative past-tense 1st person plural variant 3
+OP-EF-GM-FH-ÞT-2P-ET3 impersonal genitive-subject active indicative past-tense 2nd person singular variant 3
+OP-EF-GM-FH-ÞT-2P-FT3 impersonal genitive-subject active indicative past-tense 2nd person plural variant 3
+OP-EF-GM-FH-ÞT-3P-ET3 impersonal genitive-subject active indicative past-tense 3rd person singular variant 3
+OP-EF-GM-FH-ÞT-3P-FT3 impersonal genitive-subject active indicative past-tense 3rd person plural variant 3
+OP-EF-GM-VH-NT-1P-ET3 impersonal genitive-subject active subjunctive present-tense 1st person singular variant 3
+OP-EF-GM-VH-NT-1P-FT3 impersonal genitive-subject active subjunctive present-tense 1st person plural variant 3
+OP-EF-GM-VH-NT-2P-ET3 impersonal genitive-subject active subjunctive present-tense 2nd person singular variant 3
+OP-EF-GM-VH-NT-2P-FT3 impersonal genitive-subject active subjunctive present-tense 2nd person plural variant 3
+OP-EF-GM-VH-NT-3P-ET3 impersonal genitive-subject active subjunctive present-tense 3rd person singular variant 3
+OP-EF-GM-VH-NT-3P-FT3 impersonal genitive-subject active subjunctive present-tense 3rd person plural variant 3
+OP-EF-GM-VH-ÞT-1P-ET3 impersonal genitive-subject active subjunctive past-tense 1st person singular variant 3
+OP-EF-GM-VH-ÞT-1P-FT3 impersonal genitive-subject active subjunctive past-tense 1st person plural variant 3
+OP-EF-GM-VH-ÞT-2P-ET3 impersonal genitive-subject active subjunctive past-tense 2nd person singular variant 3
+OP-EF-GM-VH-ÞT-2P-FT3 impersonal genitive-subject active subjunctive past-tense 2nd person plural variant 3
+OP-EF-GM-VH-ÞT-3P-ET3 impersonal genitive-subject active subjunctive past-tense 3rd person singular variant 3
+OP-EF-GM-VH-ÞT-3P-FT3 impersonal genitive-subject active subjunctive past-tense 3rd person plural variant 3
+OP-það-GM-FH-NT-3P-ET3 impersonal dummy-subject active indicative present-tense 3rd person singular variant 3
+OP-það-GM-FH-ÞT-3P-ET3 impersonal dummy-subject active indicative past-tense 3rd person singular variant 3
+OP-það-GM-VH-NT-3P-ET3 impersonal dummy-subject active subjunctive present-tense 3rd person singular variant 3
+OP-það-GM-VH-ÞT-3P-ET3 impersonal dummy-subject active subjunctive past-tense 3rd person singular variant 3
+OP-það-MM-FH-NT-3P-ET3 impersonal dummy-subject mediopassive indicative present-tense 3rd person singular variant 3
+OP-það-MM-FH-ÞT-3P-ET3 impersonal dummy-subject mediopassive indicative past-tense 3rd person singular variant 3
+OP-það-MM-VH-NT-3P-ET3 impersonal dummy-subject mediopassive subjunctive present-tense 3rd person singular variant 3
+OP-það-MM-VH-ÞT-3P-ET3 impersonal dummy-subject mediopassive subjunctive past-tense 3rd person singular variant 3
+OP-ÞF-GM-FH-NT-1P-ET3 impersonal accusative-subject active indicative present-tense 1st person singular variant 3
+OP-ÞF-GM-FH-NT-1P-FT3 impersonal accusative-subject active indicative present-tense 1st person plural variant 3
+OP-ÞF-GM-FH-NT-2P-ET3 impersonal accusative-subject active indicative present-tense 2nd person singular variant 3
+OP-ÞF-GM-FH-NT-2P-FT3 impersonal accusative-subject active indicative present-tense 2nd person plural variant 3
+OP-ÞF-GM-FH-NT-3P-ET3 impersonal accusative-subject active indicative present-tense 3rd person singular variant 3
+OP-ÞF-GM-FH-NT-3P-FT3 impersonal accusative-subject active indicative present-tense 3rd person plural variant 3
+OP-ÞF-GM-FH-ÞT-1P-ET3 impersonal accusative-subject active indicative past-tense 1st person singular variant 3
+OP-ÞF-GM-FH-ÞT-1P-FT3 impersonal accusative-subject active indicative past-tense 1st person plural variant 3
+OP-ÞF-GM-FH-ÞT-2P-ET3 impersonal accusative-subject active indicative past-tense 2nd person singular variant 3
+OP-ÞF-GM-FH-ÞT-2P-FT3 impersonal accusative-subject active indicative past-tense 2nd person plural variant 3
+OP-ÞF-GM-FH-ÞT-3P-ET3 impersonal accusative-subject active indicative past-tense 3rd person singular variant 3
+OP-ÞF-GM-FH-ÞT-3P-FT3 impersonal accusative-subject active indicative past-tense 3rd person plural variant 3
+OP-ÞF-GM-VH-NT-1P-ET3 impersonal accusative-subject active subjunctive present-tense 1st person singular variant 3
+OP-ÞF-GM-VH-NT-1P-FT3 impersonal accusative-subject active subjunctive present-tense 1st person plural variant 3
+OP-ÞF-GM-VH-NT-2P-ET3 impersonal accusative-subject active subjunctive present-tense 2nd person singular variant 3
+OP-ÞF-GM-VH-NT-2P-FT3 impersonal accusative-subject active subjunctive present-tense 2nd person plural variant 3
+OP-ÞF-GM-VH-NT-3P-ET3 impersonal accusative-subject active subjunctive present-tense 3rd person singular variant 3
+OP-ÞF-GM-VH-NT-3P-FT3 impersonal accusative-subject active subjunctive present-tense 3rd person plural variant 3
+OP-ÞF-GM-VH-ÞT-1P-ET3 impersonal accusative-subject active subjunctive past-tense 1st person singular variant 3
+OP-ÞF-GM-VH-ÞT-1P-FT3 impersonal accusative-subject active subjunctive past-tense 1st person plural variant 3
+OP-ÞF-GM-VH-ÞT-2P-ET3 impersonal accusative-subject active subjunctive past-tense 2nd person singular variant 3
+OP-ÞF-GM-VH-ÞT-2P-FT3 impersonal accusative-subject active subjunctive past-tense 2nd person plural variant 3
+OP-ÞF-GM-VH-ÞT-3P-ET3 impersonal accusative-subject active subjunctive past-tense 3rd person singular variant 3
+OP-ÞF-GM-VH-ÞT-3P-FT3 impersonal accusative-subject active subjunctive past-tense 3rd person plural variant 3
+OP-ÞGF-GM-FH-NT-1P-ET3 impersonal dative-subject active indicative present-tense 1st person singular variant 3
+OP-ÞGF-GM-FH-NT-1P-FT3 impersonal dative-subject active indicative present-tense 1st person plural variant 3
+OP-ÞGF-GM-FH-NT-2P-ET3 impersonal dative-subject active indicative present-tense 2nd person singular variant 3
+OP-ÞGF-GM-FH-NT-2P-FT3 impersonal dative-subject active indicative present-tense 2nd person plural variant 3
+OP-ÞGF-GM-FH-NT-3P-ET3 impersonal dative-subject active indicative present-tense 3rd person singular variant 3
+OP-ÞGF-GM-FH-NT-3P-FT3 impersonal dative-subject active indicative present-tense 3rd person plural variant 3
+OP-ÞGF-GM-FH-ÞT-1P-ET3 impersonal dative-subject active indicative past-tense 1st person singular variant 3
+OP-ÞGF-GM-FH-ÞT-1P-FT3 impersonal dative-subject active indicative past-tense 1st person plural variant 3
+OP-ÞGF-GM-FH-ÞT-2P-ET3 impersonal dative-subject active indicative past-tense 2nd person singular variant 3
+OP-ÞGF-GM-FH-ÞT-2P-FT3 impersonal dative-subject active indicative past-tense 2nd person plural variant 3
+OP-ÞGF-GM-FH-ÞT-3P-ET3 impersonal dative-subject active indicative past-tense 3rd person singular variant 3
+OP-ÞGF-GM-FH-ÞT-3P-FT3 impersonal dative-subject active indicative past-tense 3rd person plural variant 3
+OP-ÞGF-GM-VH-NT-1P-ET3 impersonal dative-subject active subjunctive present-tense 1st person singular variant 3
+OP-ÞGF-GM-VH-NT-1P-FT3 impersonal dative-subject active subjunctive present-tense 1st person plural variant 3
+OP-ÞGF-GM-VH-NT-2P-ET3 impersonal dative-subject active subjunctive present-tense 2nd person singular variant 3
+OP-ÞGF-GM-VH-NT-2P-FT3 impersonal dative-subject active subjunctive present-tense 2nd person plural variant 3
+OP-ÞGF-GM-VH-NT-3P-ET3 impersonal dative-subject active subjunctive present-tense 3rd person singular variant 3
+OP-ÞGF-GM-VH-NT-3P-FT3 impersonal dative-subject active subjunctive present-tense 3rd person plural variant 3
+OP-ÞGF-GM-VH-ÞT-1P-ET3 impersonal dative-subject active subjunctive past-tense 1st person singular variant 3
+OP-ÞGF-GM-VH-ÞT-1P-FT3 impersonal dative-subject active subjunctive past-tense 1st person plural variant 3
+OP-ÞGF-GM-VH-ÞT-2P-ET3 impersonal dative-subject active subjunctive past-tense 2nd person singular variant 3
+OP-ÞGF-GM-VH-ÞT-2P-FT3 impersonal dative-subject active subjunctive past-tense 2nd person plural variant 3
+OP-ÞGF-GM-VH-ÞT-3P-ET3 impersonal dative-subject active subjunctive past-tense 3rd person singular variant 3
+OP-ÞGF-GM-VH-ÞT-3P-FT3 impersonal dative-subject active subjunctive past-tense 3rd person plural variant 3
+OP-ÞGF-MM-FH-NT-1P-ET3 impersonal dative-subject middle indicative present-tense 1st person singular variant 3
+OP-ÞGF-MM-FH-NT-1P-FT3 impersonal dative-subject middle indicative present-tense 1st person plural variant 3
+OP-ÞGF-MM-FH-NT-2P-ET3 impersonal dative-subject middle indicative present-tense 2nd person singular variant 3
+OP-ÞGF-MM-FH-NT-2P-FT3 impersonal dative-subject middle indicative present-tense 2nd person plural variant 3
+OP-ÞGF-MM-FH-NT-3P-ET3 impersonal dative-subject middle indicative present-tense 3rd person singular variant 3
+OP-ÞGF-MM-FH-NT-3P-FT3 impersonal dative-subject middle indicative present-tense 3rd person plural variant 3
+OP-ÞGF-MM-FH-ÞT-1P-ET3 impersonal dative-subject middle indicative past-tense 1st person singular variant 3
+OP-ÞGF-MM-FH-ÞT-1P-FT3 impersonal dative-subject middle indicative past-tense 1st person plural variant 3
+OP-ÞGF-MM-FH-ÞT-2P-ET3 impersonal dative-subject middle indicative past-tense 2nd person singular variant 3
+OP-ÞGF-MM-FH-ÞT-2P-FT3 impersonal dative-subject middle indicative past-tense 2nd person plural variant 3
+OP-ÞGF-MM-FH-ÞT-3P-ET3 impersonal dative-subject middle indicative past-tense 3rd person singular variant 3
+OP-ÞGF-MM-FH-ÞT-3P-FT3 impersonal dative-subject middle indicative past-tense 3rd person plural variant 3
+OP-ÞGF-MM-VH-NT-1P-ET3 impersonal dative-subject middle subjunctive present-tense 1st person singular variant 3
+OP-ÞGF-MM-VH-NT-1P-FT3 impersonal dative-subject middle subjunctive present-tense 1st person plural variant 3
+OP-ÞGF-MM-VH-NT-2P-ET3 impersonal dative-subject middle subjunctive present-tense 2nd person singular variant 3
+OP-ÞGF-MM-VH-NT-2P-FT3 impersonal dative-subject middle subjunctive present-tense 2nd person plural variant 3
+OP-ÞGF-MM-VH-NT-3P-ET3 impersonal dative-subject middle subjunctive present-tense 3rd person singular variant 3
+OP-ÞGF-MM-VH-NT-3P-FT3 impersonal dative-subject middle subjunctive present-tense 3rd person plural variant 3
+OP-ÞGF-MM-VH-ÞT-1P-ET3 impersonal dative-subject middle subjunctive past-tense 1st person plural variant 3
+OP-ÞGF-MM-VH-ÞT-1P-FT3 impersonal dative-subject middle subjunctive past-tense 1st person plural variant 3
+OP-ÞGF-MM-VH-ÞT-2P-ET3 impersonal dative-subject middle subjunctive past-tense 2nd person singular variant 3
+OP-ÞGF-MM-VH-ÞT-2P-FT3 impersonal dative-subject middle subjunctive past-tense 2nd person plural variant 3
+OP-ÞGF-MM-VH-ÞT-3P-ET3 impersonal dative-subject middle subjunctive past-tense 3rd person singular variant 3
+OP-ÞGF-MM-VH-ÞT-3P-FT3 impersonal dative-subject middle subjunctive past-tense 3rd person plural variant 3
+SP-GM-FH-NT-2P-ET question active indicative present-tense 2nd person singular
+SP-GM-FH-NT-2P-FT question active indicative present-tense 2nd person plural
+SP-GM-FH-ÞT-2P-ET question active indicative past-tense 2nd person singular
+SP-GM-FH-ÞT-2P-FT question active indicative past-tense 2nd person plural
+SP-GM-VH-NT-2P-ET question active subjunctive present-tense 2nd person singular
+SP-GM-VH-NT-2P-FT question active subjunctive present-tense 2nd person plural
+SP-GM-VH-ÞT-2P-ET question active subjunctive past-tense 2nd person singular
+SP-GM-VH-ÞT-2P-FT question active subjunctive past-tense 2nd person plural
+SP-MM-FH-NT-2P-ET question middle indicative present-tense 2nd person singular
+SP-MM-FH-NT-2P-FT question middle indicative present-tense 2nd person plural
+SP-MM-FH-ÞT-2P-ET question middle indicative past-tense 2nd person singular
+SP-MM-FH-ÞT-2P-FT question middle indicative past-tense 2nd person plural
+SP-MM-VH-ÞT-2P-ET question middle subjunctive past-tense 2nd person singular
+SP-MM-VH-ÞT-2P-FT question middle subjunctive past-tense 2nd person plural
+SP-MM-VH-NT-2P-ET question middle subjunctive present-tense 2nd person singular
+SP-MM-VH-NT-2P-FT question middle subjunctive present-tense 2nd person plural
+pfn_EFET genitive singular
+pfn_EFFT genitive plural
+pfn_NFET nominative singular
+pfn_NFFT nominative plural
+pfn_ÞFET accusative singular
+pfn_ÞFFT accusative plural
+pfn_ÞGFET dative singular
+pfn_ÞGFFT dative plural
+to_HK_EFET neuter genitive singular
+to_HK_EFFT neuter genitive plural
+to_HK_EFFT2 neuter genitive plural variant 2
+to_HK_NFET neuter nominative singular
+to_HK_NFFT neuter nominative plural
+to_HK_ÞFET neuter accusative singular
+to_HK_ÞFFT neuter accusative plural
+to_HK_ÞGFET neuter dative singular
+to_HK_ÞGFFT neuter dative plural
+to_HK_ÞGFFT2 neuter dative plural variant 2
+to_KK_EFET masculine genitive singular
+to_KK_EFFT masculine genitive plural
+to_KK_EFFT2 masculine genitive plural variant 2
+to_KK_NFET masculine nominative singular
+to_KK_NFFT masculine nominative plural
+to_KK_ÞFET masculine accusative singular
+to_KK_ÞFFT masculine accusative plural
+to_KK_ÞGFET masculine dative singular
+to_KK_ÞGFFT masculine dative plural
+to_KK_ÞGFFT2 masculine dative plural variant 2
+to_KVK_EFET feminine genitive singular
+to_KVK_EFFT feminine genitive plural
+to_KVK_EFFT2 feminine genitive plural variant 2
+to_KVK_NFET feminine nominative singular
+to_KVK_NFFT feminine nominative plural
+to_KVK_ÞFET feminine accusative singular
+to_KVK_ÞFFT feminine accusative plural
+to_KVK_ÞGFET feminine dative singular
+to_KVK_ÞGFFT feminine dative plural
+to_KVK_ÞGFFT2 feminine dative plural variant 2
+ÞFET accusative singular indefinite
+ÞFET2 accusative singular indefinite variant 2
+ÞFET3 accusative singular indefinite variant 3
+ÞFETgr accusative singular definite
+ÞFETgr2 accusative singular definite variant 2
+ÞFETgr3 accusative singular definite variant 3
+ÞFFT accusative plural indefinite
+ÞFFT2 accusative plural indefinite variant 2
+ÞFFT3 accusative plural indefinite variant 3
+ÞFFTgr accusative plural definite
+ÞFFTgr2 accusative plural definite variant 2
+ÞFFTgr3 accusative plural definite variant 3
+ÞGFET dative singular indefinite
+ÞGFET2 dative singular indefinite variant 2
+ÞGFET3 dative singular indefinite variant 3
+ÞGFETgr dative singular definite
+ÞGFETgr2 dative singular definite variant 2
+ÞGFFT dative plural indefinite
+ÞGFFT2 dative plural indefinite variant 2
+ÞGFFT3 dative plural indefinite variant 3
+ÞGFFTgr dative plural definite
+ÞGFFTgr2 dative plural definite variant 2
+ÞGFFTgr3 dative plural definite variant 3
+ÞF accusative
+ÞGF dative
+EF genitive
+KK_NFET masculine nominative singular
+KK_ÞFET masculine accusative singular
+KK_ÞGFET masculine dative singular
+KK_EFET masculine genitive singular
+KK_NFFT masculine nominative plural
+KK_ÞFFT masculine accusative plural
+KK_ÞGFFT masculine dative plural
+KK_ÞGFFT2 masculine dative plural variant 2
+KK_EFFT masculine genitive plural
+KK_EFFT2 masculine genitive plural variant 2
+KVK_NFET feminine nominative singular
+KVK_ÞFET feminine accusative singular
+KVK_ÞGFET feminine dative singular
+KVK_EFET feminine genitive singular
+KVK_NFFT feminine nominative plural
+KVK_ÞFFT feminine accusative plural
+KVK_ÞGFFT feminine dative plural
+KVK_ÞGFFT2 feminine dative plural variant 2
+KVK_EFFT feminine genitive plural
+KVK_EFFT2 feminine genitive plural variant 2
+HK_NFET neuter nominative singular
+HK_ÞFET neuter accusative singular
+HK_ÞGFET neuter dative singular
+HK_EFET neuter genitive singular
+HK_NFFT neuter nominative plural
+HK_ÞFFT neuter accusative plural
+HK_ÞGFFT neuter dative plural
+HK_ÞGFFT2 neuter dative plural variant 2
+HK_EFFT neuter genitive plural
+HK_EFFT2 neuter genitive plural variant 2
+

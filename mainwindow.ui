@@ -83,6 +83,7 @@
     <addaction name="actionNew_Tab"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Tab"/>
+    <addaction name="actionUpdate_Inflection_Database"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -347,6 +348,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+]</string>
+   </property>
+  </action>
+  <action name="actionUpdate_Inflection_Database">
+   <property name="text">
+    <string>Update Inflection Database</string>
    </property>
   </action>
  </widget>

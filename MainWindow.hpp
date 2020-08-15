@@ -56,6 +56,7 @@
 #include "TreeWidgetItem.hpp"
 #include "inflection.hpp"
 #include "macros.hpp"
+#include "dbupdater.hpp"
 
 using map_t = std::multimap<QString, int>;
 using vecmap_t = QVector<map_t>;  // QVector<std::multimap<QString, int>>
@@ -161,13 +162,16 @@ private:
     StatusBar * statusBar;
     Inflection InflManager;
     QCompleter * norseWordCompleter;
+    DBDownloader * m_DBDownloader;
+    DBDownloaderHelper * m_DBDownloadHelper;
 //    QCompleter * inflectionalsCompleter;
 
     /* POD members */
-    const char * writeUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
-    const char * writeUrl2 = "&submit=Search";
+    const char * searchUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=lemma&q1=";
+    const char * searchUrl2 = "&submit=Search";
     const char * textUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=dentry&q1=";
     const char * textUrl2 = "&submit=Search";
+    const char * BINDBUrl = "https://bin.arnastofnun.is/django/api/nidurhal/?file=SHsnid.csv.zip";
 
 #ifdef _WIN64
     const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\"font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"<br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
@@ -195,6 +199,7 @@ private:
         {"a", "á", "e", "é", "i", "í", "o", "ó", "u", "ú", "y", "ý", "ö", "æ"}
     };
 
+
     std::array<std::pair<QString, QString>, 20> writeRules = {
         {std::make_pair("á", "%E1"), std::make_pair("é", "%E9"), std::make_pair("í", "%ED"), std::make_pair("ó", "%F3"),
         std::make_pair("ú", "%FA"), std::make_pair("ý", "%FD"), std::make_pair("Á", "%C1"), std::make_pair("É", "%C9"),
@@ -215,11 +220,16 @@ private:
 
     setstr_t wordindex;
 
+    QString appDataLocation;
     QStringList wordIndexList;
     QList<QTextEdit::ExtraSelection> findInPageSelections;
     QList<QTextEdit::ExtraSelection>::size_type findInPageSelectionIndex;
 
+    QNetworkAccessManager webControl;
+
 private slots:
+    void importBINDBs();
+
     void activateInput();
     void loadPage();
     void connectionError();
@@ -273,6 +283,8 @@ private slots:
     void on_actionUndo_Close_Tab_triggered();
     void on_actionBack_triggered();
     void on_actionForward_triggered();
+
+    void on_actionUpdate_Inflection_Database_triggered();
 
 private:
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
@@ -345,6 +357,9 @@ private:
     void printAll(QString word);
     void printAllThread(QString word, size_t index);
     void printAllPrint(size_t index);
+
+    int examineBINDBs();
+    QString hashFile(QString const &, QCryptographicHash::Algorithm = QCryptographicHash::Md5);
 };
 
 

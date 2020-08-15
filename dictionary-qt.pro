@@ -10,11 +10,12 @@ QT       += core gui\
 
 # greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
+LIBS += -L$$PWD/quazip/0.9.1/lib -lquazip
 
 TARGET = IceDict
 TEMPLATE = app
 QMAKE_CXXFLAGS += -std=c++17
-VERSION = 1.9.3
+VERSION = 1.9.4
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -30,11 +31,12 @@ win32:RC_ICONS += IceDict.ico
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 SOURCES += main.cpp\
     TreeWidgetItem.cpp \
     MainWindow.cpp \
     PageDownloader.cpp \
+    dbtransformer.cpp \
+    dbupdater.cpp \
     inflection.cpp \
     FindPane.cpp \
     StatusBar.cpp
@@ -44,6 +46,8 @@ HEADERS  += \
     TreeWidgetItem.hpp \
     MainWindow.hpp \
     PageDownloader.hpp \
+    dbtransformer.hpp \
+    dbupdater.hpp \
     inflection.hpp \
     macros.hpp \
     FindPane.hpp \

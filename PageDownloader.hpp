@@ -13,7 +13,7 @@ class PageDownloader : public QObject
 {
     Q_OBJECT
 public:
-    PageDownloader(QObject * parent = 0);
+    PageDownloader(QNetworkAccessManager *, QObject * parent = nullptr);
     virtual ~PageDownloader();
     void DownloadPage(QUrl pageUrl);
     QByteArray downloadedData() const;
@@ -26,7 +26,7 @@ signals:
 private slots:
     void pageDownloaded(QNetworkReply * pReply);
 private:
-    QNetworkAccessManager WebControl;
+    QNetworkAccessManager * WebControl;
     QByteArray DownloadedData;
 };
 

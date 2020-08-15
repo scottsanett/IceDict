@@ -4,32 +4,10 @@
         <file>alphabet/zoega</file>
         <file>alphabet/vifgusson</file>
         <file>alphabet/wordindex</file>
-        <file>alphabet/source_reverse_index/part1</file>
-        <file>alphabet/source_reverse_index/part2</file>
-        <file>alphabet/source_reverse_index/part3</file>
-        <file>alphabet/source_reverse_index/part4</file>
-        <file>alphabet/source_reverse_index/part5</file>
-        <file>alphabet/source_reverse_index/part6</file>
-        <file>alphabet/source_reverse_index/part7</file>
-        <file>alphabet/source_reverse_index/part8</file>
-        <file>alphabet/source/part1</file>
-        <file>alphabet/source/part2</file>
-        <file>alphabet/source/part3</file>
-        <file>alphabet/source/part4</file>
-        <file>alphabet/source/part5</file>
-        <file>alphabet/source/part6</file>
-        <file>alphabet/source/part7</file>
-        <file>alphabet/source/part8</file>
-        <file>alphabet/source_index/part1</file>
-        <file>alphabet/source_index/part2</file>
-        <file>alphabet/source_index/part3</file>
-        <file>alphabet/source_index/part4</file>
-        <file>alphabet/source_index/part5</file>
-        <file>alphabet/source_index/part6</file>
-        <file>alphabet/source_index/part7</file>
-        <file>alphabet/source_index/part8</file>
         <file>alphabet/IceDict.png</file>
         <file>IceDict.ico</file>
         <file>IceDict.icns</file>
+        <file>alphabet/rules/cat.txt</file>
+        <file>alphabet/rules/rules.txt</file>
     </qresource>
 </RCC>

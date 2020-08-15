@@ -1,18 +1,21 @@
 #include "PageDownloader.hpp"
 
-PageDownloader::PageDownloader(QObject * parent): QObject(parent) {}
+PageDownloader::PageDownloader(QNetworkAccessManager * n, QObject * parent): QObject(parent) {
+    WebControl = n;
+}
 
 PageDownloader::~PageDownloader() {}
 
 void PageDownloader::DownloadPage(QUrl fileUrl) {
     QNetworkRequest request(fileUrl);
-    auto pReply = WebControl.get(request);
+    auto pReply = WebControl->get(request);
+
     QTimer timer;
     timer.setSingleShot(true);
     QEventLoop loop;
     connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
     connect(pReply, SIGNAL(finished()), &loop, SLOT(quit()));
-    timer.start(20000);
+    timer.start(10000);
     loop.exec();
 
     if (timer.isActive()) {
@@ -34,7 +37,6 @@ void PageDownloader::DownloadPage(QUrl fileUrl) {
         pReply->abort();
         emit timeoutError();
     }
-
 }
 
 void PageDownloader::pageDownloaded(QNetworkReply *pReply) {

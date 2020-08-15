@@ -4,22 +4,6 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-    Q_INIT_RESOURCE(resource);
-
-    pageControl = new PageDownloader(this);
-    QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
-    QObject::connect(pageControl, SIGNAL(connectionError()), this, SLOT(connectionError()));
-    QObject::connect(pageControl, SIGNAL(timeoutError()), this, SLOT(timeoutError()));
-    inflectionals.fill(map_t{});
-    originals.fill(map_t{});
-    definitions.fill(map_t{});
-    dictionaries.fill(mapvecstr_t{});
-
-    importWordIndex();
-    importDictionary();
-    importOriginal();
-    importInflections();
-
     ui->setupUi(this);
     this->setWindowTitle("IceDict");
     ui->actionClose_Tab->setText("Close Window");
@@ -33,6 +17,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setAutoHide(true);
     ui->resultsTab->tabBar()->setExpanding(true);
 
+    appDataLocation = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    Q_INIT_RESOURCE(resource);
+
+    pageControl = new PageDownloader(&webControl, this);
+    QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
+    QObject::connect(pageControl, SIGNAL(connectionError()), this, SLOT(connectionError()));
+    QObject::connect(pageControl, SIGNAL(timeoutError()), this, SLOT(timeoutError()));
+
     QObject::connect(ui->resultsTab->tabBar(), &QTabBar::tabCloseRequested,
                      this, &MainWindow::onTabCloseButtonClicked);
     statusBar = new StatusBar(this);
@@ -40,10 +32,80 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     statusBar->hide();
     connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
+
+    // add a dialog box to display the process
+    on_actionUpdate_Inflection_Database_triggered();
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+}
+
+void MainWindow::importBINDBs() {
+    importWordIndex();
+    importDictionary();
+    importOriginal();
+    importInflections();
+}
+
+int MainWindow::examineBINDBs() {
+    QDir::setCurrent(QDir(appDataLocation).absolutePath());
+    if (!QFileInfo(".DBHashes").exists()) {
+        qDebug() << "Database hash list does not exist; creating one...";
+        return -1;
+    }
+    else {
+        QFile f(".DBHashes");
+        if (!f.open(QIODevice::ReadOnly)) {
+            qDebug() << "Cannot open hash list";
+            return -1;
+        }
+
+        QTextStream qts(&f);
+        auto hashList = qts.readAll().split(";;;");
+        f.close();
+
+        if (hashList.length() != 25) return -1;
+
+        for (auto i = 0; i < 8; ++i) {
+            auto fileName = appDataLocation + "/source/part" + QString::number(i + 1);
+            if (hashList.at(i) != hashFile(fileName)) {
+                qDebug() << hashList.at(i) << hashFile(fileName);
+                qDebug() << "Database found but deprecated. Rebuilding dabatase...";
+                return -1;
+            }
+        }
+
+        for (auto i = 0; i < 8; ++i) {
+            auto fileName = appDataLocation + "/source_index/part" + QString::number(i + 1);
+            if (hashList.at(i + 8) != hashFile(fileName)) {
+                qDebug() << hashList.at(i) << hashFile(fileName);
+                qDebug() << "Database found but deprecated. Rebuilding dabatase...";
+                return -1;
+            }
+        }
+
+        for (auto i = 0; i < 8; ++i) {
+            auto fileName = appDataLocation + "/source_reverse_index/part" + QString::number(i + 1);
+            if (hashList.at(i + 16) != hashFile(fileName)) {
+                qDebug() << hashList.at(i) << hashFile(fileName);
+                qDebug() << "Database found but deprecated. Rebuilding dabatase...";
+                return -1;
+            }
+        }
+        return 0;
+    }
+}
+
+QString MainWindow::hashFile(QString const & fileName, QCryptographicHash::Algorithm hashAlgorithm) {
+    QFile f(fileName);
+    if (f.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(hashAlgorithm);
+        if (hash.addData(&f)) {
+            return hash.result().toHex();
+        }
+    }
+    return QString();
 }
 
 void MainWindow::addTab_clicked() {
@@ -78,7 +140,7 @@ void MainWindow::addTab_clicked() {
 #ifdef _WIN32
     currentTab->buttonLayout->setMargin(0);
 #elif __APPLE__
-    currentTab->buttonLayout->setMargin(10);
+    currentTab->buttonLayout->setMargin(0);
 #endif
     currentTab->buttonLayoutWidget = new QWidget();
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
@@ -448,7 +510,7 @@ void MainWindow::importInflections() {
 
 /*import all the inflection forms and its position*/
 void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i) {
-    QString filename = ":/alphabet/source_reverse_index/part" + QString(to_string(i).c_str());
+    QString filename = appDataLocation + "/source_reverse_index/part" + QString(to_string(i).c_str());
     QFile f(filename);
 
     f.open(QIODevice::ReadOnly);
@@ -479,7 +541,7 @@ void MainWindow::importOriginal() {
 }
 
 void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
-    QString filename = QString(":/alphabet/source_index/part") + to_string(i).c_str();
+    QString filename = QString(appDataLocation + "/source_index/part") + to_string(i).c_str();
     QFile f(filename);
 
     f.open(QIODevice::ReadOnly);
@@ -663,7 +725,7 @@ void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString
     auto && thisResult = results[index];
     auto itr = thisDic.find(word);
     if (itr == thisDic.end()) { return; }
-    QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
+    QString filename = QString(appDataLocation + "/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
 
@@ -785,7 +847,7 @@ void MainWindow::printAllThread(QString word, size_t index) {
     auto range = thisDic.equal_range(word);
     auto count = std::distance(range.first, range.second);
     if (count == 0)  return;
-    QString filename = QString(":/alphabet/source/part") + to_string(index + 1).c_str();
+    QString filename = QString(appDataLocation + "/source/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();
@@ -1002,7 +1064,7 @@ void MainWindow::onlineText(QString word) {
     word = word.toLower();
     word = oldToModern(word, Infl::Vowels);
     currentTab->textInQuery = word;
-    QString url = textUrl1 + word + textUrl2;
+    QString url = QString(textUrl1).toUtf8() + word + QString(textUrl2).toUtf8();
     downloadPage(url);
 }
 
@@ -1011,7 +1073,7 @@ void MainWindow::onlineDefinition(QString word) {
     word = word.toLower();
     word = oldToModern(word, Infl::Vowels | Infl::Consonants);
     currentTab->textInQuery = word;
-    QString url = QString(writeUrl1).toUtf8() + word + QString(writeUrl2).toUtf8();
+    QString url = QString(searchUrl1).toUtf8() + word + QString(searchUrl2).toUtf8();
     downloadPage(url);
 }
 
@@ -2548,3 +2610,21 @@ void MainWindow::on_actionForward_triggered()
     currentTab->backButton->setEnabled(true);
 }
 
+
+void MainWindow::on_actionUpdate_Inflection_Database_triggered()
+{
+    auto BINDBstatus = examineBINDBs();
+    if (BINDBstatus != 0) {
+        m_DBDownloadHelper = new DBDownloaderHelper(&webControl, this);
+        m_DBDownloader = new DBDownloader(m_DBDownloadHelper, this);
+        connect (m_DBDownloadHelper, SIGNAL(downloaded(int)),
+                 m_DBDownloader, SLOT(processFile(int)));
+        connect (m_DBDownloader, SIGNAL(DBInitializationComplete()),
+                 this, SLOT(importBINDBs()));
+        m_DBDownloadHelper->proceed(QUrl(BINDBUrl));
+        m_DBDownloader->cleanUp();
+    }
+    else {
+        importBINDBs();
+    }
+}
