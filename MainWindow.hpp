@@ -31,6 +31,7 @@
 #include "QShortcut"
 #include "QMessageBox"
 #include "QSplitter"
+#include <QProgressBar>
 #include <QDesktopServices>
 
 #include <cstdlib>
@@ -56,7 +57,8 @@
 #include "TreeWidgetItem.hpp"
 #include "inflection.hpp"
 #include "macros.hpp"
-#include "dbupdater.hpp"
+#include "dbdownloader.hpp"
+#include "dbupdatedialog.hpp"
 
 using map_t = std::multimap<QString, int>;
 using vecmap_t = QVector<map_t>;  // QVector<std::multimap<QString, int>>
@@ -103,6 +105,10 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void  initialize();
+
+signals:
+    void windowLoaded();
 
 private:
     struct Pimpl {
@@ -161,9 +167,10 @@ private:
     PageDownloader * pageControl;
     StatusBar * statusBar;
     Inflection InflManager;
+    DBUpdateDialog * updateDialog;
+    DBUpdateDialogThread * updateDialogThread;
     QCompleter * norseWordCompleter;
-    DBDownloader * m_DBDownloader;
-    DBDownloaderHelper * m_DBDownloadHelper;
+
 //    QCompleter * inflectionalsCompleter;
 
     /* POD members */
@@ -171,7 +178,7 @@ private:
     const char * searchUrl2 = "&submit=Search";
     const char * textUrl1 = "http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?type=simple&size=First+100&rgn=dentry&q1=";
     const char * textUrl2 = "&submit=Search";
-    const char * BINDBUrl = "https://bin.arnastofnun.is/django/api/nidurhal/?file=SHsnid.csv.zip";
+//    const char * BINDBUrl = "https://bin.arnastofnun.is/django/api/nidurhal/?file=SHsnid.csv.zip";
 
 #ifdef _WIN64
     const char * startScreen = "<html><head/><body><p align=\"center\"><br/></p><p align=\"center\"><span style=\"font-size:24px;\">Welcome to IceDict</span></p><p align=\"center\"<br/></p><p align=\"center\"><img src=\":/alphabet/cover.jpg\"/></p></body></html>";
@@ -225,7 +232,7 @@ private:
     QList<QTextEdit::ExtraSelection> findInPageSelections;
     QList<QTextEdit::ExtraSelection>::size_type findInPageSelectionIndex;
 
-    QNetworkAccessManager webControl;
+//    QNetworkAccessManager m_WebCtrl;
 
 private slots:
     void importBINDBs();
@@ -358,8 +365,6 @@ private:
     void printAllThread(QString word, size_t index);
     void printAllPrint(size_t index);
 
-    int examineBINDBs();
-    QString hashFile(QString const &, QCryptographicHash::Algorithm = QCryptographicHash::Md5);
 };
 
 

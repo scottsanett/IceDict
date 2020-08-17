@@ -4,6 +4,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    Q_INIT_RESOURCE(resource);
     ui->setupUi(this);
     this->setWindowTitle("IceDict");
     ui->actionClose_Tab->setText("Close Window");
@@ -18,9 +19,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setExpanding(true);
 
     appDataLocation = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    Q_INIT_RESOURCE(resource);
 
-    pageControl = new PageDownloader(&webControl, this);
+    pageControl = new PageDownloader(this);
     QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
     QObject::connect(pageControl, SIGNAL(connectionError()), this, SLOT(connectionError()));
     QObject::connect(pageControl, SIGNAL(timeoutError()), this, SLOT(timeoutError()));
@@ -30,16 +30,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     statusBar = new StatusBar(this);
     this->setStatusBar(statusBar);
     statusBar->hide();
-    connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+    QObject::connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
 
-    // add a dialog box to display the process
     on_actionUpdate_Inflection_Database_triggered();
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
+
 
 void MainWindow::importBINDBs() {
     importWordIndex();
@@ -48,71 +48,13 @@ void MainWindow::importBINDBs() {
     importInflections();
 }
 
-int MainWindow::examineBINDBs() {
-    QDir::setCurrent(QDir(appDataLocation).absolutePath());
-    if (!QFileInfo(".DBHashes").exists()) {
-        qDebug() << "Database hash list does not exist; creating one...";
-        return -1;
-    }
-    else {
-        QFile f(".DBHashes");
-        if (!f.open(QIODevice::ReadOnly)) {
-            qDebug() << "Cannot open hash list";
-            return -1;
-        }
-
-        QTextStream qts(&f);
-        auto hashList = qts.readAll().split(";;;");
-        f.close();
-
-        if (hashList.length() != 25) return -1;
-
-        for (auto i = 0; i < 8; ++i) {
-            auto fileName = appDataLocation + "/source/part" + QString::number(i + 1);
-            if (hashList.at(i) != hashFile(fileName)) {
-                qDebug() << hashList.at(i) << hashFile(fileName);
-                qDebug() << "Database found but deprecated. Rebuilding dabatase...";
-                return -1;
-            }
-        }
-
-        for (auto i = 0; i < 8; ++i) {
-            auto fileName = appDataLocation + "/source_index/part" + QString::number(i + 1);
-            if (hashList.at(i + 8) != hashFile(fileName)) {
-                qDebug() << hashList.at(i) << hashFile(fileName);
-                qDebug() << "Database found but deprecated. Rebuilding dabatase...";
-                return -1;
-            }
-        }
-
-        for (auto i = 0; i < 8; ++i) {
-            auto fileName = appDataLocation + "/source_reverse_index/part" + QString::number(i + 1);
-            if (hashList.at(i + 16) != hashFile(fileName)) {
-                qDebug() << hashList.at(i) << hashFile(fileName);
-                qDebug() << "Database found but deprecated. Rebuilding dabatase...";
-                return -1;
-            }
-        }
-        return 0;
-    }
-}
-
-QString MainWindow::hashFile(QString const & fileName, QCryptographicHash::Algorithm hashAlgorithm) {
-    QFile f(fileName);
-    if (f.open(QFile::ReadOnly)) {
-        QCryptographicHash hash(hashAlgorithm);
-        if (hash.addData(&f)) {
-            return hash.result().toHex();
-        }
-    }
-    return QString();
-}
-
 void MainWindow::addTab_clicked() {
     auto currentTab = std::make_shared<Pimpl>();
     currentTab->centralLayout = new QVBoxLayout();
     currentTab->mainSplitter = new QSplitter();
 #ifdef _WIN32
+    currentTab->mainSplitter->setHandleWidth(0);
+#else
     currentTab->mainSplitter->setHandleWidth(0);
 #endif
     tabIndices.insert(std::make_pair(currentTab->mainSplitter, currentTab));
@@ -122,6 +64,8 @@ void MainWindow::addTab_clicked() {
     currentTab->inputLayout = new QSplitter();
 #ifdef _WIN32
     currentTab->inputLayout->setHandleWidth(0);
+#else
+    currentTab->inputLayout->setHandleWidth(10);
 #endif
     currentTab->inputLayout->setContentsMargins(0, 0, 0, 0);
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
@@ -2613,18 +2557,21 @@ void MainWindow::on_actionForward_triggered()
 
 void MainWindow::on_actionUpdate_Inflection_Database_triggered()
 {
-    auto BINDBstatus = examineBINDBs();
-    if (BINDBstatus != 0) {
-        m_DBDownloadHelper = new DBDownloaderHelper(&webControl, this);
-        m_DBDownloader = new DBDownloader(m_DBDownloadHelper, this);
-        connect (m_DBDownloadHelper, SIGNAL(downloaded(int)),
-                 m_DBDownloader, SLOT(processFile(int)));
-        connect (m_DBDownloader, SIGNAL(DBInitializationComplete()),
-                 this, SLOT(importBINDBs()));
-        m_DBDownloadHelper->proceed(QUrl(BINDBUrl));
-        m_DBDownloader->cleanUp();
-    }
-    else {
-        importBINDBs();
-    }
+    updateDialog = new DBUpdateDialog(this);
+
+    auto t = new QThread();
+    updateDialogThread = new DBUpdateDialogThread();
+    updateDialogThread->moveToThread(t);
+    connect(updateDialogThread, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+    connect(t, SIGNAL(started()), updateDialogThread, SLOT(process()));
+    connect(updateDialogThread, SIGNAL(finished()), t, SLOT(quit()));
+    connect(t, SIGNAL(finished()), updateDialogThread, SLOT(deleteLater()));
+    connect(updateDialogThread, SIGNAL(finished()), t, SLOT(deleteLater()));
+    connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importBINDBs()));
+    connect(updateDialogThread, SIGNAL(finished()), updateDialog, SLOT(close()));
+    connect(updateDialogThread, SIGNAL(updateStatus(QString const)), updateDialog, SLOT(appendMsg(QString const)));
+
+
+    t->start();
 }
+

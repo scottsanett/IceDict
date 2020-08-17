@@ -1,14 +1,14 @@
 #include "PageDownloader.hpp"
 
-PageDownloader::PageDownloader(QNetworkAccessManager * n, QObject * parent): QObject(parent) {
-    WebControl = n;
+PageDownloader::PageDownloader(QObject * parent): QObject(parent) {
+
 }
 
 PageDownloader::~PageDownloader() {}
 
 void PageDownloader::DownloadPage(QUrl fileUrl) {
     QNetworkRequest request(fileUrl);
-    auto pReply = WebControl->get(request);
+    auto pReply = WebControl.get(request);
 
     QTimer timer;
     timer.setSingleShot(true);

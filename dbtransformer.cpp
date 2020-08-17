@@ -146,6 +146,7 @@ void DBTransformer::split(matrix_t const & mat, matcol_t & col, int num) {
 }
 
 void DBTransformer::outputSource(matcol_t const & col, std::string const & fileName) {
+    emit updateStatus("Generaing source files...");
     std::cout << "Generaing source files..." << std::endl;
 
     QFile hashTable(appDataLocation + "/.DBHashes");
@@ -180,10 +181,12 @@ void DBTransformer::outputSource(matcol_t const & col, std::string const & fileN
 
     hashTable.close();
     std::cout << "source files generation complete!" << std::endl;
+    emit updateStatus("source files generation complete!");
 }
 
 void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & fileName) {
     std::cout << "Generating source_index files..." << std::endl;
+    emit updateStatus("Generating source_index files...");
 
     QFile hashTable(appDataLocation + "/.DBHashes");
     if (hashTable.open(QIODevice::WriteOnly | QIODevice::Append)) {
@@ -218,11 +221,13 @@ void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & 
 
     hashTable.close();
     std::cout << "source_index files generation complete!" << std::endl;
+    emit updateStatus("source_index files generation complete!");
     }
 }
 
 void DBTransformer::outputSourceReverseIndex(matcol_t const & col, std::string const & fileName) {
     std::cout << "Generating source_reverse_index files..." << std::endl;
+    emit updateStatus("Generating source_reverse_index files...");
 
     QFile hashTable(appDataLocation + "/.DBHashes");
     if (!hashTable.open(QIODevice::WriteOnly | QIODevice::Append)) { return; }
@@ -254,6 +259,7 @@ void DBTransformer::outputSourceReverseIndex(matcol_t const & col, std::string c
 
     hashTable.close();
     std::cout << "source_reverse_index files generation complete!" << std::endl;
+    emit updateStatus("source_reverse_index files generation complete!");
 }
 
 QString DBTransformer::hashFile(const QString &fileName, QCryptographicHash::Algorithm hashAlgorithm) {

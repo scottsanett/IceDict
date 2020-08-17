@@ -35,8 +35,9 @@ SOURCES += main.cpp\
     TreeWidgetItem.cpp \
     MainWindow.cpp \
     PageDownloader.cpp \
+    dbdownloader.cpp \
     dbtransformer.cpp \
-    dbupdater.cpp \
+    dbupdatedialog.cpp \
     inflection.cpp \
     FindPane.cpp \
     StatusBar.cpp
@@ -46,12 +47,14 @@ HEADERS  += \
     TreeWidgetItem.hpp \
     MainWindow.hpp \
     PageDownloader.hpp \
+    dbdownloader.hpp \
     dbtransformer.hpp \
-    dbupdater.hpp \
+    dbupdatedialog.hpp \
     inflection.hpp \
     macros.hpp \
     FindPane.hpp \
     StatusBar.hpp
 
 FORMS += \
+    dbupdatedialog.ui \
     mainwindow.ui

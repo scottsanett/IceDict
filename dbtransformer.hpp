@@ -33,6 +33,8 @@ public:
     virtual ~DBTransformer() {}
     int transform(std::string const &);
 
+signals:
+    void updateStatus(QString const);
 
 private:
     const char * outputFileName = "part";

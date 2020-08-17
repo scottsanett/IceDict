@@ -9,6 +9,8 @@
 #include <QFile>
 #include <QFileinfo>
 #include <QSaveFile>
+#include <QThread>
+#include <QDesktopWidget>
 
 #include "dbtransformer.hpp"
 #include "quazip/0.9.1/include/quazip/JlCompress.h"
@@ -19,21 +21,24 @@ class DBDownloaderHelper: public QObject
     Q_OBJECT
 
 public:
-    explicit DBDownloaderHelper(QNetworkAccessManager *, QObject * parent = nullptr);
+    explicit DBDownloaderHelper(QObject * parent = nullptr);
     virtual ~DBDownloaderHelper();
     QByteArray downloadedData() const;
-    void proceed(QUrl);
+    void proceed();
 
 signals:
     void downloaded(int);
+    void updateStatus(QString const &);
 
 private slots:
     void fileDownloaded(QNetworkReply* pReply);
 
 private:
+    QString appDataLocation;
     QUrl DBUrl;
     QNetworkAccessManager * m_WebCtrl;
     QByteArray m_DownloadedData;
+    const char * BINUrl = "https://bin.arnastofnun.is/django/api/nidurhal/?file=SHsnid.csv.zip";
 };
 
 
@@ -48,11 +53,15 @@ public:
 
 signals:
     void DBInitializationComplete();
+    void updateStatus(QString const);
+    void cleanedUp();
 
 private slots:
     void processFile(int);
+    void acceptUpdate(QString const);
 
 private:
+    QString appDataLocation;
     DBDownloaderHelper * DBCtrl;
     DBTransformer * DBTransformCtrl;
 
