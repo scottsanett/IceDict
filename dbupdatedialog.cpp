@@ -57,6 +57,8 @@ void DBUpdateDialog::slot_UpdateProgress(qint64 ist, qint64 max) {
 
 void DBUpdateDialog::slot_HideProgress() {
     pBar->close();
+    pBar->deleteLater();
+    pBar = nullptr;
 }
 
 void DBUpdateDialogThread::acceptUpdate(QString const str) {

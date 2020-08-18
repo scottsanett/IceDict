@@ -38,10 +38,10 @@ private:
     Ui::DBUpdateDialog *ui;
     bool cancelStatus;
     QString appDataLocation;
-    QTextBrowser * textBrowser;
-    QProgressBar * pBar;
-    DBDownloader * m_DBDownloader;
-    DBDownloaderHelper * m_DBDownloadHelper;
+    QTextBrowser * textBrowser = nullptr;
+    QProgressBar * pBar = nullptr;
+    DBDownloader * m_DBDownloader = nullptr;
+    DBDownloaderHelper * m_DBDownloadHelper = nullptr;
 
     const char * BINDBUrl = "https://bin.arnastofnun.is/django/api/nidurhal/?file=SHsnid.csv.zip";
 

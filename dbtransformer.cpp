@@ -20,6 +20,9 @@ int DBTransformer::transform(const std::string & fileName) {
     outputSourceIndex(collection, outputFileName);
     outputSourceReverseIndex(collection, outputFileName);
     emit signal_HideProgress();
+
+    mat.clear();
+    collection.clear();
     return 0;
 }
 
@@ -72,7 +75,7 @@ bool DBTransformer::translateCategory(matrix_t & mat, rules_t & categories) {
         auto after = categories[before];
         i.at(2) = after;
     }
-
+    file.close();
     return true;
 }
 
@@ -100,7 +103,7 @@ bool DBTransformer::translateMarks(matrix_t & mat, rules_t marks) {
         auto after = marks[before];
         i.at(5) = after;
     }
-
+    file.close();
     return true;
 }
 

@@ -44,7 +44,8 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::importBINDBs() {
-    updateDialog->deleteLater();
+    updateDialog->deleteLater(); updateDialog = nullptr;
+    updateDialogThread = nullptr;
     importWordIndex();
     importDictionary();
     importOriginal();
@@ -870,6 +871,8 @@ void MainWindow::printAllPrint(size_t index) {
     display = "<span style=\"font-size: " + QString::fromStdString(to_string(currentTab->fontSize)) + "px;\"><p align=\"center\"><table border=\"1\" cellpadding=\"10\">" + display + "</table></p></span>";
     currentTab->result->setHtml(display);
     onResultTextChanged(display);
+
+    currentTab->resultsToPrint.clear();
 }
 
 
@@ -2614,6 +2617,7 @@ void MainWindow::on_actionUpdate_Inflection_Database_triggered()
     connect(updateDialogThread, SIGNAL(signal_ShowProgress()), updateDialog, SLOT(slot_ShowProgress()));
     connect(updateDialogThread, SIGNAL(signal_UpdateProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateProgress(qint64, qint64)));
     connect(updateDialogThread, SIGNAL(signal_HideProgress()), updateDialog, SLOT(slot_HideProgress()));
+
     t->start();
 }
 

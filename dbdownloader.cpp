@@ -79,6 +79,8 @@ void DBDownloader::processFile(int status) {
     connect(DBTransformCtrl, SIGNAL(signal_HideProgress()), this, SLOT(slot_HideProgress()));
     connect(DBTransformCtrl, SIGNAL(signal_UpdateProgress(qint64, qint64)), this, SLOT(slot_UpdateProgress(qint64, qint64)));
     DBTransformCtrl->transform(fileName.toStdString());
+    DBTransformCtrl->deleteLater();
+    DBTransformCtrl = nullptr;
     cleanUp();
 }
 
