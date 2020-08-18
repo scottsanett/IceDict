@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QObject::connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
 
-    on_actionUpdate_Inflection_Database_triggered();
+    checkDatabaseIntegrity();
 }
 
 MainWindow::~MainWindow() {
@@ -44,6 +44,7 @@ MainWindow::~MainWindow() {
 
 
 void MainWindow::importBINDBs() {
+    updateDialog->deleteLater();
     importWordIndex();
     importDictionary();
     importOriginal();
@@ -471,7 +472,7 @@ void MainWindow::importInflections() {
 
 /*import all the inflection forms and its position*/
 void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i) {
-    QString filename = appDataLocation + "/db3/partpart" + QString(to_string(i).c_str());
+    QString filename = appDataLocation + "/db3/part" + QString(to_string(i).c_str());
     QFile f(filename);
 
     f.open(QIODevice::ReadOnly);
@@ -2571,13 +2572,13 @@ void MainWindow::on_actionForward_triggered()
     currentTab->backButton->setEnabled(true);
 }
 
-
-void MainWindow::on_actionUpdate_Inflection_Database_triggered()
+void MainWindow::checkDatabaseIntegrity()
 {
     updateDialog = new DBUpdateDialog(this);
 
     auto t = new QThread();
     updateDialogThread = new DBUpdateDialogThread();
+    updateDialogThread->checkIntegrity(true);
     updateDialogThread->moveToThread(t);
     connect(updateDialogThread, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
     connect(t, SIGNAL(started()), updateDialogThread, SLOT(process()));
@@ -2587,13 +2588,32 @@ void MainWindow::on_actionUpdate_Inflection_Database_triggered()
     connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importBINDBs()));
     connect(updateDialogThread, SIGNAL(finished()), updateDialog, SLOT(close()));
     connect(updateDialogThread, SIGNAL(updateStatus(QString const)), updateDialog, SLOT(appendMsg(QString const)));
-    connect(updateDialogThread, SIGNAL(signal_ShowDownloadProgress()), updateDialog, SLOT(slot_ShowDownloadProgress()));
-    connect(updateDialogThread, SIGNAL(signal_UpdateDownloadProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
-    connect(updateDialogThread, SIGNAL(signal_HideDownloadProgress()), updateDialog, SLOT(slot_HideDownloadProgress()));
+    connect(updateDialogThread, SIGNAL(signal_ShowProgress()), updateDialog, SLOT(slot_ShowProgress()));
+    connect(updateDialogThread, SIGNAL(signal_UpdateProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateProgress(qint64, qint64)));
+    connect(updateDialogThread, SIGNAL(signal_HideProgress()), updateDialog, SLOT(slot_HideProgress()));
+    t->start();
+}
 
-    connect(updateDialogThread, SIGNAL(signal_ShowTranformProgress()), updateDialog, SLOT(slot_ShowTransformProgress()));
-    connect(updateDialogThread, SIGNAL(signal_UpdateTransformProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateTransformProgress(qint64, qint64)));
-    connect(updateDialogThread, SIGNAL(signal_HideTransformProgress()), updateDialog, SLOT(slot_HideTransformProgress()));
+
+void MainWindow::on_actionUpdate_Inflection_Database_triggered()
+{
+    updateDialog = new DBUpdateDialog(this);
+
+    auto t = new QThread();
+    updateDialogThread = new DBUpdateDialogThread();
+    updateDialogThread->checkIntegrity(false);
+    updateDialogThread->moveToThread(t);
+    connect(updateDialogThread, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+    connect(t, SIGNAL(started()), updateDialogThread, SLOT(process()));
+    connect(updateDialogThread, SIGNAL(finished()), t, SLOT(quit()));
+    connect(t, SIGNAL(finished()), updateDialogThread, SLOT(deleteLater()));
+    connect(updateDialogThread, SIGNAL(finished()), t, SLOT(deleteLater()));
+    connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importBINDBs()));
+    connect(updateDialogThread, SIGNAL(finished()), updateDialog, SLOT(close()));
+    connect(updateDialogThread, SIGNAL(updateStatus(QString const)), updateDialog, SLOT(appendMsg(QString const)));
+    connect(updateDialogThread, SIGNAL(signal_ShowProgress()), updateDialog, SLOT(slot_ShowProgress()));
+    connect(updateDialogThread, SIGNAL(signal_UpdateProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateProgress(qint64, qint64)));
+    connect(updateDialogThread, SIGNAL(signal_HideProgress()), updateDialog, SLOT(slot_HideProgress()));
     t->start();
 }
 

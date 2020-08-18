@@ -294,6 +294,8 @@ private slots:
     void on_actionUpdate_Inflection_Database_triggered();
 
 private:
+    void checkDatabaseIntegrity();
+
     TreeWidgetItem * constructItem(QString, TreeWidget * parent);
     TreeWidgetItem * constructItem(QString, TreeWidgetItem * parent);
 

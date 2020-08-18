@@ -29,13 +29,13 @@ void DBDownloaderHelper::proceed() {
         QNetworkRequest request(DBUrl);
         m_NetworkReply = m_WebCtrl->get(request);
         connect(m_NetworkReply, SIGNAL(downloadProgress(qint64, qint64)),
-                this, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
-        emit signal_ShowDownloadProgress();
+                this, SLOT(slot_UpdateProgress(qint64, qint64)));
+        emit signal_ShowProgress();
     }
 }
 
-void DBDownloaderHelper::slot_UpdateDownloadProgress(qint64 a, qint64 b) {
-    emit signal_UpdateDownloadProgress(a, b);
+void DBDownloaderHelper::slot_UpdateProgress(qint64 a, qint64 b) {
+    emit signal_UpdateProgress(a, b);
 }
 
 /*
@@ -50,7 +50,7 @@ void DBDownloaderHelper::fileDownloaded(QNetworkReply* pReply) {
     emit updateStatus("Download completed.");
     //emit a signal
     pReply->deleteLater();
-    emit signal_HideDownloadProgress();
+    emit signal_HideProgress();
     emit downloaded(0);
 }
 
@@ -75,9 +75,9 @@ void DBDownloader::processFile(int status) {
     auto && fileName = JlCompress::extractFile(inputFileName, extractFileName);
     DBTransformCtrl = new DBTransformer(this);
     connect(DBTransformCtrl, SIGNAL(updateStatus(QString const)), this, SLOT(acceptUpdate(QString const)));
-    connect(DBTransformCtrl, SIGNAL(signal_ShowProgress()), this, SLOT(slot_ShowTransformProgress()));
-    connect(DBTransformCtrl, SIGNAL(signal_HideProgress()), this, SLOT(slot_HideTransformProgress()));
-    connect(DBTransformCtrl, SIGNAL(signal_UpdateProgress(qint64, qint64)), this, SLOT(slot_UpdateTransformProgress(qint64, qint64)));
+    connect(DBTransformCtrl, SIGNAL(signal_ShowProgress()), this, SLOT(slot_ShowProgress()));
+    connect(DBTransformCtrl, SIGNAL(signal_HideProgress()), this, SLOT(slot_HideProgress()));
+    connect(DBTransformCtrl, SIGNAL(signal_UpdateProgress(qint64, qint64)), this, SLOT(slot_UpdateProgress(qint64, qint64)));
     DBTransformCtrl->transform(fileName.toStdString());
     cleanUp();
 }
@@ -93,14 +93,14 @@ void DBDownloader::acceptUpdate(QString const str) {
     emit updateStatus(str);
 }
 
-void DBDownloader::slot_ShowTransformProgress() {
-    emit signal_ShowTransformProgress();
+void DBDownloader::slot_ShowProgress() {
+    emit signal_ShowProgress();
 }
 
-void DBDownloader::slot_HideTransformProgress() {
-    emit signal_HideTransformProgress();
+void DBDownloader::slot_HideProgress() {
+    emit signal_HideProgress();
 }
 
-void DBDownloader::slot_UpdateTransformProgress(qint64 a, qint64 b) {
-    emit signal_UpdateTransformProgress(a, b);
+void DBDownloader::slot_UpdateProgress(qint64 a, qint64 b) {
+    emit signal_UpdateProgress(a, b);
 }

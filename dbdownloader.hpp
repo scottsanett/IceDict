@@ -29,13 +29,13 @@ public:
 signals:
     void downloaded(int);
     void updateStatus(QString const &);
-    void signal_ShowDownloadProgress();
-    void signal_UpdateDownloadProgress(qint64, qint64);
-    void signal_HideDownloadProgress();
+    void signal_ShowProgress();
+    void signal_UpdateProgress(qint64, qint64);
+    void signal_HideProgress();
 
 private slots:
     void fileDownloaded(QNetworkReply* pReply);
-    void slot_UpdateDownloadProgress(qint64, qint64);
+    void slot_UpdateProgress(qint64, qint64);
 
 private:
     QString appDataLocation;
@@ -60,16 +60,16 @@ signals:
     void DBInitializationComplete();
     void updateStatus(QString const);
     void cleanedUp();
-    void signal_ShowTransformProgress();
-    void signal_HideTransformProgress();
-    void signal_UpdateTransformProgress(qint64, qint64);
+    void signal_ShowProgress();
+    void signal_HideProgress();
+    void signal_UpdateProgress(qint64, qint64);
 
 private slots:
     void processFile(int);
     void acceptUpdate(QString const);
-    void slot_ShowTransformProgress();
-    void slot_HideTransformProgress();
-    void slot_UpdateTransformProgress(qint64, qint64);
+    void slot_ShowProgress();
+    void slot_HideProgress();
+    void slot_UpdateProgress(qint64, qint64);
 
 private:
     QString appDataLocation;

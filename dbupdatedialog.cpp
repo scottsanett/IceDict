@@ -45,33 +45,17 @@ void DBUpdateDialog::closeDialog() {
     this->close();
 }
 
-void DBUpdateDialog::slot_ShowDownloadProgress() {
+void DBUpdateDialog::slot_ShowProgress() {
     pBar = new QProgressBar(this);
-    pBar->setTextVisible(true);
     this->layout()->addWidget(pBar);
 }
 
-void DBUpdateDialog::slot_UpdateDownloadProgress(qint64 ist, qint64 max) {
+void DBUpdateDialog::slot_UpdateProgress(qint64 ist, qint64 max) {
     pBar->setRange(0, max);
     pBar->setValue(ist);
 }
 
-void DBUpdateDialog::slot_HideDownloadProgress() {
-    pBar->close();
-}
-
-void DBUpdateDialog::slot_ShowTransformProgress() {
-    pBar = new QProgressBar(this);
-    pBar->setTextVisible(true);
-    this->layout()->addWidget(pBar);
-}
-
-void DBUpdateDialog::slot_UpdateTransformProgress(qint64 ist, qint64 max) {
-    pBar->setRange(0, max);
-    pBar->setValue(ist);
-}
-
-void DBUpdateDialog::slot_HideTransformProgress() {
+void DBUpdateDialog::slot_HideProgress() {
     pBar->close();
 }
 
@@ -81,81 +65,76 @@ void DBUpdateDialogThread::acceptUpdate(QString const str) {
 
 void DBUpdateDialogThread::process() {
     appDataLocation = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    auto BINDBstatus = examineBINDBs();
+    bool BINDBStatus = false;
 
-    m_DBDownloadHelper = new DBDownloaderHelper(this);
-    m_DBDownloader = new DBDownloader(m_DBDownloadHelper, this);
+    if (m_CheckIntegrity) {
+        BINDBStatus = examineBINDBs();
+    }
 
-    connect (m_DBDownloadHelper, SIGNAL(downloaded(int)),
-             m_DBDownloader, SLOT(processFile(int)));
-    connect (m_DBDownloadHelper, SIGNAL(updateStatus(QString const)),
-             this, SLOT(acceptUpdate(QString const)));
-    connect (m_DBDownloadHelper, SIGNAL(signal_ShowDownloadProgress()),
-             this, SLOT(slot_ShowDownloadProgress()));
-    connect (m_DBDownloadHelper, SIGNAL(signal_UpdateDownloadProgress(qint64, qint64)),
-             this, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
-    connect (m_DBDownloadHelper, SIGNAL(signal_HideDownloadProgress()),
-             this, SLOT(slot_HideDownloadProgress()));
+    if (!m_CheckIntegrity || BINDBStatus != 0) {
 
-    connect (m_DBDownloader, SIGNAL(updateStatus(QString const)),
-             this, SLOT(acceptUpdate(QString const)));
-    connect (m_DBDownloader, SIGNAL(cleanedUp()),
-             this, SLOT(acceptCleanedUp()));
-    connect (m_DBDownloader, SIGNAL(signal_ShowTransformProgress()),
-             this, SLOT(slot_ShowDownloadProgress()));
-    connect (m_DBDownloader, SIGNAL(signal_UpdateTransformProgress(qint64, qint64)),
-             this, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
-    connect (m_DBDownloader, SIGNAL(signal_HideTransformProgress()),
-             this, SLOT(slot_HideDownloadProgress()));
+        m_DBDownloadHelper = new DBDownloaderHelper(this);
+        m_DBDownloader = new DBDownloader(m_DBDownloadHelper, this);
 
-    if (BINDBstatus != 0) {
+        connect (m_DBDownloadHelper, SIGNAL(downloaded(int)),
+                 m_DBDownloader, SLOT(processFile(int)));
+        connect (m_DBDownloadHelper, SIGNAL(updateStatus(QString const)),
+                 this, SLOT(acceptUpdate(QString const)));
+        connect (m_DBDownloadHelper, SIGNAL(signal_ShowProgress()),
+                 this, SLOT(slot_ShowProgress()));
+        connect (m_DBDownloadHelper, SIGNAL(signal_UpdateProgress(qint64, qint64)),
+                 this, SLOT(slot_UpdateProgress(qint64, qint64)));
+        connect (m_DBDownloadHelper, SIGNAL(signal_HideProgress()),
+                 this, SLOT(slot_HideProgress()));
+
+        connect (m_DBDownloader, SIGNAL(updateStatus(QString const)),
+                 this, SLOT(acceptUpdate(QString const)));
+        connect (m_DBDownloader, SIGNAL(cleanedUp()),
+                 this, SLOT(acceptCleanedUp()));
+        connect (m_DBDownloader, SIGNAL(signal_ShowProgress()),
+                 this, SLOT(slot_ShowProgress()));
+        connect (m_DBDownloader, SIGNAL(signal_UpdateProgress(qint64, qint64)),
+                 this, SLOT(slot_UpdateProgress(qint64, qint64)));
+        connect (m_DBDownloader, SIGNAL(signal_HideProgress()),
+                 this, SLOT(slot_HideProgress()));
+
         m_DBDownloadHelper->proceed();
-//        m_DBDownloader->cleanUp();
     }
     else {
         emit acceptCleanedUp();
     }
 }
 
-void DBUpdateDialogThread::slot_ShowDownloadProgress() {
-    emit signal_ShowDownloadProgress();
+void DBUpdateDialogThread::slot_ShowProgress() {
+    emit signal_ShowProgress();
 }
 
 
-void DBUpdateDialogThread::slot_UpdateDownloadProgress(qint64 a, qint64 b) {
-    emit signal_UpdateDownloadProgress(a, b);
+void DBUpdateDialogThread::slot_UpdateProgress(qint64 a, qint64 b) {
+    emit signal_UpdateProgress(a, b);
 }
 
-void DBUpdateDialogThread::slot_HideDownloadProgress() {
-    emit signal_HideDownloadProgress();
+void DBUpdateDialogThread::slot_HideProgress() {
+    emit signal_HideProgress();
 }
-
-void DBUpdateDialogThread::slot_ShowTransformProgress() {
-    emit signal_ShowTransformProgress();
-}
-
-void DBUpdateDialogThread::slot_UpdateTransformProgress(qint64 a, qint64 b) {
-    emit signal_UpdateTransformProgress(a, b);
-}
-
-void DBUpdateDialogThread::slot_HideTransformProgress() {
-    emit signal_HideTransformProgress();
-}
-
 
 void DBUpdateDialogThread::acceptCleanedUp() {
     emit finished();
 }
 
+void DBUpdateDialogThread::checkIntegrity(bool f) {
+    m_CheckIntegrity = f;
+}
+
 
 int DBUpdateDialogThread::examineBINDBs() {
-    emit signal_ShowDownloadProgress();
+    emit signal_ShowProgress();
     QDir::setCurrent(appDataLocation);
     qDebug() << appDataLocation;
     if (!QFileInfo(".DBHashes").exists()) {
         qDebug() << "Database hash list does not exist; creating one...";
         emit updateStatus("Database hash list does not exist; creating one...");
-        emit signal_HideDownloadProgress();
+        emit signal_HideProgress();
         return -1;
     }
     else {
@@ -181,7 +160,7 @@ int DBUpdateDialogThread::examineBINDBs() {
                 emit updateStatus("Database found but deprecated. Rebuilding dabatase...");
                 return -1;
             }
-            emit signal_UpdateDownloadProgress(i + 1, 24);
+            emit signal_UpdateProgress(i + 1, 24);
         }
 
         for (auto i = 0; i < 8; ++i) {
@@ -193,7 +172,7 @@ int DBUpdateDialogThread::examineBINDBs() {
                 emit updateStatus("Database found but deprecated. Rebuilding dabatase...");
                 return -1;
             }
-            emit signal_UpdateDownloadProgress(i + 9, 24);
+            emit signal_UpdateProgress(i + 9, 24);
         }
 
         for (auto i = 0; i < 8; ++i) {
@@ -204,9 +183,9 @@ int DBUpdateDialogThread::examineBINDBs() {
                 emit updateStatus("Database found but deprecated. Rebuilding dabatase...");
                 return -1;
             }
-            emit signal_UpdateDownloadProgress(i + 17, 24);
+            emit signal_UpdateProgress(i + 17, 24);
         }
-        emit signal_HideDownloadProgress();
+        emit signal_HideProgress();
         return 0;
     }
 }
