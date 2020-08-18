@@ -471,7 +471,7 @@ void MainWindow::importInflections() {
 
 /*import all the inflection forms and its position*/
 void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i) {
-    QString filename = appDataLocation + "/source_reverse_index/part" + QString(to_string(i).c_str());
+    QString filename = appDataLocation + "/db3/partpart" + QString(to_string(i).c_str());
     QFile f(filename);
 
     f.open(QIODevice::ReadOnly);
@@ -502,7 +502,7 @@ void MainWindow::importOriginal() {
 }
 
 void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
-    QString filename = QString(appDataLocation + "/source_index/part") + to_string(i).c_str();
+    QString filename = QString(appDataLocation + "/db2/part") + to_string(i).c_str();
     QFile f(filename);
 
     f.open(QIODevice::ReadOnly);
@@ -686,7 +686,7 @@ void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString
     auto && thisResult = results[index];
     auto itr = thisDic.find(word);
     if (itr == thisDic.end()) { return; }
-    QString filename = QString(appDataLocation + "/source/part") + to_string(index + 1).c_str();
+    QString filename = QString(appDataLocation + "/db1/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
 
@@ -808,7 +808,7 @@ void MainWindow::printAllThread(QString word, size_t index) {
     auto range = thisDic.equal_range(word);
     auto count = std::distance(range.first, range.second);
     if (count == 0)  return;
-    QString filename = QString(appDataLocation + "/source/part") + to_string(index + 1).c_str();
+    QString filename = QString(appDataLocation + "/db1/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
     auto qfile = file.readAll();

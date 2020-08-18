@@ -114,7 +114,7 @@ private:
     struct Pimpl {
         QString textInQuery;
         QString wordAfterRedirection;
-        size_t fontSize = 15;
+        size_t fontSize = 16;
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
         QString webpage;
         std::set<QVector<QString>> inflStruct;

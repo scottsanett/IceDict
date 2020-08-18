@@ -47,6 +47,7 @@ void DBUpdateDialog::closeDialog() {
 
 void DBUpdateDialog::slot_ShowDownloadProgress() {
     pBar = new QProgressBar(this);
+    pBar->setTextVisible(true);
     this->layout()->addWidget(pBar);
 }
 
@@ -61,6 +62,7 @@ void DBUpdateDialog::slot_HideDownloadProgress() {
 
 void DBUpdateDialog::slot_ShowTransformProgress() {
     pBar = new QProgressBar(this);
+    pBar->setTextVisible(true);
     this->layout()->addWidget(pBar);
 }
 
@@ -147,11 +149,13 @@ void DBUpdateDialogThread::acceptCleanedUp() {
 
 
 int DBUpdateDialogThread::examineBINDBs() {
+    emit signal_ShowDownloadProgress();
     QDir::setCurrent(appDataLocation);
     qDebug() << appDataLocation;
     if (!QFileInfo(".DBHashes").exists()) {
         qDebug() << "Database hash list does not exist; creating one...";
         emit updateStatus("Database hash list does not exist; creating one...");
+        emit signal_HideDownloadProgress();
         return -1;
     }
     else {
@@ -169,7 +173,7 @@ int DBUpdateDialogThread::examineBINDBs() {
         if (hashList.length() != 25) return -1;
 
         for (auto i = 0; i < 8; ++i) {
-            auto fileName = appDataLocation + "/source/part" + QString::number(i + 1);
+            auto fileName = appDataLocation + "/db1/part" + QString::number(i + 1);
             auto currentHash = hashFile(fileName);
             if (hashList.at(i) != currentHash) {
                 qDebug() << hashList.at(i) << currentHash;
@@ -177,10 +181,11 @@ int DBUpdateDialogThread::examineBINDBs() {
                 emit updateStatus("Database found but deprecated. Rebuilding dabatase...");
                 return -1;
             }
+            emit signal_UpdateDownloadProgress(i + 1, 24);
         }
 
         for (auto i = 0; i < 8; ++i) {
-            auto fileName = appDataLocation + "/source_index/part" + QString::number(i + 1);
+            auto fileName = appDataLocation + "/db2/part" + QString::number(i + 1);
             auto currentHash = hashFile(fileName);
             if (hashList.at(i + 8) != currentHash) {
                 qDebug() << hashList.at(i + 8) << currentHash;
@@ -188,17 +193,20 @@ int DBUpdateDialogThread::examineBINDBs() {
                 emit updateStatus("Database found but deprecated. Rebuilding dabatase...");
                 return -1;
             }
+            emit signal_UpdateDownloadProgress(i + 9, 24);
         }
 
         for (auto i = 0; i < 8; ++i) {
-            auto fileName = appDataLocation + "/source_reverse_index/part" + QString::number(i + 1);
+            auto fileName = appDataLocation + "/db3/part" + QString::number(i + 1);
             if (hashList.at(i + 16) != hashFile(fileName)) {
                 qDebug() << hashList.at(i) << hashFile(fileName);
                 qDebug() << "Database found but deprecated. Rebuilding dabatase...";
                 emit updateStatus("Database found but deprecated. Rebuilding dabatase...");
                 return -1;
             }
+            emit signal_UpdateDownloadProgress(i + 17, 24);
         }
+        emit signal_HideDownloadProgress();
         return 0;
     }
 }

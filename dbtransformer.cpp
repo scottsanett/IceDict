@@ -14,6 +14,7 @@ int DBTransformer::transform(const std::string & fileName) {
     collection.fill(matrix_t{}, outputFileNumber);
 
     split(mat, collection, outputFileNumber);
+
     emit signal_ShowProgress();
     outputSource(collection, outputFileName);
     outputSourceIndex(collection, outputFileName);
@@ -23,6 +24,7 @@ int DBTransformer::transform(const std::string & fileName) {
 }
 
 bool DBTransformer::loadInformation(std::string const & fileName, matrix_t & mat) {
+    emit updateStatus("Loading database from downloaded file...");
     std::string line;
     if (fileName.empty()) { return false; }
     std::ifstream ifs(fileName);
@@ -47,6 +49,7 @@ bool DBTransformer::loadInformation(std::string const & fileName, matrix_t & mat
 }
 
 bool DBTransformer::translateCategory(matrix_t & mat, rules_t & categories) {
+    emit updateStatus("Translating category...");
     std::string line;
     QFile file(":/alphabet/rules/cat.txt");
     if(!file.open(QIODevice::ReadOnly)) {
@@ -63,15 +66,18 @@ bool DBTransformer::translateCategory(matrix_t & mat, rules_t & categories) {
         categories.insert(std::make_pair(firstHalf.c_str(), secondHalf.c_str()));
     }
 
+    int ins = 1, max = mat.size();
     for (auto && i : mat) {
         auto before = i.at(2);
         auto after = categories[before];
         i.at(2) = after;
     }
+
     return true;
 }
 
 bool DBTransformer::translateMarks(matrix_t & mat, rules_t marks) {
+    emit updateStatus("Translating inflectional information...");
     std::string line;
     QFile file(":/alphabet/rules/rules.txt");
     if(!file.open(QIODevice::ReadOnly)) {
@@ -88,6 +94,7 @@ bool DBTransformer::translateMarks(matrix_t & mat, rules_t marks) {
         marks.insert(std::make_pair(firstHalf.c_str(), secondHalf.c_str()));
     }
 
+    int ins = 1, max = mat.size();
     for (auto && i : mat) {
         auto before = i.at(5);
         auto after = marks[before];
@@ -99,11 +106,13 @@ bool DBTransformer::translateMarks(matrix_t & mat, rules_t marks) {
 
 
 void DBTransformer::split(matrix_t const & mat, matcol_t & col, int num) {
+    emit signal_ShowProgress();
     auto average = mat.size() / num + 1;
     QString entryToCompare, catToCompare;
     std::ostringstream oss;
     int fileIndex = 0;
     int entryIndex = 0;
+    emit updateStatus("Splitting database...");
 
     for (auto && i : mat) {
         if (entryIndex < average) {
@@ -143,18 +152,20 @@ void DBTransformer::split(matrix_t const & mat, matcol_t & col, int num) {
                 ++entryIndex;
             }
         }
+        emit signal_UpdateProgress(fileIndex, 8);
     }
+    emit signal_HideProgress();
 }
 
 void DBTransformer::outputSource(matcol_t const & col, std::string const & fileName) {
-    emit updateStatus("Generaing source files...");
-    std::cout << "Generaing source files..." << std::endl;
+    emit updateStatus("Generaing db1 files...");
+    std::cout << "Generaing db1 files..." << std::endl;
 
     QFile hashTable(appDataLocation + "/.DBHashes");
     if (!hashTable.open(QIODevice::WriteOnly)) { return; }
     QTextStream dbstream(&hashTable);
 
-    auto sourceLocation = appDataLocation + "/source";
+    auto sourceLocation = appDataLocation + "/db1";
     auto sourceDir = QDir(sourceLocation);
     sourceDir.mkpath(sourceDir.absolutePath());
     QDir::setCurrent(sourceDir.absolutePath());
@@ -182,19 +193,19 @@ void DBTransformer::outputSource(matcol_t const & col, std::string const & fileN
     }
 
     hashTable.close();
-    std::cout << "source files generation complete!" << std::endl;
-    emit updateStatus("source files generation complete!");
+    std::cout << "db1 files generation complete!" << std::endl;
+    emit updateStatus("db1 files generation complete!");
 }
 
 void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & fileName) {
-    std::cout << "Generating source_index files..." << std::endl;
-    emit updateStatus("Generating source_index files...");
+    std::cout << "Generating db2 files..." << std::endl;
+    emit updateStatus("Generating db2 files...");
 
     QFile hashTable(appDataLocation + "/.DBHashes");
     if (hashTable.open(QIODevice::WriteOnly | QIODevice::Append)) {
     QTextStream dbstream(&hashTable);
 
-    auto SIndexLocation = appDataLocation + "/source_index";
+    auto SIndexLocation = appDataLocation + "/db2";
     auto SIndexDir = QDir(SIndexLocation);
     SIndexDir.mkpath(SIndexDir.absolutePath());
     QDir::setCurrent(SIndexDir.absolutePath());
@@ -223,20 +234,20 @@ void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & 
     }
 
     hashTable.close();
-    std::cout << "source_index files generation complete!" << std::endl;
-    emit updateStatus("source_index files generation complete!");
+    std::cout << "db2 files generation complete!" << std::endl;
+    emit updateStatus("db2 files generation complete!");
     }
 }
 
 void DBTransformer::outputSourceReverseIndex(matcol_t const & col, std::string const & fileName) {
-    std::cout << "Generating source_reverse_index files..." << std::endl;
-    emit updateStatus("Generating source_reverse_index files...");
+    std::cout << "Generating db3 files..." << std::endl;
+    emit updateStatus("Generating db3 files...");
 
     QFile hashTable(appDataLocation + "/.DBHashes");
     if (!hashTable.open(QIODevice::WriteOnly | QIODevice::Append)) { return; }
     QTextStream dbstream(&hashTable);
 
-    auto SRIndexLocation = appDataLocation + "/source_reverse_index";
+    auto SRIndexLocation = appDataLocation + "/db3";
     auto SRIndexDir = QDir(SRIndexLocation);
     SRIndexDir.mkpath(SRIndexDir.absolutePath());
     QDir::setCurrent(SRIndexDir.absolutePath());
@@ -262,8 +273,8 @@ void DBTransformer::outputSourceReverseIndex(matcol_t const & col, std::string c
     }
 
     hashTable.close();
-    std::cout << "source_reverse_index files generation complete!" << std::endl;
-    emit updateStatus("source_reverse_index files generation complete!");
+    std::cout << "db3 files generation complete!" << std::endl;
+    emit updateStatus("db3 files generation complete!");
 }
 
 QString DBTransformer::hashFile(const QString &fileName, QCryptographicHash::Algorithm hashAlgorithm) {
