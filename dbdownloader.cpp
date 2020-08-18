@@ -14,7 +14,7 @@ void DBDownloaderHelper::proceed() {
     QDir::setCurrent(appDataLocation);
 
     auto DBUrl = QUrl(BINUrl);
-    m_WebCtrl = new QNetworkAccessManager;
+    m_WebCtrl = new QNetworkAccessManager(this);
     connect(m_WebCtrl, SIGNAL (finished(QNetworkReply*)),
             this, SLOT (fileDownloaded(QNetworkReply*)));
 
@@ -27,9 +27,22 @@ void DBDownloaderHelper::proceed() {
         qDebug() << "Initiating download";
         emit updateStatus("Initiating download...");
         QNetworkRequest request(DBUrl);
-        m_WebCtrl->get(request);
+        m_NetworkReply = m_WebCtrl->get(request);
+        connect(m_NetworkReply, SIGNAL(downloadProgress(qint64, qint64)),
+                this, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
+        emit signal_ShowDownloadProgress();
     }
 }
+
+void DBDownloaderHelper::slot_UpdateDownloadProgress(qint64 a, qint64 b) {
+    emit signal_UpdateDownloadProgress(a, b);
+}
+
+/*
+QNetworkAccessManager * DBDownloaderHelper::getWebCtrl() {
+    return m_WebCtrl;
+}
+*/
 
 void DBDownloaderHelper::fileDownloaded(QNetworkReply* pReply) {
     m_DownloadedData = pReply->readAll();
@@ -37,6 +50,7 @@ void DBDownloaderHelper::fileDownloaded(QNetworkReply* pReply) {
     emit updateStatus("Download completed.");
     //emit a signal
     pReply->deleteLater();
+    emit signal_HideDownloadProgress();
     emit downloaded(0);
 }
 
@@ -61,8 +75,11 @@ void DBDownloader::processFile(int status) {
     auto && fileName = JlCompress::extractFile(inputFileName, extractFileName);
     DBTransformCtrl = new DBTransformer(this);
     connect(DBTransformCtrl, SIGNAL(updateStatus(QString const)), this, SLOT(acceptUpdate(QString const)));
+    connect(DBTransformCtrl, SIGNAL(signal_ShowProgress()), this, SLOT(slot_ShowTransformProgress()));
+    connect(DBTransformCtrl, SIGNAL(signal_HideProgress()), this, SLOT(slot_HideTransformProgress()));
+    connect(DBTransformCtrl, SIGNAL(signal_UpdateProgress(qint64, qint64)), this, SLOT(slot_UpdateTransformProgress(qint64, qint64)));
     DBTransformCtrl->transform(fileName.toStdString());
-//    emit DBInitializationComplete();
+    cleanUp();
 }
 
 void DBDownloader::cleanUp() {
@@ -74,4 +91,16 @@ void DBDownloader::cleanUp() {
 
 void DBDownloader::acceptUpdate(QString const str) {
     emit updateStatus(str);
+}
+
+void DBDownloader::slot_ShowTransformProgress() {
+    emit signal_ShowTransformProgress();
+}
+
+void DBDownloader::slot_HideTransformProgress() {
+    emit signal_HideTransformProgress();
+}
+
+void DBDownloader::slot_UpdateTransformProgress(qint64 a, qint64 b) {
+    emit signal_UpdateTransformProgress(a, b);
 }

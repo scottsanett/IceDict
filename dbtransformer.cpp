@@ -13,11 +13,12 @@ int DBTransformer::transform(const std::string & fileName) {
 
     collection.fill(matrix_t{}, outputFileNumber);
 
-
     split(mat, collection, outputFileNumber);
+    emit signal_ShowProgress();
     outputSource(collection, outputFileName);
     outputSourceIndex(collection, outputFileName);
     outputSourceReverseIndex(collection, outputFileName);
+    emit signal_HideProgress();
     return 0;
 }
 
@@ -174,6 +175,7 @@ void DBTransformer::outputSource(matcol_t const & col, std::string const & fileN
                 oss << entryRef[0].toStdString() << "; " << entryRef[1].toStdString() << "; " << entryRef[2].toStdString() << "; " << entryRef[4].toStdString() << "; " << entryRef[5].toStdString() << std::endl;
             }
             stream << QString::fromStdString(oss.str());
+            emit signal_UpdateProgress(i, 24);
         }
         file.close();
         dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";;;";
@@ -214,6 +216,7 @@ void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & 
                 }
             }
             stream << QString::fromStdString(oss.str());
+            emit signal_UpdateProgress(i + 8, 24);
         }
         file.close();
         dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";;;";
@@ -254,6 +257,7 @@ void DBTransformer::outputSourceReverseIndex(matcol_t const & col, std::string c
             file.write(byteData);
         }
         file.close();
+        emit signal_UpdateProgress(i + 16, 24);
         dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";;;";
     }
 

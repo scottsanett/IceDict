@@ -6,6 +6,7 @@
 #include <QTextBrowser>
 #include <QTimer>
 #include <QThread>
+#include <QProgressBar>
 
 #include "dbdownloader.hpp"
 #include "dbtransformer.hpp"
@@ -38,6 +39,7 @@ private:
     bool cancelStatus;
     QString appDataLocation;
     QTextBrowser * textBrowser;
+    QProgressBar * pBar;
     DBDownloader * m_DBDownloader;
     DBDownloaderHelper * m_DBDownloadHelper;
 
@@ -53,6 +55,13 @@ private slots:
     void displayMsg(QString const msg);
     void appendMsg(QString const msg);
     void closeDialog();
+    void slot_ShowDownloadProgress();
+    void slot_UpdateDownloadProgress(qint64, qint64);
+    void slot_HideDownloadProgress();
+
+    void slot_ShowTransformProgress();
+    void slot_UpdateTransformProgress(qint64, qint64);
+    void slot_HideTransformProgress();
 };
 
 class DBUpdateDialogThread : public QObject {
@@ -70,10 +79,25 @@ signals:
     void finished();
     void error(QString err);
 
+    void signal_ShowDownloadProgress();
+    void signal_UpdateDownloadProgress(qint64, qint64);
+    void signal_HideDownloadProgress();
+
+    void signal_ShowTransformProgress();
+    void signal_UpdateTransformProgress(qint64, qint64);
+    void signal_HideTransformProgress();
+
 private slots:
     void acceptUpdate(QString const);
     void process();
     void acceptCleanedUp();
+    void slot_ShowDownloadProgress();
+    void slot_UpdateDownloadProgress(qint64, qint64);
+    void slot_HideDownloadProgress();
+
+    void slot_ShowTransformProgress();
+    void slot_UpdateTransformProgress(qint64, qint64);
+    void slot_HideTransformProgress();
 
 private:
     QString appDataLocation;

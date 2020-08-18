@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->resultsTab->tabBar()->setExpanding(true);
 
     appDataLocation = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir dir;
+    if (!dir.exists(appDataLocation)) dir.mkpath(appDataLocation);
 
     pageControl = new PageDownloader(this);
     QObject::connect(pageControl, SIGNAL(downloaded()), this, SLOT(loadPage()));
@@ -53,9 +55,9 @@ void MainWindow::addTab_clicked() {
     currentTab->centralLayout = new QVBoxLayout();
     currentTab->mainSplitter = new QSplitter();
 #ifdef _WIN32
-    currentTab->mainSplitter->setHandleWidth(0);
+    currentTab->mainSplitter->setHandleWidth(1);
 #else
-    currentTab->mainSplitter->setHandleWidth(0);
+    currentTab->mainSplitter->setHandleWidth(1);
 #endif
     tabIndices.insert(std::make_pair(currentTab->mainSplitter, currentTab));
     tabResultHistory.insert(std::make_pair(currentTab->mainSplitter, std::deque<QString>{}));
@@ -63,9 +65,9 @@ void MainWindow::addTab_clicked() {
     currentTab->centralLayout->addWidget(currentTab->mainSplitter);
     currentTab->inputLayout = new QSplitter();
 #ifdef _WIN32
-    currentTab->inputLayout->setHandleWidth(0);
+    currentTab->inputLayout->setHandleWidth(1);
 #else
-    currentTab->inputLayout->setHandleWidth(10);
+    currentTab->inputLayout->setHandleWidth(1);
 #endif
     currentTab->inputLayout->setContentsMargins(0, 0, 0, 0);
     currentTab->inputLayout->setFrameStyle(QFrame::NoFrame);
@@ -89,19 +91,24 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayoutWidget = new QWidget();
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
 #ifdef _WIN32
-    currentTab->backButton = new QPushButton("◀");
+    currentTab->backButton = new QPushButton("Back");
 #elif __APPLE__
     currentTab->backButton = new QPushButton("⬅");
 #endif
     currentTab->backButton->setStyleSheet("font-size: 13px");
     currentTab->backButton->setEnabled(false);
     auto buttonSizeHint = currentTab->backButton->sizeHint();
+#ifdef _WIN32
+    currentTab->buttonLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 2);
+    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 3);
+#elif __APPLE__
     currentTab->buttonLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 9 / 2);
+    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 4);
+#endif
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
 #ifdef _WIN32
-    currentTab->nextButton = new QPushButton("▶");
+    currentTab->nextButton = new QPushButton("Next");
 #elif __APPLE__
     currentTab->nextButton = new QPushButton("➡︎");
 #endif
@@ -152,8 +159,13 @@ void MainWindow::addTab_clicked() {
 #endif
 
     currentTab->options = new QListWidget(this);
+#ifdef _WIN32
+    currentTab->options->setMinimumWidth(buttonSizeHint.width() * 2);
+    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 3);
+#elif __APPLE__
     currentTab->options->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 9 / 2);
+    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 4);
+#endif
     currentTab->options->setStyleSheet("font-size: 14px");
     currentTab->options->setFrameStyle(QFrame::HLine);
     currentTab->options->setEnabled(false);
@@ -164,7 +176,7 @@ void MainWindow::addTab_clicked() {
     currentTab->resultLayout = new QSplitter;
     currentTab->resultLayout->setOrientation(Qt::Vertical);
     currentTab->resultLayout->setFrameStyle(QFrame::NoFrame);
-    currentTab->resultLayout->setHandleWidth(0);
+    currentTab->resultLayout->setHandleWidth(1);
     currentTab->resultLayout->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     currentTab->mainSplitter->addWidget(currentTab->resultLayout);
     currentTab->result = new QTextBrowser();
@@ -257,8 +269,13 @@ void MainWindow::initializeInflectionForms() {
         currentTab->inflectionForms = new TreeWidget(this);
     currentTab->inflectionForms->setHeaderLabel("Inflections");
     auto buttonSizeHint = currentTab->backButton->sizeHint();
+#ifdef _WIN32
+    currentTab->inflectionForms->setMinimumWidth(buttonSizeHint.width() * 2);
+    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 3);
+#elif __APPLE__
     currentTab->inflectionForms->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 9 / 2);
+    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 4);
+#endif
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
     currentTab->inflectionForms->setStyleSheet("font-size: 14px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
@@ -2570,8 +2587,13 @@ void MainWindow::on_actionUpdate_Inflection_Database_triggered()
     connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importBINDBs()));
     connect(updateDialogThread, SIGNAL(finished()), updateDialog, SLOT(close()));
     connect(updateDialogThread, SIGNAL(updateStatus(QString const)), updateDialog, SLOT(appendMsg(QString const)));
+    connect(updateDialogThread, SIGNAL(signal_ShowDownloadProgress()), updateDialog, SLOT(slot_ShowDownloadProgress()));
+    connect(updateDialogThread, SIGNAL(signal_UpdateDownloadProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
+    connect(updateDialogThread, SIGNAL(signal_HideDownloadProgress()), updateDialog, SLOT(slot_HideDownloadProgress()));
 
-
+    connect(updateDialogThread, SIGNAL(signal_ShowTranformProgress()), updateDialog, SLOT(slot_ShowTransformProgress()));
+    connect(updateDialogThread, SIGNAL(signal_UpdateTransformProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateTransformProgress(qint64, qint64)));
+    connect(updateDialogThread, SIGNAL(signal_HideTransformProgress()), updateDialog, SLOT(slot_HideTransformProgress()));
     t->start();
 }
 

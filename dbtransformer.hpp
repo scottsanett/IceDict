@@ -35,6 +35,9 @@ public:
 
 signals:
     void updateStatus(QString const);
+    void signal_ShowProgress();
+    void signal_HideProgress();
+    void signal_UpdateProgress(qint64, qint64);
 
 private:
     const char * outputFileName = "part";

@@ -45,6 +45,33 @@ void DBUpdateDialog::closeDialog() {
     this->close();
 }
 
+void DBUpdateDialog::slot_ShowDownloadProgress() {
+    pBar = new QProgressBar(this);
+    this->layout()->addWidget(pBar);
+}
+
+void DBUpdateDialog::slot_UpdateDownloadProgress(qint64 ist, qint64 max) {
+    pBar->setRange(0, max);
+    pBar->setValue(ist);
+}
+
+void DBUpdateDialog::slot_HideDownloadProgress() {
+    pBar->close();
+}
+
+void DBUpdateDialog::slot_ShowTransformProgress() {
+    pBar = new QProgressBar(this);
+    this->layout()->addWidget(pBar);
+}
+
+void DBUpdateDialog::slot_UpdateTransformProgress(qint64 ist, qint64 max) {
+    pBar->setRange(0, max);
+    pBar->setValue(ist);
+}
+
+void DBUpdateDialog::slot_HideTransformProgress() {
+    pBar->close();
+}
 
 void DBUpdateDialogThread::acceptUpdate(QString const str) {
     emit updateStatus(str);
@@ -61,19 +88,58 @@ void DBUpdateDialogThread::process() {
              m_DBDownloader, SLOT(processFile(int)));
     connect (m_DBDownloadHelper, SIGNAL(updateStatus(QString const)),
              this, SLOT(acceptUpdate(QString const)));
+    connect (m_DBDownloadHelper, SIGNAL(signal_ShowDownloadProgress()),
+             this, SLOT(slot_ShowDownloadProgress()));
+    connect (m_DBDownloadHelper, SIGNAL(signal_UpdateDownloadProgress(qint64, qint64)),
+             this, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
+    connect (m_DBDownloadHelper, SIGNAL(signal_HideDownloadProgress()),
+             this, SLOT(slot_HideDownloadProgress()));
+
     connect (m_DBDownloader, SIGNAL(updateStatus(QString const)),
              this, SLOT(acceptUpdate(QString const)));
     connect (m_DBDownloader, SIGNAL(cleanedUp()),
              this, SLOT(acceptCleanedUp()));
+    connect (m_DBDownloader, SIGNAL(signal_ShowTransformProgress()),
+             this, SLOT(slot_ShowDownloadProgress()));
+    connect (m_DBDownloader, SIGNAL(signal_UpdateTransformProgress(qint64, qint64)),
+             this, SLOT(slot_UpdateDownloadProgress(qint64, qint64)));
+    connect (m_DBDownloader, SIGNAL(signal_HideTransformProgress()),
+             this, SLOT(slot_HideDownloadProgress()));
 
     if (BINDBstatus != 0) {
         m_DBDownloadHelper->proceed();
-        m_DBDownloader->cleanUp();
+//        m_DBDownloader->cleanUp();
     }
     else {
         emit acceptCleanedUp();
     }
 }
+
+void DBUpdateDialogThread::slot_ShowDownloadProgress() {
+    emit signal_ShowDownloadProgress();
+}
+
+
+void DBUpdateDialogThread::slot_UpdateDownloadProgress(qint64 a, qint64 b) {
+    emit signal_UpdateDownloadProgress(a, b);
+}
+
+void DBUpdateDialogThread::slot_HideDownloadProgress() {
+    emit signal_HideDownloadProgress();
+}
+
+void DBUpdateDialogThread::slot_ShowTransformProgress() {
+    emit signal_ShowTransformProgress();
+}
+
+void DBUpdateDialogThread::slot_UpdateTransformProgress(qint64 a, qint64 b) {
+    emit signal_UpdateTransformProgress(a, b);
+}
+
+void DBUpdateDialogThread::slot_HideTransformProgress() {
+    emit signal_HideTransformProgress();
+}
+
 
 void DBUpdateDialogThread::acceptCleanedUp() {
     emit finished();
