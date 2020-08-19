@@ -137,7 +137,7 @@ void DBTransformer::split(matrix_t const & mat, matcol_t & col, int num) {
 }
 
 void DBTransformer::outputSource(matcol_t const & col, QString const & fileName) {
-    emit updateStatus("Generaing db1 files...");
+    emit updateStatus("Generating db1 files...");
     std::cout << "Generaing db1 files..." << std::endl;
 
     QFile hashTable(appDataLocation + "/.DBHashes");
