@@ -22,7 +22,6 @@ int DBTransformer::transform(QString const & fileName) {
     emit signal_HideProgress();
 
     mat.clear();
-//    collection.clear();
     for (auto && i : collection) {
         i.clear();
     }

@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     statusBar = new StatusBar(this);
     this->setStatusBar(statusBar);
     statusBar->hide();
-    QObject::connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+//    QObject::connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
     addTab_clicked();
 
     checkDatabaseIntegrity();
@@ -45,7 +45,6 @@ MainWindow::~MainWindow() {
 
 void MainWindow::importAllDatabases() {
     updateDialog->deleteLater(); updateDialog = nullptr;
-    updateDialogThread = nullptr;
     importWordIndex();
     importDictionary();
     importOriginal();
@@ -202,6 +201,7 @@ void MainWindow::addTab_clicked() {
 
 void MainWindow::closeTab(int index) {
     auto currentSplitter = ui->resultsTab->widget(index);
+    qDebug() << tabIndices.size();
     if (tabIndices.find(currentSplitter) != tabIndices.end()) {
         if (closedTabs.size() == 10) {
             closedTabs.pop_front();
@@ -493,13 +493,11 @@ void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
     auto && thisMap = mapvec[i - 1];
     thisMap.clear();
 
-//    int lineNo = 1;
     while (!qts.atEnd()) {
         auto line = qts.readLine();
         auto tokens = line.split(';');
         if (tokens.size() == 2)
             thisMap.insert(std::make_pair(tokens.at(0), tokens.at(1).toLong()));
-//        ++lineNo;
     }
 }
 
@@ -512,7 +510,7 @@ void MainWindow::importDictionary() {
 void MainWindow::importDictionaryThread(QString const name, size_t i) {
     QString filename = ":/alphabet/" + name;
     QFile f(filename);
-    f.open(QIODevice::ReadOnly);
+    if (!f.open(QIODevice::ReadOnly)) { qDebug() << name << "cannot be opened!"; return; }
     QString qfile = f.readAll();
     std::istringstream file(qfile.toStdString());
     std::string line;
@@ -560,7 +558,6 @@ void MainWindow::findDefinition(QString word) {
 
     if ((zisspair.first == zisspair.second) && (visspair.first == visspair.second) && (uisspair.first == uisspair.second))
     {
-//        currentTab->result->setFontFamily("Perpetua");
         currentTab->result->setFontPointSize(20);
         currentTab->result->setText("Word not found");
         return;

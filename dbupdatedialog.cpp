@@ -142,12 +142,15 @@ int DBUpdateDialogThread::examineBINDBs() {
     }
     else {
         QFile f(".DBHashes");
+#ifdef _WIN32
+        auto fullPath = appDataLocation + "/.DBHashes";
+        SetFileAttributes(fullPath.toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
+#endif
         if (!f.open(QIODevice::ReadOnly)) {
             qDebug() << "Cannot open hash list";
             emit updateStatus("Cannot open hash list");
             return -1;
         }
-
         QTextStream qts(&f);
         auto hashList = qts.readAll().split(";");
         f.close();

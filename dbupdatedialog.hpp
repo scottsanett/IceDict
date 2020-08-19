@@ -8,6 +8,10 @@
 #include <QThread>
 #include <QProgressBar>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include "dbdownloader.hpp"
 #include "dbtransformer.hpp"
 
