@@ -115,39 +115,21 @@ bool DBTransformer::translateMarks(matrix_t & mat, rules_t marks) {
 void DBTransformer::split(matrix_t const & mat, matcol_t & col, int num) {
     emit signal_ShowProgress();
     auto average = mat.size() / num + 1;
-    QString entryToCompare, indexToCompare;
-    int fileIndex = 0;
-    int entryIndex = 0;
+//    QString entryToCompare, indexToCompare;
+
     emit updateStatus("Splitting database...");
 
-    for (auto && i : mat) {
-//        qDebug() << indexToCompare;
-        if (entryIndex < average) {
-            entryToCompare = i.at(0);
-            indexToCompare = i.at(1);
-            auto && matRef = col[fileIndex];
-            matRef.push_back(i);
-            ++entryIndex;
+    for (auto i = 0; i < 8; ++i) {
+        auto && matRef = col[i];
+        if (i < 7) {
+            matRef = QVector(mat.begin() + i * average, mat.begin() + (1 + i) * average);
         }
         else {
-            auto currentIndex = i.at(1);
-            if (currentIndex == indexToCompare) {
-                auto && matRef = col[fileIndex];
-                matRef.push_back(i);
-                ++entryIndex;
-            }
-            else {
-                entryIndex = 0;
-                ++fileIndex;
-                entryToCompare = i.at(0);
-                indexToCompare = i.at(1);
-                auto && matRef = col[fileIndex];
-                matRef.push_back(i);
-                ++entryIndex;
-                emit signal_UpdateProgress(fileIndex, 8);
-            }
+            matRef = QVector(mat.begin() + i * average, mat.end());
         }
+        emit signal_UpdateProgress(i, 8);
     }
+
     emit signal_HideProgress();
 }
 
@@ -161,6 +143,7 @@ void DBTransformer::outputSource(matcol_t const & col, QString const & fileName)
 
     auto sourceLocation = appDataLocation + "/db1";
     auto sourceDir = QDir(sourceLocation);
+    sourceDir.removeRecursively();
     sourceDir.mkpath(sourceDir.absolutePath());
     QDir::setCurrent(sourceDir.absolutePath());
 
@@ -199,6 +182,7 @@ void DBTransformer::outputSourceIndex(matcol_t const & col, QString const & file
 
     auto SIndexLocation = appDataLocation + "/db2";
     auto SIndexDir = QDir(SIndexLocation);
+    SIndexDir.removeRecursively();
     SIndexDir.mkpath(SIndexDir.absolutePath());
     QDir::setCurrent(SIndexDir.absolutePath());
 
@@ -242,6 +226,7 @@ void DBTransformer::outputSourceReverseIndex(matcol_t const & col, QString const
 
     auto SRIndexLocation = appDataLocation + "/db3";
     auto SRIndexDir = QDir(SRIndexLocation);
+    SRIndexDir.removeRecursively();
     SRIndexDir.mkpath(SRIndexDir.absolutePath());
     QDir::setCurrent(SRIndexDir.absolutePath());
 
