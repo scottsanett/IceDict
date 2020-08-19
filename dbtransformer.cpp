@@ -6,7 +6,7 @@ DBTransformer::DBTransformer(QObject * parent): QObject(parent) {
     qDebug() << appDataLocation;
 }
 
-int DBTransformer::transform(const std::string & fileName) {
+int DBTransformer::transform(QString const & fileName) {
     if (!loadInformation(fileName, mat)) return -1;
     if (!translateCategory(mat, categories)) return -1;
     if (!translateMarks(mat, marks)) return -1;
@@ -26,13 +26,20 @@ int DBTransformer::transform(const std::string & fileName) {
     return 0;
 }
 
-bool DBTransformer::loadInformation(std::string const & fileName, matrix_t & mat) {
+bool DBTransformer::loadInformation(QString const & fileName, matrix_t & mat) {
     emit updateStatus("Loading database from downloaded file...");
     std::string line;
-    if (fileName.empty()) { return false; }
-    std::ifstream ifs(fileName);
-    while (std::getline(ifs, line)) {
-        auto entries = QString(line.c_str()).split(';');
+    if (fileName.isEmpty()) { return false; }
+    QFile f(fileName);
+    if(!f.open(QIODevice::ReadOnly)) {
+        qDebug() << "Error: can't open " << fileName << Qt::endl;
+        return false;
+    }
+    QTextStream qts(&f);
+    while (!qts.atEnd()) {
+        auto line = qts.readLine();
+        auto entries = line.split(';');
+//        qDebug() << entries;
         auto lemma = entries.at(0);
         auto index = entries.at(1);
         auto category = entries.at(2);
@@ -53,55 +60,52 @@ bool DBTransformer::loadInformation(std::string const & fileName, matrix_t & mat
 
 bool DBTransformer::translateCategory(matrix_t & mat, rules_t & categories) {
     emit updateStatus("Translating category...");
-    std::string line;
     QFile file(":/alphabet/rules/cat.txt");
-    if(!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly)) {
         std::cout << "Error: can't open cat.txt" << std::endl;
         return false;
     }
+
     QTextStream qts(&file);
     while (!qts.atEnd()) {
         QString qline = qts.readLine();
-        line = qline.toStdString();
-        auto pos = line.find_first_of(' ');
-        auto firstHalf = line.substr(0, pos);
-        auto secondHalf = line.substr(pos + 1, line.length() - firstHalf.length() - 1);
-        categories.insert(std::make_pair(firstHalf.c_str(), secondHalf.c_str()));
+        auto strArray = qline.split('|');
+        categories.insert(std::make_pair(strArray.at(0), strArray.at(1)));
     }
 
-    int ins = 1, max = mat.size();
     for (auto && i : mat) {
         auto before = i.at(2);
         auto after = categories[before];
         i.at(2) = after;
     }
+
     file.close();
     return true;
 }
 
 bool DBTransformer::translateMarks(matrix_t & mat, rules_t marks) {
     emit updateStatus("Translating inflectional information...");
-    std::string line;
     QFile file(":/alphabet/rules/rules.txt");
     if(!file.open(QIODevice::ReadOnly)) {
-        std::cout << "Error: can't open cat.txt" << std::endl;
+        std::cout << "Error: can't open rules.txt" << std::endl;
         return false;
     }
+
     QTextStream qts(&file);
     while (!qts.atEnd()) {
         QString qline = qts.readLine();
-        line = qline.toStdString();
-        auto pos = line.find_first_of(' ');
-        auto firstHalf = line.substr(0, pos);
-        auto secondHalf = line.substr(pos + 1, line.length() - firstHalf.length() - 1);
-        marks.insert(std::make_pair(firstHalf.c_str(), secondHalf.c_str()));
+        if (!qline.isEmpty()) {
+            auto strArray = qline.split('|');
+            marks.insert(std::make_pair(strArray.at(0), strArray.at(1)));
+        }
     }
 
-    int ins = 1, max = mat.size();
+    int ins = 1;
     for (auto && i : mat) {
         auto before = i.at(5);
         auto after = marks[before];
         i.at(5) = after;
+//        qDebug() << i.at(5);
     }
     file.close();
     return true;
@@ -111,56 +115,43 @@ bool DBTransformer::translateMarks(matrix_t & mat, rules_t marks) {
 void DBTransformer::split(matrix_t const & mat, matcol_t & col, int num) {
     emit signal_ShowProgress();
     auto average = mat.size() / num + 1;
-    QString entryToCompare, catToCompare;
-    std::ostringstream oss;
+    QString entryToCompare, indexToCompare;
     int fileIndex = 0;
     int entryIndex = 0;
     emit updateStatus("Splitting database...");
 
     for (auto && i : mat) {
+//        qDebug() << indexToCompare;
         if (entryIndex < average) {
             entryToCompare = i.at(0);
-            catToCompare = i.at(2);
+            indexToCompare = i.at(1);
             auto && matRef = col[fileIndex];
-            auto entry = entry_t {};
-            for (auto j = 0; j < i.size(); ++j) {
-                entry[j] = i[j];
-            }
-            matRef.push_back(entry);
+            matRef.push_back(i);
             ++entryIndex;
         }
         else {
-            auto currentEntry = i.at(0);
-            auto currentCat = i.at(2);
-            if (currentEntry == entryToCompare && currentCat == catToCompare) {
+            auto currentIndex = i.at(1);
+            if (currentIndex == indexToCompare) {
                 auto && matRef = col[fileIndex];
-                auto entry = entry_t{};
-                for (auto j = 0; j < i.size(); ++j) {
-                    entry[j] = i[j];
-                }
-                matRef.push_back(entry);
+                matRef.push_back(i);
                 ++entryIndex;
             }
             else {
                 entryIndex = 0;
                 ++fileIndex;
                 entryToCompare = i.at(0);
-                catToCompare = i.at(2);
+                indexToCompare = i.at(1);
                 auto && matRef = col[fileIndex];
-                auto entry = entry_t{};
-                for (auto j = 0; j < i.size(); ++j) {
-                    entry[j] = i[j];
-                }
-                matRef.push_back(entry);
+                matRef.push_back(i);
                 ++entryIndex;
+                emit signal_UpdateProgress(fileIndex, 8);
             }
         }
-        emit signal_UpdateProgress(fileIndex, 8);
     }
     emit signal_HideProgress();
 }
 
-void DBTransformer::outputSource(matcol_t const & col, std::string const & fileName) {
+void DBTransformer::outputSource(matcol_t const & col, QString const & fileName) {
     emit updateStatus("Generaing db1 files...");
     std::cout << "Generaing db1 files..." << std::endl;
 
@@ -173,26 +164,24 @@ void DBTransformer::outputSource(matcol_t const & col, std::string const & fileN
     sourceDir.mkpath(sourceDir.absolutePath());
     QDir::setCurrent(sourceDir.absolutePath());
 
-    QString qfileName = fileName.c_str();
-
     for (auto i = 1; i <= col.size(); ++i) {
         auto && matRef = col[i - 1];
-        auto currentFileName = qfileName + QString(std::to_string(i).c_str());
+        auto currentFileName = fileName + QString(std::to_string(i).c_str());
         qDebug() << currentFileName;
         QFile file(currentFileName);
+        QTextStream qts(&file);
         if (file.open(QIODevice::ReadWrite)) {
-            QTextStream stream(&file);
-            std::ostringstream oss;
-            QString string;
+            QString buffer;
+            QTextStream stream(&buffer);
             for (auto j = 0; j < matRef.size(); ++j) {
                 auto && entryRef = matRef[j];
-                oss << entryRef[0].toStdString() << "; " << entryRef[1].toStdString() << "; " << entryRef[2].toStdString() << "; " << entryRef[4].toStdString() << "; " << entryRef[5].toStdString() << std::endl;
+                stream << entryRef[0] << ";" << entryRef[1] << ";" << entryRef[2] << ";" << entryRef[4] << ";" << entryRef[5] << Qt::endl;
             }
-            stream << QString::fromStdString(oss.str());
+            qts << buffer;
             emit signal_UpdateProgress(i, 24);
         }
         file.close();
-        dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";;;";
+        dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";";
     }
 
     hashTable.close();
@@ -200,7 +189,7 @@ void DBTransformer::outputSource(matcol_t const & col, std::string const & fileN
     emit updateStatus("db1 files generation complete!");
 }
 
-void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & fileName) {
+void DBTransformer::outputSourceIndex(matcol_t const & col, QString const & fileName) {
     std::cout << "Generating db2 files..." << std::endl;
     emit updateStatus("Generating db2 files...");
 
@@ -216,24 +205,25 @@ void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & 
     QString currentEntry;
     for (auto i = 1; i <= col.size(); ++i) {
         auto && matRef = col[i - 1];
-        auto currentFileName = QString(fileName.c_str()) + QString(std::to_string(i).c_str());
+        auto currentFileName = fileName + QString::number(i);
         qDebug() << currentFileName;
         QFile file(currentFileName);
+        QTextStream qts(&file);
         if (file.open(QIODevice::ReadWrite)) {
-            QTextStream stream(&file);
-            std::ostringstream oss;
+            QString buffer;
+            QTextStream stream(&buffer);
             for (auto j = 0; j < matRef.size(); ++j) {
                 auto && entryRef = matRef[j];
                 if (currentEntry != entryRef[0]) {
-                    oss << entryRef[0].toStdString() << "; " << j << std::endl;
+                    stream << entryRef[0] << ";" << j << Qt::endl;
                     currentEntry = entryRef[0];
                 }
             }
-            stream << QString::fromStdString(oss.str());
+            qts << buffer;
             emit signal_UpdateProgress(i + 8, 24);
         }
         file.close();
-        dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";;;";
+        dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";";
     }
 
     hashTable.close();
@@ -242,7 +232,7 @@ void DBTransformer::outputSourceIndex(matcol_t const & col, std::string const & 
     }
 }
 
-void DBTransformer::outputSourceReverseIndex(matcol_t const & col, std::string const & fileName) {
+void DBTransformer::outputSourceReverseIndex(matcol_t const & col, QString const & fileName) {
     std::cout << "Generating db3 files..." << std::endl;
     emit updateStatus("Generating db3 files...");
 
@@ -257,22 +247,22 @@ void DBTransformer::outputSourceReverseIndex(matcol_t const & col, std::string c
 
     for (auto i = 1; i <= col.size(); ++i) {
         auto && matRef = col[i - 1];
-        auto currentFileName = QString(fileName.c_str()) + QString(std::to_string(i).c_str());
+        auto currentFileName = fileName + QString::number(i);
         qDebug() << currentFileName;
         QFile file(currentFileName);
+        QTextStream qts(&file);
         if (file.open(QIODevice::ReadWrite)) {
-            std::ostringstream oss;
+            QString buffer;
+            QTextStream stream(&buffer);
             for (auto j = 0; j < matRef.size(); ++j) {
                 auto && entryRef = matRef[j];
-                oss << entryRef[4].toStdString() << std::endl;
+                stream << entryRef[4] << Qt::endl;
             }
-            auto && str = oss.str();
-            QByteArray byteData(str.c_str());
-            file.write(byteData);
+            qts << buffer;
         }
         file.close();
         emit signal_UpdateProgress(i + 16, 24);
-        dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";;;";
+        dbstream << hashFile(currentFileName, QCryptographicHash::Md5) << ";";
     }
 
     hashTable.close();

@@ -43,7 +43,7 @@ MainWindow::~MainWindow() {
 }
 
 
-void MainWindow::importBINDBs() {
+void MainWindow::importAllDatabases() {
     updateDialog->deleteLater(); updateDialog = nullptr;
     updateDialogThread = nullptr;
     importWordIndex();
@@ -306,36 +306,14 @@ void MainWindow::clearInflectionForms() {
 }
 
 QString MainWindow::addStyleToResults(QString line) {
-    std::string result;
-    std::istringstream iss(line.toStdString());
-    std::string key;
-    iss >> key;
-    if (key.back() != ';') {
-        std::string temp;
-        iss >> temp;
-        key += ' ' + temp;
-    }
-    else {
-        key = key.substr(0, key.length() - 1);
-    }
-    key = "<th>" + key + "</th>";
-    std::string arg2, arg3;
-    iss >> arg2 >> arg3;
-    arg3 = arg3.substr(0, arg3.length() - 1);
-    arg3 = "<td>" + arg3 + "</td>";
-    std::string arg4;
-    iss >> arg4;
-    arg4 = arg4.substr(0, arg4.length() - 1);
-    arg4 = "<td><font color=\"red\">" + arg4 + "</font></td>";
-    std::string arg5;
-    std::string temp;
-    while (iss >> temp) {
-        arg5 += temp + ' ';
-    }
-    arg5 = arg5.substr(0, arg5.length() - 1);
-    arg5 = "<td>" + arg5 + "</td>";
-    result = "<tr>" + key + arg3 + arg4 + arg5 + "</tr>";
-    return result.c_str();
+    auto strArray = line.split(';');
+    auto arg1  = "<th>" + strArray.at(0) + "</th>";
+    auto arg3 = "<td>" + strArray.at(2) + "</td>";
+    auto arg4 = "<td><font color=\"red\">" + strArray.at(3) + "</font></td>";
+    auto arg5 = "<td>" + strArray.at(4) + "</td>";
+    auto result = "<tr>" + arg1 + arg3 + arg4 + arg5 + "</tr>";
+
+    return result;
 }
 
 QString MainWindow::wordToWrite(QString arg) {
@@ -476,17 +454,17 @@ void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i
     QString filename = appDataLocation + "/db3/part" + QString(to_string(i).c_str());
     QFile f(filename);
 
-    f.open(QIODevice::ReadOnly);
-    QString qfile = f.readAll();
-    std::istringstream file(qfile.toStdString());
-    std::string line;
-    int index = 0;
+    if (!f.open(QIODevice::ReadOnly)) return;
+    QString qfile = f.readAll(); f.close();
+    QTextStream qts(&qfile);
     auto && thisMap = mapvec[i - 1];
-    while (std::getline(file, line)) {
-        thisMap.insert(std::make_pair(line.c_str(), index));
+
+    int index = 0;
+    while (!qts.atEnd()) {
+        auto line = qts.readLine();
+        thisMap.insert(std::make_pair(line, index));
         ++index;
     }
-    f.close();
 }
 
 void MainWindow::importOriginal() {
@@ -507,27 +485,19 @@ void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
     QString filename = QString(appDataLocation + "/db2/part") + to_string(i).c_str();
     QFile f(filename);
 
-    f.open(QIODevice::ReadOnly);
-    QString qfile = f.readAll();
-    std::istringstream file(qfile.toStdString());
-    std::string line;
+    if (!f.open(QIODevice::ReadOnly)) return;
+    QString qfile = f.readAll(); f.close();
+    QTextStream qts(&qfile);
     auto && thisMap = mapvec[i - 1];
-    while (std::getline(file, line)) {
-        std::string key;
-        std::istringstream iss(line);
-        iss >> key;
-        if (key.back() != ';') {
-            std::string temp;
-            iss >> temp;
-            key += " " + temp;
-        }
-        std::string index;
-        iss >> index;
-        auto index_number = strtol(index.c_str(), 0, 10);
-        thisMap.insert(std::make_pair(key.c_str(), index_number));
-    }
 
-    f.close();
+//    int lineNo = 1;
+    while (!qts.atEnd()) {
+        auto line = qts.readLine();
+        auto tokens = line.split(';');
+        if (tokens.size() == 2)
+            thisMap.insert(std::make_pair(tokens.at(0), tokens.at(1).toLong()));
+//        ++lineNo;
+    }
 }
 
 void MainWindow::importDictionary() {
@@ -640,7 +610,7 @@ void MainWindow::findDefinitionPrint(size_t index) {
     onResultTextChanged(display);
 }
 
-void MainWindow::findInflection(QString word) {
+void MainWindow::findOriginal(QString word) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
     std::array<vecstr_t, 8> results;
     results.fill(vecstr_t{});
@@ -653,13 +623,13 @@ void MainWindow::findInflection(QString word) {
     auto wordInfl = oldToModern(word, Infl::Inflections);
 
     for (size_t i = 0; i < 8; ++i) {
-        findInflectionThread(results, word, i);
+        findOriginalThread(results, word, i);
     }
 
 
     if (word != wordInfl) {
         for (size_t i = 0; i < 8; ++i) {
-            findInflectionThread(results, wordInfl, i);
+            findOriginalThread(results, wordInfl, i);
         }
     }
 
@@ -683,7 +653,7 @@ void MainWindow::findInflection(QString word) {
     onResultTextChanged(toprint);
 }
 
-void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString word, size_t index) {
+void MainWindow::findOriginalThread(std::array<vecstr_t, 8> & results, QString word, size_t index) {
     auto && thisDic = inflectionals[index];
     auto && thisResult = results[index];
     auto itr = thisDic.find(word);
@@ -691,20 +661,21 @@ void MainWindow::findInflectionThread(std::array<vecstr_t, 8> & results, QString
     QString filename = QString(appDataLocation + "/db1/part") + to_string(index + 1).c_str();
     QFile file(filename);
     file.open(QIODevice::ReadOnly);
+    QTextStream qts(&file);
 
-    auto qfile = file.readAll();
-    std::istringstream issfile(qfile.toStdString());
-    std::string line;
     auto key = itr->first;
     auto pos = itr->second;
     int currentPos = 0;
-    while (std::getline(issfile, line)) {
+
+    while (!qts.atEnd()) {
+        auto line = qts.readLine();
         if (currentPos != pos) {
             ++currentPos;
-            continue; }
+            continue;
+        }
         else {
             if (itr->first != key) { break; }
-            thisResult.push_back(line.c_str());
+            thisResult.push_back(line);
             itr = std::next(itr);
             ++currentPos;
             pos = itr->second;
@@ -783,7 +754,7 @@ void MainWindow::printAll(QString word) {
         word = word.toLower();
     }
     word = oldToModern(word, Infl::Vowels | Infl::Consonants);
-    word = word + ';';
+//    word = word + ';';
 
     auto & results = currentTab->resultsToPrint;
     for (size_t i = 0; i < 8; ++i) {
@@ -810,18 +781,28 @@ void MainWindow::printAllThread(QString word, size_t index) {
     auto range = thisDic.equal_range(word);
     auto count = std::distance(range.first, range.second);
     if (count == 0)  return;
-    QString filename = QString(appDataLocation + "/db1/part") + to_string(index + 1).c_str();
+    QString filename = appDataLocation + "/db1/part" + QString::number(index + 1);
     QFile file(filename);
-    file.open(QIODevice::ReadOnly);
-    auto qfile = file.readAll();
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << filename << "cannot be read!";
+        return;
+    }
+
+    QTextStream stream(&file);
+
+    QString buffer;
+    QTextStream qts(&buffer);
+/*
     std::istringstream issfile(qfile.toStdString());
     std::string line, wordIndex;
+*/
     int currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
         vecstr_t thisEntry;
         auto pos = itr->second;
 
+        /*
         while (std::getline(issfile, line)) {
             if (currentPos < pos) { ++currentPos; continue; }
             else {
@@ -841,6 +822,30 @@ void MainWindow::printAllThread(QString word, size_t index) {
                     continue;
                 }
                 thisEntry.push_back(line.c_str());
+                ++currentPos;
+            }
+        }
+        */
+
+        QString wordIndex;
+        while (!stream.atEnd()) {
+            if (currentPos < pos) { ++currentPos; continue; }
+            else {
+                auto line = stream.readLine();
+                auto strArray = line.split(';');
+                auto t1 = strArray.at(0);
+                auto t2 = strArray.at(1);
+                if (currentPos == pos) { wordIndex = t2; }
+                if (t1 != key) { ++currentPos; break; }
+                else if (t2 != wordIndex) {
+                    ++currentPos;
+                    wordIndex = t2;
+                    thisResult.push_back(std::make_pair(key, thisEntry));
+                    thisEntry.clear();
+                    thisEntry.push_back(line);
+                    continue;
+                }
+                thisEntry.push_back(line);
                 ++currentPos;
             }
         }
@@ -932,7 +937,7 @@ void MainWindow::onInputReturnPressed()
     else if (currentTab->flags[4] == 1 && word.length() > 0) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
         currentTab->options->clear();
-        findInflection(word);
+        findOriginal(word);
     }
     else if (currentTab->flags[5] == 1 && word.length() > 0) {
         ui->resultsTab->setTabText(ui->resultsTab->currentIndex(), word);
@@ -2588,7 +2593,7 @@ void MainWindow::checkDatabaseIntegrity()
     connect(updateDialogThread, SIGNAL(finished()), t, SLOT(quit()));
     connect(t, SIGNAL(finished()), updateDialogThread, SLOT(deleteLater()));
     connect(updateDialogThread, SIGNAL(finished()), t, SLOT(deleteLater()));
-    connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importBINDBs()));
+    connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importAllDatabases()));
     connect(updateDialogThread, SIGNAL(finished()), updateDialog, SLOT(close()));
     connect(updateDialogThread, SIGNAL(updateStatus(QString const)), updateDialog, SLOT(appendMsg(QString const)));
     connect(updateDialogThread, SIGNAL(signal_ShowProgress()), updateDialog, SLOT(slot_ShowProgress()));
@@ -2611,7 +2616,7 @@ void MainWindow::on_actionUpdate_Inflection_Database_triggered()
     connect(updateDialogThread, SIGNAL(finished()), t, SLOT(quit()));
     connect(t, SIGNAL(finished()), updateDialogThread, SLOT(deleteLater()));
     connect(updateDialogThread, SIGNAL(finished()), t, SLOT(deleteLater()));
-    connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importBINDBs()));
+    connect(updateDialogThread, SIGNAL(finished()), this, SLOT(importAllDatabases()));
     connect(updateDialogThread, SIGNAL(finished()), updateDialog, SLOT(close()));
     connect(updateDialogThread, SIGNAL(updateStatus(QString const)), updateDialog, SLOT(appendMsg(QString const)));
     connect(updateDialogThread, SIGNAL(signal_ShowProgress()), updateDialog, SLOT(slot_ShowProgress()));

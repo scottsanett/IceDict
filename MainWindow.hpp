@@ -235,7 +235,7 @@ private:
 //    QNetworkAccessManager m_WebCtrl;
 
 private slots:
-    void importBINDBs();
+    void importAllDatabases();
 
     void activateInput();
     void loadPage();
@@ -358,8 +358,8 @@ private:
     void findDefinitionPrint(size_t index);
     void onlineDefinition(QString word);
     void onlineText(QString word);
-    void findInflection(QString word);
-    void findInflectionThread(std::array<vecstr_t, 8> & dics, QString word, size_t index);
+    void findOriginal(QString word);
+    void findOriginalThread(std::array<vecstr_t, 8> & dics, QString word, size_t index);
     void textualSearch(QString const & word);
     void textualSearchThread(QString word, size_t index);
     void textualSearchPrint(size_t index);

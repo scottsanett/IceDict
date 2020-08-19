@@ -46,6 +46,7 @@ void DBUpdateDialog::closeDialog() {
 }
 
 void DBUpdateDialog::slot_ShowProgress() {
+    if (pBar) pBar->deleteLater();
     pBar = new QProgressBar(this);
     this->layout()->addWidget(pBar);
 }
@@ -148,7 +149,7 @@ int DBUpdateDialogThread::examineBINDBs() {
         }
 
         QTextStream qts(&f);
-        auto hashList = qts.readAll().split(";;;");
+        auto hashList = qts.readAll().split(";");
         f.close();
 
         if (hashList.length() != 25) return -1;

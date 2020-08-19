@@ -1,11 +1,11 @@
-hk neut
-kk masc
-kvk fem
-lo adj
-so verb
-ao adv
-to num
-pfn perspron
-abfn reflpron
-fn pron
-gr art
+hk|neut
+kk|masc
+kvk|fem
+lo|adj
+so|verb
+ao|adv
+to|num
+pfn|perspron
+abfn|reflpron
+fn|pron
+gr|art

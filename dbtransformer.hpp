@@ -31,7 +31,7 @@ class DBTransformer: public QObject {
 public:
     explicit DBTransformer(QObject * parent = nullptr);
     virtual ~DBTransformer() {}
-    int transform(std::string const &);
+    int transform(QString const &);
 
 signals:
     void updateStatus(QString const);
@@ -49,17 +49,17 @@ private:
 
     matrix_t mat;
     rules_t categories, marks;
-    std::string fileName, nameOfOutput;
+    QString fileName, nameOfOutput;
     int numOfFiles;
     matcol_t collection;
 
-    bool loadInformation(std::string const & fileName, matrix_t & mat);
+    bool loadInformation(QString const & fileName, matrix_t & mat);
     bool translateCategory(matrix_t & mat, rules_t & categories);
     bool translateMarks(matrix_t & mat, rules_t marks);
     void split(matrix_t const & mat, matcol_t & col, int num);
-    void outputSource(matcol_t const & col, std::string const & fileName);
-    void outputSourceIndex(matcol_t const & col, std::string const & fileName);
-    void outputSourceReverseIndex(matcol_t const & col, std::string const & fileName);
+    void outputSource(matcol_t const & col, QString const & fileName);
+    void outputSourceIndex(matcol_t const & col, QString const & fileName);
+    void outputSourceReverseIndex(matcol_t const & col, QString const & fileName);
     QString hashFile(const QString &fileName, QCryptographicHash::Algorithm hashAlgorithm);
 
 };
