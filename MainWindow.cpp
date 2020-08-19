@@ -168,7 +168,7 @@ void MainWindow::addTab_clicked() {
     currentTab->options->setMinimumWidth(buttonSizeHint.width() * 3);
     currentTab->options->setMaximumWidth(buttonSizeHint.width() * 4);
 #endif
-    currentTab->options->setStyleSheet("font-size: 14px");
+    currentTab->options->setStyleSheet("font-size: 13px");
     currentTab->options->setFrameStyle(QFrame::HLine);
     currentTab->options->setEnabled(false);
     currentTab->inputLayout->addWidget(currentTab->options);
@@ -279,7 +279,7 @@ void MainWindow::initializeInflectionForms() {
     currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 4);
 #endif
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
-    currentTab->inflectionForms->setStyleSheet("font-size: 14px");
+    currentTab->inflectionForms->setStyleSheet("font-size: 13px");
     currentTab->inputLayout->addWidget(currentTab->inflectionForms);
 
     if (!currentTab->proceedButton) {
@@ -426,6 +426,7 @@ void MainWindow::importWordIndex() {
     QFile wd(":/alphabet/wordindex");
     wd.open(QIODevice::ReadOnly);
     QString file = wd.readAll();
+    wordIndexList.clear();
     wordIndexList = file.split("\n");
     wordIndexList.sort(Qt::CaseInsensitive);
     wd.close();
@@ -458,6 +459,7 @@ void MainWindow::importInflectionsThread(std::array<map_t, 8> & mapvec, size_t i
     QString qfile = f.readAll(); f.close();
     QTextStream qts(&qfile);
     auto && thisMap = mapvec[i - 1];
+    thisMap.clear();
 
     int index = 0;
     while (!qts.atEnd()) {
@@ -489,6 +491,7 @@ void MainWindow::importOriginalThread(std::array<map_t, 8> & mapvec, size_t i) {
     QString qfile = f.readAll(); f.close();
     QTextStream qts(&qfile);
     auto && thisMap = mapvec[i - 1];
+    thisMap.clear();
 
 //    int lineNo = 1;
     while (!qts.atEnd()) {
@@ -514,6 +517,7 @@ void MainWindow::importDictionaryThread(QString const name, size_t i) {
     std::istringstream file(qfile.toStdString());
     std::string line;
     auto && thisMap = dictionaries[i];
+    thisMap.clear();
     while (std::getline(file, line)) {
         auto entry = vecstr_t{};
         std::istringstream iss(line);
@@ -750,18 +754,20 @@ void MainWindow::printAll(QString word) {
     currentTab->input->clear();
     currentTab->options->clear();
 
+    /*
     if ([](QString str){ for (auto && i : str) { if (i.isLower()) return false; } return true; }(word)) {
         word = word.toLower();
     }
-    word = oldToModern(word, Infl::Vowels | Infl::Consonants);
-//    word = word + ';';
+    */
 
-    auto & results = currentTab->resultsToPrint;
+    word = oldToModern(word, Infl::Vowels | Infl::Consonants);
+
     for (size_t i = 0; i < 8; ++i) {
         printAllThread(word, i);
     }
 
-    auto resultSize = [&]() { int sz = 0; for (auto i : results) { sz += i.second.size(); } return sz; }();
+    auto && results = currentTab->resultsToPrint;
+    auto resultSize = [&]() { int sz = 0; for (auto && i : results) { sz += i.second.size(); } return sz; }();
 
     if (resultSize == 0) {
         currentTab->result->setFontPointSize(20);
@@ -776,8 +782,8 @@ void MainWindow::printAll(QString word) {
 
 void MainWindow::printAllThread(QString word, size_t index) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    auto & thisDic = originals.at(index);
-    auto & thisResult = currentTab->resultsToPrint;
+    auto && thisDic = originals.at(index);
+    auto && thisResult = currentTab->resultsToPrint;
     auto range = thisDic.equal_range(word);
     auto count = std::distance(range.first, range.second);
     if (count == 0)  return;
@@ -787,51 +793,20 @@ void MainWindow::printAllThread(QString word, size_t index) {
         qDebug() << filename << "cannot be read!";
         return;
     }
-
     QTextStream stream(&file);
-
     QString buffer;
     QTextStream qts(&buffer);
-/*
-    std::istringstream issfile(qfile.toStdString());
-    std::string line, wordIndex;
-*/
     int currentPos = 0;
     for (auto itr = range.first; itr != range.second; ++itr) {
         auto key = itr->first;
-        vecstr_t thisEntry;
         auto pos = itr->second;
-
-        /*
-        while (std::getline(issfile, line)) {
-            if (currentPos < pos) { ++currentPos; continue; }
-            else {
-                std::istringstream iss(line);
-                std::string temp1;
-                iss >> temp1;
-                std::string temp2;
-                iss >> temp2;
-                if (currentPos == pos) { wordIndex = temp2; }
-                if (temp1.c_str() != key) { ++currentPos; break;}
-                else if (temp2 != wordIndex) {
-                    ++currentPos;
-                    wordIndex = temp2;
-                    thisResult.push_back(std::make_pair(key, thisEntry));
-                    thisEntry.clear();
-                    thisEntry.push_back(line.c_str());
-                    continue;
-                }
-                thisEntry.push_back(line.c_str());
-                ++currentPos;
-            }
-        }
-        */
+        vecstr_t thisEntry;
 
         QString wordIndex;
         while (!stream.atEnd()) {
+            auto line = stream.readLine();
             if (currentPos < pos) { ++currentPos; continue; }
             else {
-                auto line = stream.readLine();
                 auto strArray = line.split(';');
                 auto t1 = strArray.at(0);
                 auto t2 = strArray.at(1);
@@ -876,8 +851,6 @@ void MainWindow::printAllPrint(size_t index) {
     display = "<span style=\"font-size: " + QString::fromStdString(to_string(currentTab->fontSize)) + "px;\"><p align=\"center\"><table border=\"1\" cellpadding=\"10\">" + display + "</table></p></span>";
     currentTab->result->setHtml(display);
     onResultTextChanged(display);
-
-    currentTab->resultsToPrint.clear();
 }
 
 

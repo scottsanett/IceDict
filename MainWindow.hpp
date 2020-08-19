@@ -114,7 +114,7 @@ private:
     struct Pimpl {
         QString textInQuery;
         QString wordAfterRedirection;
-        size_t fontSize = 16;
+        size_t fontSize = 15;
         std::array<bool, 6> flags = {{0, 0, 0, 0, 0, 0}};
         QString webpage;
         std::set<QVector<QString>> inflStruct;
@@ -191,14 +191,14 @@ private:
 
 
     struct PartOfSpeech {
-        const char * MasNoun = " masc; ";
-        const char * FemNoun = " fem; ";
-        const char * NetNoun = " neut; ";
-        const char * Adjective = " adj; ";
-        const char * Verb = " verb; ";
-        const char * Pronoun = " pron; ";
-        const char * Adverb = " adv; ";
-        const char * Numerical = " num; ";
+        const char * MasNoun = ";masc;";
+        const char * FemNoun = ";fem;";
+        const char * NetNoun = ";neut;";
+        const char * Adjective = ";adj;";
+        const char * Verb = ";verb;";
+        const char * Pronoun = ";pron;";
+        const char * Adverb = ";adv;";
+        const char * Numerical = ";num;";
     } PartOfSpeech;
 
     /* Abstract data types */
