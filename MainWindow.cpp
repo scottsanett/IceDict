@@ -45,10 +45,18 @@ MainWindow::~MainWindow() {
 
 void MainWindow::importAllDatabases() {
     updateDialog->deleteLater(); updateDialog = nullptr;
+    std::thread t1(&MainWindow::importWordIndex, this);
+    std::thread t2(&MainWindow::importDictionary, this);
+    std::thread t3(&MainWindow::importOriginal, this);
+    std::thread t4(&MainWindow::importInflections, this);
+
+    /*
     importWordIndex();
     importDictionary();
     importOriginal();
     importInflections();
+    */
+    t1.join(); t2.join(); t3.join(); t4.join();
 }
 
 void MainWindow::addTab_clicked() {
