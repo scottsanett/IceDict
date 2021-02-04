@@ -16,7 +16,7 @@ INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include/QtZlib
 TARGET = IceDict
 TEMPLATE = app
 CONFIG += c++17
-VERSION = 1.9.6
+VERSION = 1.9.7
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
