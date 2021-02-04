@@ -74,6 +74,7 @@ public:
     */
 
     void checkIntegrity(bool);
+//    void process();
 
 signals:
     void updateStatus(QString const);
@@ -87,11 +88,11 @@ signals:
 
 private slots:
     void acceptUpdate(QString const);
-    void process();
     void acceptCleanedUp();
     void slot_ShowProgress();
     void slot_UpdateProgress(qint64, qint64);
     void slot_HideProgress();
+    void process();
 
 private:
     QString appDataLocation;

@@ -1147,7 +1147,7 @@ Infl::Results MainWindow::parsePage() {
             std::istringstream iss(i.toStdString());
             std::string link, key;
             iss >> link;
-            link = "http://digicoll.library.wisc.edu" + link;
+            link = "https://digicoll.library.wisc.edu" + link;
             QString temp;
             iss >> key;
             if (*key.end() == ',') {
@@ -1194,7 +1194,7 @@ Infl::Results MainWindow::parsePage() {
 
 void MainWindow::onResultUrlClicked(QUrl url) {
     auto currentTab = tabIndices.at(ui->resultsTab->currentWidget());
-    QString finalUrl = "http://digicoll.library.wisc.edu" + url.toString();
+    QString finalUrl = "https://digicoll.library.wisc.edu" + url.toString();
     downloadPage(finalUrl);
 }
 
@@ -2437,7 +2437,7 @@ void MainWindow::on_actionAcknowledgements_triggered()
             <p align=center><h1 id="toc_0">Acknowledgements</h1></p>
             <p style="font-weight:normal">IceDict utilizes the following copyrighted materials, the use of which is hereby acknowledged.</p>
             <h3 id="toc_1">Online Dictionary:</h3>
-            <p style="font-weight:normal"><a href="http://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?id=IcelOnline.IEOrd">Íslensk-ensk orðabók</a></p>
+            <p style="font-weight:normal"><a href="https://digicoll.library.wisc.edu/cgi-bin/IcelOnline/IcelOnline.TEId-idx?id=IcelOnline.IEOrd">Íslensk-ensk orðabók</a></p>
             <h3 id="toc_2">Offline Dictionaries:</h3>
             <p style="font-weight:normal"><a href="http://norse.ulver.com/dct/zoega/">A Concise Dictionary of Norse</a></p>
             <p style="font-weight:normal"><a href="http://norse.ulver.com/dct/cleasby/">An Icelandic-English Dictionary Based on the MS. Collections of the Late Richard Cleasby Enlarged and Completed by Gudbrand Vigfusson, M.A.</a></p>
@@ -2566,7 +2566,8 @@ void MainWindow::checkDatabaseIntegrity()
     updateDialogThread = new DBUpdateDialogThread();
     updateDialogThread->checkIntegrity(true);
     updateDialogThread->moveToThread(t);
-    connect(updateDialogThread, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+
+//    connect(updateDialogThread, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
     connect(t, SIGNAL(started()), updateDialogThread, SLOT(process()));
     connect(updateDialogThread, SIGNAL(finished()), t, SLOT(quit()));
     connect(t, SIGNAL(finished()), updateDialogThread, SLOT(deleteLater()));
@@ -2577,6 +2578,7 @@ void MainWindow::checkDatabaseIntegrity()
     connect(updateDialogThread, SIGNAL(signal_ShowProgress()), updateDialog, SLOT(slot_ShowProgress()));
     connect(updateDialogThread, SIGNAL(signal_UpdateProgress(qint64, qint64)), updateDialog, SLOT(slot_UpdateProgress(qint64, qint64)));
     connect(updateDialogThread, SIGNAL(signal_HideProgress()), updateDialog, SLOT(slot_HideProgress()));
+
     t->start();
 }
 
@@ -2589,7 +2591,8 @@ void MainWindow::on_actionUpdate_Inflection_Database_triggered()
     updateDialogThread = new DBUpdateDialogThread();
     updateDialogThread->checkIntegrity(false);
     updateDialogThread->moveToThread(t);
-    connect(updateDialogThread, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
+
+//    connect(updateDialogThread, SIGNAL(error(QString)), this, SLOT(errorString(QString)));
     connect(t, SIGNAL(started()), updateDialogThread, SLOT(process()));
     connect(updateDialogThread, SIGNAL(finished()), t, SLOT(quit()));
     connect(t, SIGNAL(finished()), updateDialogThread, SLOT(deleteLater()));
@@ -2602,5 +2605,6 @@ void MainWindow::on_actionUpdate_Inflection_Database_triggered()
     connect(updateDialogThread, SIGNAL(signal_HideProgress()), updateDialog, SLOT(slot_HideProgress()));
 
     t->start();
+
 }
 

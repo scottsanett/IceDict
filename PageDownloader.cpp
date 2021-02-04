@@ -30,6 +30,13 @@ void PageDownloader::DownloadPage(QUrl fileUrl) {
                 pReply->deleteLater();
                 emit downloaded();
             }
+            else {
+
+                qDebug() << value;
+                qDebug() << fileUrl;
+                qDebug() << pReply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+
+            }
         }
     }
     else {
