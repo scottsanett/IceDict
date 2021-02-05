@@ -45,18 +45,10 @@ MainWindow::~MainWindow() {
 
 void MainWindow::importAllDatabases() {
     updateDialog->deleteLater(); updateDialog = nullptr;
-    std::thread t1(&MainWindow::importWordIndex, this);
-    std::thread t2(&MainWindow::importDictionary, this);
-    std::thread t3(&MainWindow::importOriginal, this);
-    std::thread t4(&MainWindow::importInflections, this);
-
-    /*
     importWordIndex();
     importDictionary();
     importOriginal();
     importInflections();
-    */
-    t1.join(); t2.join(); t3.join(); t4.join();
 }
 
 void MainWindow::addTab_clicked() {
@@ -600,6 +592,7 @@ void MainWindow::findDefinition(QString word) {
 
     currentTab->options->clear();
     currentTab->options->addItems(alternatives);
+
     findDefinitionPrint(0);
 }
 
@@ -2560,7 +2553,9 @@ void MainWindow::on_actionForward_triggered()
 
 void MainWindow::checkDatabaseIntegrity()
 {
+
     updateDialog = new DBUpdateDialog(this);
+
 
     auto t = new QThread();
     updateDialogThread = new DBUpdateDialogThread();
