@@ -2408,7 +2408,7 @@ void MainWindow::on_actionAbout_IceDict_triggered()
             R"foo(
             <p align=center><h2>IceDict</h2></p>
             <p align=center style="font-weight: normal">Version )foo" + QString::fromUtf8(VERSION_STRING) + R"foo(</p>
-            <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2020 Li Xianpeng<br><br>Licensed under GNU LGPLv3 or later<br>All rights reserved.</p>)foo";
+            <p align=center style="font-weight: normal; font-size:11px">Copyright © 2017-2022 Li Xianpeng<br><br>Licensed under GNU LGPLv3 or later<br>All rights reserved.</p>)foo";
     auto messagebox = new QMessageBox(this);
     messagebox->setTextFormat(Qt::RichText);
     auto pixmap = QPixmap(":/alphabet/IceDict.png");

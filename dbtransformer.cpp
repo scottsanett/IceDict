@@ -58,6 +58,8 @@ bool DBTransformer::loadInformation(QString const & fileName, matrix_t & mat) {
         entry[5] = mark;
         mat.push_back(entry);
     }
+    // sort mat
+    std::sort(mat.begin(), mat.end(), entry_greater());
     return true;
 }
 

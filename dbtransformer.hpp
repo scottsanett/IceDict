@@ -25,6 +25,9 @@ using matrix_t = QVector<entry_t>;
 using matcol_t = QVector<matrix_t>;
 using rules_t = std::map<QString, QString>;
 
+struct entry_greater {
+    template <class T> bool operator () (T const & a, T const & b) { return a[1] > b[1]; }
+};
 
 class DBTransformer: public QObject {
     Q_OBJECT
