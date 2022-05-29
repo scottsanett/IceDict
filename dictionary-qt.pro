@@ -10,13 +10,14 @@ QT       += core gui\
 
 # greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
-LIBS += -L$$PWD/quazip/0.9.1/lib -lquazip
+#LIBS += -L$$PWD/quazip/0.9.1/lib -lquazip
+LIBS += "/usr/local/lib/libquazip1-qt6.1.3.0.dylib"
 INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include/QtZlib
 
 TARGET = IceDict
 TEMPLATE = app
 CONFIG += c++17
-VERSION = 1.9.8
+VERSION = 1.9.9
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -26,6 +27,7 @@ DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 RESOURCES = resource.qrc
 ICON = IceDict.icns
 CONFIG += resources_big
+QT += core5compat
 win32:RC_ICONS += IceDict.ico
 
 # You can also make your code fail to compile if you use deprecated APIs.

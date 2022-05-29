@@ -75,7 +75,7 @@ void FindPane::caseSensitivityChanged(int value) {
     if (state == Qt::Checked) {
         caseSensitivityFlag = QTextDocument::FindCaseSensitively;
     }
-    else caseSensitivityFlag = 0x0;
+//    else caseSensitivityFlag = 0x0;
     emit returnPressedSignal(searchPanel->text(), caseSensitivityFlag | matchWholeWordsFlag);
 }
 
@@ -84,6 +84,6 @@ void FindPane::matchWholeWordsChanged(int value) {
     if (state == Qt::Checked) {
         matchWholeWordsFlag = QTextDocument::FindWholeWords;
     }
-    else matchWholeWordsFlag = 0x0;
+//    else matchWholeWordsFlag = 0x0;
     emit returnPressedSignal(searchPanel->text(), caseSensitivityFlag | matchWholeWordsFlag);
 }
