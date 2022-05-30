@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     statusBar = new StatusBar(this);
     this->setStatusBar(statusBar);
     statusBar->hide();
-//    QObject::connect(ui->resultsTab, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+//    QObject::connect(ui->resultsTab, SIGNAL(tabCloseRequested(int )), this, SLOT(closeTab(int)));
     addTab_clicked();
 
     checkDatabaseIntegrity();
@@ -77,7 +77,7 @@ void MainWindow::addTab_clicked() {
 
     currentTab->inputPaneLayout = new QVBoxLayout;
     currentTab->inputPaneLayout->setSpacing(0);
-    currentTab->inputPaneLayout->setContentsMargins(0, 0, 0, 0);
+    currentTab->inputPaneLayout->setContentsMargins(0, 5, 0, 5);
     currentTab->inputPaneLayoutWidget = new QWidget;
     currentTab->inputPaneLayoutWidget->setLayout(currentTab->inputPaneLayout);
     currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
@@ -96,7 +96,7 @@ void MainWindow::addTab_clicked() {
 #elif __APPLE__
     currentTab->backButton = new QPushButton("⬅");
 #endif
-    currentTab->backButton->setStyleSheet("font-size: 13px");
+    currentTab->backButton->setStyleSheet("font-size: 15px");
     currentTab->backButton->setEnabled(false);
     auto buttonSizeHint = currentTab->backButton->sizeHint();
 #ifdef _WIN32
@@ -104,7 +104,7 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 3);
 #elif __APPLE__
     currentTab->buttonLayoutWidget->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 4);
+    currentTab->buttonLayoutWidget->setMaximumWidth(buttonSizeHint.width() * 5);
 #endif
     QObject::connect(currentTab->backButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionBack_triggered);
@@ -113,7 +113,7 @@ void MainWindow::addTab_clicked() {
 #elif __APPLE__
     currentTab->nextButton = new QPushButton("➡︎");
 #endif
-    currentTab->nextButton->setStyleSheet("font-size: 13px");
+    currentTab->nextButton->setStyleSheet("font-size: 15px");
     currentTab->nextButton->setEnabled(false);
     QObject::connect(currentTab->nextButton, &QPushButton::pressed,
                      this, &MainWindow::on_actionForward_triggered);
@@ -165,7 +165,7 @@ void MainWindow::addTab_clicked() {
     currentTab->options->setMaximumWidth(buttonSizeHint.width() * 3);
 #elif __APPLE__
     currentTab->options->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 4);
+    currentTab->options->setMaximumWidth(buttonSizeHint.width() * 5);
 #endif
     currentTab->options->setStyleSheet("font-size: 13px");
     currentTab->options->setFrameStyle(QFrame::HLine);
@@ -276,7 +276,7 @@ void MainWindow::initializeInflectionForms() {
     currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 3);
 #elif __APPLE__
     currentTab->inflectionForms->setMinimumWidth(buttonSizeHint.width() * 3);
-    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 4);
+    currentTab->inflectionForms->setMaximumWidth(buttonSizeHint.width() * 5);
 #endif
     currentTab->inflectionForms->setFrameStyle(QFrame::NoFrame);
     currentTab->inflectionForms->setStyleSheet("font-size: 13px");
