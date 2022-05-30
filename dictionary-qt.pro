@@ -10,9 +10,10 @@ QT       += core gui\
 
 # greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
-#LIBS += -L$$PWD/quazip/0.9.1/lib -lquazip
-LIBS += "/usr/local/lib/libquazip1-qt6.1.3.0.dylib"
-INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include/QtZlib
+#LIBS += "/usr/local/lib/libquazip1-qt6.1.3.0.dylib"
+LIBS += "C:\Users\scott\Downloads\build-quazip-1.3-Desktop_Qt_6_3_0_MSVC2019_ARM64-Release\quazip\quazip1-qt6.lib"
+INCLUDEPATH += $$PWD/zlib-1.2.12
+INCLUDEPATH += $$PWD/quazip-1.3
 
 TARGET = IceDict
 TEMPLATE = app

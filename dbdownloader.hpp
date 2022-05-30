@@ -13,7 +13,7 @@
 //#include <QDesktopWidget>
 
 #include "dbtransformer.hpp"
-#include "quazip-1.3/quazip/JlCompress.h"
+#include "quazip/JlCompress.h"
 
 class DBDownloaderHelper: public QObject
 {

@@ -1,2 +1,0 @@
-# Hashes of file build rules.
-bafa2ed1505bb1148ef194bf76e2eefb quazip/CMakeFiles/QuaZip_autogen

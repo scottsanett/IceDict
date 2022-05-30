@@ -85,7 +85,7 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayout = new QHBoxLayout;
     currentTab->buttonLayout->setSpacing(0);
 #ifdef _WIN32
-    currentTab->buttonLayout->setMargin(0);
+    currentTab->buttonLayout->setContentsMargins(0, 0, 0, 0);
 #elif __APPLE__
     currentTab->buttonLayout->setContentsMargins(0, 0, 0, 0);
 #endif
