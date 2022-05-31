@@ -10,12 +10,13 @@ QT       += core gui\
 
 # greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
-LIBS += "/opt/homebrew/Cellar/quazip/1.3/lib/libquazip1-qt6.1.3.dylib"
+LIBS += "/Users/scott/Projects/libquazip1-qt6.1.3.0.dylib"
 INCLUDEPATH += $$PWD/zlib-1.2.12
 INCLUDEPATH += $$PWD/quazip-1.3
 
 TARGET = IceDict
 TEMPLATE = app
+QMAKE_APPLE_DEVICE_ARCHS = x86_64 arm64
 CONFIG += c++17
 VERSION = 1.9.9
 # The following define makes your compiler emit warnings if you use
