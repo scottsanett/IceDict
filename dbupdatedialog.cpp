@@ -20,7 +20,7 @@ DBUpdateDialog::DBUpdateDialog(QWidget *parent) :
 //    layout->addWidget(buttonBox);
     show();
 
-    QRect screenGeometry = QApplication::desktop()->screenGeometry();
+    QRect screenGeometry = QGuiApplication::primaryScreen()->geometry();
     int x = (screenGeometry.width() - this->width()) / 2;
     int y = (screenGeometry.height() - this->height()) / 2;
     this->move(screenGeometry.center() - this->rect().center());

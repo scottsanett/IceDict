@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QThread>
 #include <QProgressBar>
+#include <QScreen>
 
 #ifdef _WIN32
 #include <Windows.h>

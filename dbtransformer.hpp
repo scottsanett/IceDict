@@ -6,7 +6,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
-#include <QTextCodec>
+#include <QtCore5Compat/QTextCodec>
 #include <QDebug>
 #include <QStandardPaths>
 

@@ -77,7 +77,7 @@ void MainWindow::addTab_clicked() {
 
     currentTab->inputPaneLayout = new QVBoxLayout;
     currentTab->inputPaneLayout->setSpacing(0);
-    currentTab->inputPaneLayout->setMargin(0);
+    currentTab->inputPaneLayout->setContentsMargins(0, 0, 0, 0);
     currentTab->inputPaneLayoutWidget = new QWidget;
     currentTab->inputPaneLayoutWidget->setLayout(currentTab->inputPaneLayout);
     currentTab->inputLayout->addWidget(currentTab->inputPaneLayoutWidget);
@@ -85,9 +85,9 @@ void MainWindow::addTab_clicked() {
     currentTab->buttonLayout = new QHBoxLayout;
     currentTab->buttonLayout->setSpacing(0);
 #ifdef _WIN32
-    currentTab->buttonLayout->setMargin(0);
+//    currentTab->buttonLayout->setContentsMargins(0, 0, 0, 0);
 #elif __APPLE__
-    currentTab->buttonLayout->setMargin(0);
+    currentTab->buttonLayout->setContentsMargins(0, 0, 0, 0);
 #endif
     currentTab->buttonLayoutWidget = new QWidget();
     currentTab->buttonLayoutWidget->setLayout(currentTab->buttonLayout);
@@ -147,7 +147,7 @@ void MainWindow::addTab_clicked() {
     currentTab->input->setStyleSheet("font-size: 13px");
     currentTab->input->setClearButtonEnabled(true);
     currentTab->input->setEnabled(false);
-    currentTab->inputPaneLayout->addWidget(currentTab->input, 1, 0);
+    currentTab->inputPaneLayout->addWidget(currentTab->input, 1, QFlags<Qt::AlignmentFlag>().fromInt(0));
     QObject::connect(currentTab->input, &QLineEdit::textEdited,
                      this, &MainWindow::onInputTextEdited);
     QObject::connect(currentTab->input, &QLineEdit::returnPressed,
@@ -183,7 +183,7 @@ void MainWindow::addTab_clicked() {
     currentTab->result = new QTextBrowser();
     currentTab->result->setHtml(startScreen);
     currentTab->result->setFrameStyle(QFrame::NoFrame);
-    currentTab->result->setFont(QFont("Georgia"));
+//    currentTab->result->setFont(QFont("Georgia"));
     currentTab->result->setContextMenuPolicy(Qt::CustomContextMenu);
     QObject::connect(currentTab->result, &QTextBrowser::anchorClicked,
                      this, &MainWindow::onResultUrlClicked);

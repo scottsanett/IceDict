@@ -10,7 +10,7 @@
 #include <QFileInfo>
 #include <QSaveFile>
 #include <QThread>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 
 #include "dbtransformer.hpp"
 #include "quazip/0.9.1/include/quazip/JlCompress.h"

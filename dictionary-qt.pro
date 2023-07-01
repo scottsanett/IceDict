@@ -4,18 +4,19 @@
 #
 #-------------------------------------------------
 
-QT       += core gui\
+QT       += core5compat\
+            core gui\
            network\
            widgets\
 
 # greaterThan(QT_MAJOR_VERSION, 5): QT += widgets
 
-LIBS += -L$$PWD/quazip/0.9.1/lib -lquazip
+LIBS += -L$$PWD/quazip/0.9.1/lib -lquazip1
 INCLUDEPATH += $$[QT_INSTALL_PREFIX]/include/QtZlib
 
 TARGET = IceDict
 TEMPLATE = app
-CONFIG += c++17
+CONFIG += c++21
 VERSION = 1.9.8
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked as deprecated (the exact warnings

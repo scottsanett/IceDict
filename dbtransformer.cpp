@@ -127,10 +127,10 @@ void DBTransformer::split(matrix_t const & mat, matcol_t & col, int num) {
     for (auto i = 0; i < 8; ++i) {
         auto && matRef = col[i];
         if (i < 7) {
-            matRef = QVector(mat.begin() + i * average, mat.begin() + (1 + i) * average);
+            matRef = QList(mat.begin() + i * average, mat.begin() + (1 + i) * average);
         }
         else {
-            matRef = QVector(mat.begin() + i * average, mat.end());
+            matRef = QList(mat.begin() + i * average, mat.end());
         }
         emit signal_UpdateProgress(i, 8);
     }
